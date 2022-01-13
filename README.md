@@ -15,6 +15,11 @@ Look around for helper methods in the `AdventBase` class and the `Advent` module
 
 Run the project, then double-click the day to run the code. Each day runs in a Thread so you could, if you wanted, run them simultaneously. Double-click again to pause while running, or run again after it's done.
 
+## Included Solutions
+
+The project includes solutions to all of 2021 and some of other years. More may be added as time goes on. The solutions are meant to solve the puzzles and should not be taken as examples of proper coding or technique.
+
+In other words, some of this is ugly, but I'm posting it anyway. :-)
 ## Who Did This
 
 This project was created by Kem Tekinay (ktekinay at mactechnologies dot com). It may or may not be maintained, but is free to use as a framework.
