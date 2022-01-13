@@ -1,0 +1,247 @@
+#tag Class
+Protected Class Advent_2021_12_22
+Inherits AdventBase
+	#tag Event
+		Function RunA() As Integer
+		  return CalculateResultA( kInput )
+		  
+		End Function
+	#tag EndEvent
+
+	#tag Event
+		Function RunB() As Integer
+		  return CalculateResultB( kInput )
+		End Function
+	#tag EndEvent
+
+	#tag Event
+		Function RunTestA() As Integer
+		  return CalculateResultA( kTestInput )
+		  
+		End Function
+	#tag EndEvent
+
+	#tag Event
+		Function RunTestB() As Integer
+		  return CalculateResultB( kTestInput )
+		  
+		End Function
+	#tag EndEvent
+
+
+	#tag Method, Flags = &h21
+		Private Function CalculateResultA(input As String) As Integer
+		  var target as new CubeRange
+		  target.X0 = -50
+		  target.X1 = 50
+		  target.Y0 = target.X0
+		  target.Y1 = target.X1
+		  target.Z0 = target.X0
+		  target.Z1 = target.X1
+		  
+		  var cubes() as CubeRange = ParseInput( input )
+		  
+		  var count as integer
+		  for each cube as CubeRange in cubes
+		    count = count + cube.CountInRange( target )
+		  next
+		  
+		  return count
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CalculateResultB(input As String) As Integer
+		  var cubes() as CubeRange = ParseInput( input )
+		  
+		  var count as integer
+		  for each cube as CubeRange in cubes
+		    count = count + cube.Count
+		  next
+		  
+		  return count
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function GetInstructions(input As String) As CubeRange()
+		  var rx as new RegEx
+		  rx.SearchPattern = "^(off|on) x=(-?\d+)\.\.(-?\d+),y=(-?\d+)\.\.(-?\d+),z=(-?\d+)\.\.(-?\d+)$"
+		  // on x=-20..26,y=-36..17,z=-47..7
+		  
+		  var result() as CubeRange
+		  
+		  var match as RegExMatch = rx.Search( input )
+		  
+		  while match isa object
+		    var cube as new CubeRange
+		    
+		    select case match.SubExpressionString( 1 )
+		    case "on"
+		      cube.State = CubeRange.States.On
+		    case "off"
+		      cube.State = CubeRange.States.Off
+		    end select
+		    
+		    cube.X0 = match.SubExpressionString( 2 ).ToInteger
+		    cube.X1 = match.SubExpressionString( 3 ).ToInteger
+		    
+		    cube.Y0 = match.SubExpressionString( 4 ).ToInteger
+		    cube.Y1 = match.SubExpressionString( 5 ).ToInteger
+		    
+		    cube.Z0 = match.SubExpressionString( 6 ).ToInteger
+		    cube.Z1 = match.SubExpressionString( 7 ).ToInteger
+		    
+		    result.Add cube
+		    
+		    match = rx.Search
+		  wend
+		  
+		  return result
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function ParseInput(input As String) As CubeRange()
+		  var cubes() as CubeRange
+		  
+		  var instructions() as CubeRange = GetInstructions( input )
+		  
+		  if instructions.Count = 0 then
+		    return cubes
+		  end if
+		  
+		  while instructions.Count <> 0 and instructions( 0 ).State = CubeRange.States.Off
+		    instructions.RemoveAt 0 
+		  wend
+		  
+		  cubes.Add instructions( 0 )
+		  
+		  for each instruction as CubeRange in instructions
+		    var newCubes() as CubeRange
+		    
+		    for each cube as CubeRange in cubes
+		      var modified() as CubeRange = cube.Apply( instruction )
+		      for each item as CubeRange in modified
+		        newCubes.Add item
+		      next
+		      if instruction is nil then
+		        exit
+		      end if
+		    next cube
+		    
+		    if instruction isa object and instruction.State = CubeRange.States.On then
+		      newCubes.Add instruction
+		    end if
+		    
+		    cubes = newCubes
+		    
+		  next instruction
+		  
+		  return cubes
+		  
+		End Function
+	#tag EndMethod
+
+
+	#tag Constant, Name = kInput, Type = String, Dynamic = False, Default = \"on x\x3D-48..6\x2Cy\x3D-13..40\x2Cz\x3D-12..35\non x\x3D-44..0\x2Cy\x3D-24..28\x2Cz\x3D-21..24\non x\x3D-26..28\x2Cy\x3D-19..35\x2Cz\x3D-34..15\non x\x3D-33..14\x2Cy\x3D-48..1\x2Cz\x3D-9..42\non x\x3D-15..34\x2Cy\x3D-24..28\x2Cz\x3D-15..37\non x\x3D-5..40\x2Cy\x3D-43..11\x2Cz\x3D0..47\non x\x3D-47..5\x2Cy\x3D-19..34\x2Cz\x3D-16..31\non x\x3D-49..2\x2Cy\x3D-42..7\x2Cz\x3D-11..43\non x\x3D-15..31\x2Cy\x3D-6..48\x2Cz\x3D-41..6\non x\x3D-48..-3\x2Cy\x3D-18..36\x2Cz\x3D-26..28\noff x\x3D-22..-11\x2Cy\x3D-42..-27\x2Cz\x3D-29..-14\non x\x3D-19..30\x2Cy\x3D-45..0\x2Cz\x3D-26..21\noff x\x3D-8..11\x2Cy\x3D-4..15\x2Cz\x3D-6..5\non x\x3D-36..9\x2Cy\x3D-34..16\x2Cz\x3D-48..4\noff x\x3D-35..-22\x2Cy\x3D-35..-17\x2Cz\x3D-5..13\non x\x3D-17..30\x2Cy\x3D-11..35\x2Cz\x3D-18..35\noff x\x3D4..21\x2Cy\x3D-19..-8\x2Cz\x3D-29..-18\non x\x3D-47..1\x2Cy\x3D-5..41\x2Cz\x3D-13..40\noff x\x3D18..31\x2Cy\x3D-47..-28\x2Cz\x3D31..44\non x\x3D-39..11\x2Cy\x3D-2..49\x2Cz\x3D-7..37\non x\x3D59948..77225\x2Cy\x3D-23808..-9387\x2Cz\x3D7715..32589\non x\x3D50928..60239\x2Cy\x3D-16409..-5204\x2Cz\x3D51701..66341\non x\x3D-70857..-38119\x2Cy\x3D-48880..-32940\x2Cz\x3D-59519..-25446\non x\x3D34659..51798\x2Cy\x3D36859..47631\x2Cz\x3D-78056..-58506\non x\x3D24466..49551\x2Cy\x3D-63135..-45703\x2Cz\x3D40568..46891\non x\x3D36065..44964\x2Cy\x3D-66141..-46768\x2Cz\x3D15860..51738\non x\x3D-43929..-30796\x2Cy\x3D54352..77794\x2Cz\x3D-25429..2466\non x\x3D-21467..3054\x2Cy\x3D30827..61109\x2Cz\x3D-70969..-59488\non x\x3D74284..82380\x2Cy\x3D-8243..5954\x2Cz\x3D-21798..4298\non x\x3D-67855..-49197\x2Cy\x3D44082..64316\x2Cz\x3D-37876..-6139\non x\x3D3972..13181\x2Cy\x3D-89954..-60769\x2Cz\x3D-8964..17547\non x\x3D45537..72942\x2Cy\x3D-52362..-40435\x2Cz\x3D-34119..-19891\non x\x3D-2028..14997\x2Cy\x3D35442..60991\x2Cz\x3D61443..68750\non x\x3D-43916..-28061\x2Cy\x3D-55465..-48755\x2Cz\x3D42998..63681\non x\x3D73350..88457\x2Cy\x3D-11874..16030\x2Cz\x3D26440..31762\non x\x3D-65313..-56356\x2Cy\x3D-53026..-32520\x2Cz\x3D34300..39265\non x\x3D-32146..-12079\x2Cy\x3D50972..72550\x2Cz\x3D22248..46391\non x\x3D-46657..-43006\x2Cy\x3D-16969..11204\x2Cz\x3D-82344..-47383\non x\x3D35995..47370\x2Cy\x3D35895..62150\x2Cz\x3D39655..60420\non x\x3D-65653..-39728\x2Cy\x3D-60635..-31172\x2Cz\x3D-63220..-37129\non x\x3D-9288..10739\x2Cy\x3D-16832..4120\x2Cz\x3D-88004..-69447\non x\x3D-38863..-28980\x2Cy\x3D-63737..-41900\x2Cz\x3D37942..62217\non x\x3D-13517..-5187\x2Cy\x3D52267..70255\x2Cz\x3D37003..43218\non x\x3D-80174..-58479\x2Cy\x3D-27669..-13937\x2Cz\x3D22740..39119\non x\x3D40481..79327\x2Cy\x3D-50686..-34109\x2Cz\x3D-47873..-19251\non x\x3D-53141..-25290\x2Cy\x3D4087..26829\x2Cz\x3D-76669..-49306\non x\x3D47628..74073\x2Cy\x3D30788..65007\x2Cz\x3D-5729..24076\non x\x3D-27429..1716\x2Cy\x3D-38795..-25619\x2Cz\x3D-80470..-60991\non x\x3D-85532..-76247\x2Cy\x3D-20583..-14388\x2Cz\x3D-6180..6938\non x\x3D36136..54651\x2Cy\x3D681..16673\x2Cz\x3D54021..88347\non x\x3D-10839..2952\x2Cy\x3D44009..73991\x2Cz\x3D-76526..-37503\non x\x3D-80935..-54015\x2Cy\x3D20375..47723\x2Cz\x3D-44985..-11570\non x\x3D-29152..-17522\x2Cy\x3D-79004..-70473\x2Cz\x3D-19513..9075\non x\x3D42805..56719\x2Cy\x3D-71746..-63383\x2Cz\x3D-8020..9317\non x\x3D23827..62622\x2Cy\x3D8817..33810\x2Cz\x3D-63712..-56192\non x\x3D23854..50148\x2Cy\x3D54657..74822\x2Cz\x3D-35286..-16764\non x\x3D16361..35905\x2Cy\x3D-50459..-25278\x2Cz\x3D59114..81629\non x\x3D50416..73692\x2Cy\x3D13668..34439\x2Cz\x3D-58964..-28733\non x\x3D-16085..5956\x2Cy\x3D33773..54756\x2Cz\x3D53424..59946\non x\x3D29300..59677\x2Cy\x3D16972..31580\x2Cz\x3D-67574..-43566\non x\x3D-66498..-35764\x2Cy\x3D-48191..-20365\x2Cz\x3D-45669..-26894\non x\x3D-5249..15206\x2Cy\x3D66472..87991\x2Cz\x3D-25088..-6346\non x\x3D44940..47047\x2Cy\x3D-7875..6164\x2Cz\x3D48885..70603\non x\x3D20334..45224\x2Cy\x3D-58330..-39597\x2Cz\x3D-66985..-51764\non x\x3D-62110..-36926\x2Cy\x3D-33844..-3332\x2Cz\x3D-67989..-49276\non x\x3D-79537..-46973\x2Cy\x3D-41387..-22193\x2Cz\x3D-56295..-18343\non x\x3D35909..55950\x2Cy\x3D-73326..-51004\x2Cz\x3D951..14112\non x\x3D-3548..16851\x2Cy\x3D-66843..-45057\x2Cz\x3D-70220..-51667\non x\x3D69838..79527\x2Cy\x3D-18994..9060\x2Cz\x3D24208..40094\non x\x3D-33158..-21723\x2Cy\x3D-39086..-22336\x2Cz\x3D68420..89585\non x\x3D39270..59724\x2Cy\x3D55673..65464\x2Cz\x3D19151..38318\non x\x3D52496..59201\x2Cy\x3D-65214..-44553\x2Cz\x3D14672..41441\non x\x3D-80556..-51289\x2Cy\x3D-6834..12651\x2Cz\x3D45231..50265\non x\x3D-42529..-37256\x2Cy\x3D-71786..-46047\x2Cz\x3D-45160..-29457\non x\x3D-7292..20683\x2Cy\x3D33964..38369\x2Cz\x3D56266..81875\non x\x3D56554..94857\x2Cy\x3D-9323..7628\x2Cz\x3D-38191..-15246\non x\x3D-90239..-64199\x2Cy\x3D-12106..4945\x2Cz\x3D-31861..-6737\non x\x3D-70665..-37138\x2Cy\x3D-3664..17652\x2Cz\x3D-65566..-55631\non x\x3D39992..42010\x2Cy\x3D5097..17932\x2Cz\x3D-83176..-64675\non x\x3D2050..15132\x2Cy\x3D55300..79725\x2Cz\x3D24637..48177\non x\x3D-67167..-43932\x2Cy\x3D-38348..-17508\x2Cz\x3D32074..69487\non x\x3D-13982..9189\x2Cy\x3D-64768..-47652\x2Cz\x3D44539..72740\non x\x3D24036..50641\x2Cy\x3D-80964..-50826\x2Cz\x3D11307..32203\non x\x3D-15873..4045\x2Cy\x3D71444..98664\x2Cz\x3D5987..27175\non x\x3D34924..52262\x2Cy\x3D-42488..-23727\x2Cz\x3D-69151..-52471\non x\x3D-38716..-13415\x2Cy\x3D-75701..-54513\x2Cz\x3D16558..32557\non x\x3D54512..73804\x2Cy\x3D-57104..-51952\x2Cz\x3D6372..20935\non x\x3D-2472..18821\x2Cy\x3D-93395..-65344\x2Cz\x3D-27827..-21516\non x\x3D-30985..-14732\x2Cy\x3D59384..91140\x2Cz\x3D-27681..9023\non x\x3D-21901..13525\x2Cy\x3D-22756..-10458\x2Cz\x3D62818..95668\non x\x3D-56596..-42620\x2Cy\x3D-9174..11095\x2Cz\x3D40474..65553\non x\x3D9454..34644\x2Cy\x3D45831..73068\x2Cz\x3D-60309..-32554\non x\x3D-59975..-35542\x2Cy\x3D21755..46912\x2Cz\x3D-62049..-50380\non x\x3D50256..64742\x2Cy\x3D44024..60232\x2Cz\x3D11175..27704\non x\x3D70624..93118\x2Cy\x3D-3971..24925\x2Cz\x3D-24402..7603\non x\x3D-91350..-61496\x2Cy\x3D28135..40274\x2Cz\x3D-34236..-490\non x\x3D-62876..-48072\x2Cy\x3D-66154..-41664\x2Cz\x3D-25541..-16593\non x\x3D-74843..-43868\x2Cy\x3D-44683..-21483\x2Cz\x3D-61245..-27163\non x\x3D-21194..11087\x2Cy\x3D32302..58516\x2Cz\x3D-64798..-62134\non x\x3D-67768..-47768\x2Cy\x3D-14556..2165\x2Cz\x3D32174..62655\non x\x3D45627..72404\x2Cy\x3D-10725..7085\x2Cz\x3D-74867..-56057\non x\x3D73335..80103\x2Cy\x3D-940..24549\x2Cz\x3D-26652..-2057\non x\x3D-29611..-8953\x2Cy\x3D-83755..-47428\x2Cz\x3D-62239..-32609\non x\x3D-77451..-43059\x2Cy\x3D-50733..-38309\x2Cz\x3D-27638..-6618\non x\x3D2797..15028\x2Cy\x3D-4395..18291\x2Cz\x3D72354..89238\non x\x3D32357..54221\x2Cy\x3D19376..54571\x2Cz\x3D53654..62509\non x\x3D39407..45063\x2Cy\x3D20798..36099\x2Cz\x3D-84563..-49978\non x\x3D17999..24268\x2Cy\x3D60988..69443\x2Cz\x3D-48016..-24991\non x\x3D-12881..13621\x2Cy\x3D6292..25612\x2Cz\x3D61881..82751\non x\x3D5723..29564\x2Cy\x3D61975..85143\x2Cz\x3D-2144..27434\non x\x3D37079..51048\x2Cy\x3D30137..58437\x2Cz\x3D-69970..-36369\non x\x3D19115..52470\x2Cy\x3D-70326..-47132\x2Cz\x3D32756..58758\non x\x3D64631..72765\x2Cy\x3D12149..20662\x2Cz\x3D-43670..-21570\non x\x3D26118..42731\x2Cy\x3D-56115..-18709\x2Cz\x3D-70138..-48945\non x\x3D-17212..8538\x2Cy\x3D45983..70176\x2Cz\x3D33763..62277\non x\x3D-50017..-27326\x2Cy\x3D-66494..-60174\x2Cz\x3D29470..36944\non x\x3D-81143..-78005\x2Cy\x3D-24265..-8891\x2Cz\x3D-28874..1866\non x\x3D-4680..7425\x2Cy\x3D-74141..-50733\x2Cz\x3D-44837..-37602\non x\x3D-13433..2206\x2Cy\x3D-62141..-38550\x2Cz\x3D-73842..-51963\non x\x3D5912..29687\x2Cy\x3D-51272..-21220\x2Cz\x3D-89041..-61057\non x\x3D-90566..-72748\x2Cy\x3D-4352..14510\x2Cz\x3D161..15910\non x\x3D-66098..-42657\x2Cy\x3D50253..73378\x2Cz\x3D-26126..2146\non x\x3D-87456..-57132\x2Cy\x3D-2793..20938\x2Cz\x3D-43168..-26919\non x\x3D-65715..-49598\x2Cy\x3D58414..71608\x2Cz\x3D-6442..20355\non x\x3D-60479..-42891\x2Cy\x3D-1414..4764\x2Cz\x3D-76994..-58816\non x\x3D31247..51271\x2Cy\x3D-72093..-55943\x2Cz\x3D22587..41912\non x\x3D-48835..-24794\x2Cy\x3D-69869..-51581\x2Cz\x3D44188..61813\non x\x3D-79310..-52425\x2Cy\x3D13545..46273\x2Cz\x3D-1077..13779\non x\x3D-26198..-14119\x2Cy\x3D-91381..-58786\x2Cz\x3D22625..42542\non x\x3D-16634..-12884\x2Cy\x3D-84573..-64477\x2Cz\x3D-45007..-10241\non x\x3D8770..37879\x2Cy\x3D-39990..-27335\x2Cz\x3D-79869..-56641\non x\x3D-69417..-67919\x2Cy\x3D-55482..-26599\x2Cz\x3D4222..12461\non x\x3D-38614..-30984\x2Cy\x3D46341..54464\x2Cz\x3D44168..69759\non x\x3D28043..55260\x2Cy\x3D-31640..-19321\x2Cz\x3D-70069..-45405\non x\x3D-54428..-29734\x2Cy\x3D-63361..-48536\x2Cz\x3D29773..43221\non x\x3D-74758..-50576\x2Cy\x3D41608..59761\x2Cz\x3D-23506..-2964\non x\x3D-31899..-25641\x2Cy\x3D45265..72201\x2Cz\x3D-55652..-36338\non x\x3D-23602..-8956\x2Cy\x3D49804..61138\x2Cz\x3D-61100..-42764\non x\x3D-64012..-42795\x2Cy\x3D28549..50310\x2Cz\x3D-41432..-13826\non x\x3D-84716..-71838\x2Cy\x3D-20336..-2119\x2Cz\x3D-20114..-5422\non x\x3D10649..41863\x2Cy\x3D38727..64335\x2Cz\x3D-58210..-43041\non x\x3D60827..83146\x2Cy\x3D-19276..97\x2Cz\x3D900..39347\non x\x3D45494..67585\x2Cy\x3D-10004..11155\x2Cz\x3D-66469..-41468\non x\x3D-6167..-3234\x2Cy\x3D-77297..-54226\x2Cz\x3D-53843..-40669\non x\x3D-10346..9584\x2Cy\x3D-89627..-65703\x2Cz\x3D18788..41145\non x\x3D-13011..10106\x2Cy\x3D-83728..-78513\x2Cz\x3D-3855..20426\non x\x3D-21252..744\x2Cy\x3D-59633..-51031\x2Cz\x3D51691..60560\non x\x3D-81603..-57080\x2Cy\x3D-43510..-15120\x2Cz\x3D19352..47740\non x\x3D31643..53797\x2Cy\x3D-33640..-20732\x2Cz\x3D-57283..-52708\non x\x3D-72627..-41549\x2Cy\x3D37174..63978\x2Cz\x3D28579..51492\non x\x3D-915..969\x2Cy\x3D-27860..-7753\x2Cz\x3D64022..79251\non x\x3D12375..24026\x2Cy\x3D-27076..421\x2Cz\x3D-77551..-65430\non x\x3D42569..69220\x2Cy\x3D-60197..-52691\x2Cz\x3D19649..32410\non x\x3D11234..19988\x2Cy\x3D56563..92456\x2Cz\x3D-34414..-23000\non x\x3D32691..52925\x2Cy\x3D-50395..-29538\x2Cz\x3D44420..50843\non x\x3D72338..73748\x2Cy\x3D-48473..-10825\x2Cz\x3D-20831..2321\non x\x3D-36649..-23132\x2Cy\x3D-80543..-55440\x2Cz\x3D-52261..-18786\non x\x3D-81996..-66896\x2Cy\x3D4406..25901\x2Cz\x3D27102..33967\non x\x3D-88925..-66506\x2Cy\x3D25211..33544\x2Cz\x3D-43953..-16381\non x\x3D-22852..-16256\x2Cy\x3D-81570..-64232\x2Cz\x3D-2836..13133\non x\x3D-73125..-59973\x2Cy\x3D-51071..-41288\x2Cz\x3D2006..32523\non x\x3D11921..48558\x2Cy\x3D-38014..-23538\x2Cz\x3D52816..79133\non x\x3D-77276..-52350\x2Cy\x3D10148..21580\x2Cz\x3D-58080..-49079\non x\x3D-69682..-50301\x2Cy\x3D39426..52352\x2Cz\x3D6187..32903\non x\x3D16282..48921\x2Cy\x3D17226..37966\x2Cz\x3D60185..80807\non x\x3D46345..65705\x2Cy\x3D-46417..-33395\x2Cz\x3D-22827..-6690\non x\x3D-50394..-32686\x2Cy\x3D-88333..-62954\x2Cz\x3D-27024..3577\non x\x3D7140..33792\x2Cy\x3D9767..46829\x2Cz\x3D-81299..-61246\non x\x3D-9597..18989\x2Cy\x3D46127..54334\x2Cz\x3D58870..62950\non x\x3D-61738..-59895\x2Cy\x3D-67751..-39782\x2Cz\x3D3758..33083\non x\x3D18021..20588\x2Cy\x3D528..22252\x2Cz\x3D-79722..-66478\non x\x3D-33283..-16175\x2Cy\x3D51647..88795\x2Cz\x3D4289..38050\non x\x3D8418..34402\x2Cy\x3D62940..75700\x2Cz\x3D10937..39842\non x\x3D38066..69216\x2Cy\x3D-61870..-52666\x2Cz\x3D7001..21002\non x\x3D-14065..14210\x2Cy\x3D26629..40175\x2Cz\x3D64895..76326\non x\x3D-48905..-28984\x2Cy\x3D-67332..-53830\x2Cz\x3D27023..51056\non x\x3D-53349..-28532\x2Cy\x3D-86113..-54385\x2Cz\x3D-6640..3816\non x\x3D19927..40679\x2Cy\x3D38888..50220\x2Cz\x3D-66852..-37883\non x\x3D34822..58245\x2Cy\x3D39419..56047\x2Cz\x3D-48074..-35453\non x\x3D55519..71268\x2Cy\x3D23251..51805\x2Cz\x3D-43197..-34669\non x\x3D18366..31245\x2Cy\x3D47455..57923\x2Cz\x3D-63314..-40399\non x\x3D16809..44884\x2Cy\x3D-72696..-51190\x2Cz\x3D48656..59401\non x\x3D-65078..-41053\x2Cy\x3D5543..11678\x2Cz\x3D41590..60949\non x\x3D-66361..-47750\x2Cy\x3D25542..52976\x2Cz\x3D23459..52981\non x\x3D48492..73562\x2Cy\x3D6501..24685\x2Cz\x3D-55476..-47585\non x\x3D-5913..10423\x2Cy\x3D-3513..23009\x2Cz\x3D68060..95432\non x\x3D-36665..-16936\x2Cy\x3D51458..79451\x2Cz\x3D25675..41881\non x\x3D-50562..-20432\x2Cy\x3D-36101..-8899\x2Cz\x3D-75843..-59065\non x\x3D-10290..84\x2Cy\x3D-91837..-60678\x2Cz\x3D-45412..-30817\non x\x3D-43611..-27505\x2Cy\x3D53544..74236\x2Cz\x3D-51041..-27055\non x\x3D-84876..-69188\x2Cy\x3D-9505..-2278\x2Cz\x3D-19956..507\non x\x3D8912..34239\x2Cy\x3D28948..46925\x2Cz\x3D-84786..-57018\non x\x3D-66773..-42848\x2Cy\x3D-15800..4160\x2Cz\x3D-70245..-53902\non x\x3D1616..11581\x2Cy\x3D-37586..-23422\x2Cz\x3D-93635..-58351\non x\x3D-17716..-6166\x2Cy\x3D23649..53084\x2Cz\x3D-77414..-59720\non x\x3D66509..76291\x2Cy\x3D-18788..14910\x2Cz\x3D-44437..-15056\non x\x3D-62464..-54602\x2Cy\x3D-40294..-18120\x2Cz\x3D-48928..-29110\non x\x3D39077..56965\x2Cy\x3D56879..78708\x2Cz\x3D14990..24122\non x\x3D-53077..-36084\x2Cy\x3D33702..54413\x2Cz\x3D47657..68507\non x\x3D61520..70369\x2Cy\x3D18056..32432\x2Cz\x3D-44688..-27507\non x\x3D-59388..-42728\x2Cy\x3D30479..52052\x2Cz\x3D40767..50150\non x\x3D-92249..-67129\x2Cy\x3D-10938..1941\x2Cz\x3D-9913..7565\non x\x3D-25812..-1624\x2Cy\x3D-71753..-51660\x2Cz\x3D25844..40025\non x\x3D19649..48386\x2Cy\x3D-41014..-23919\x2Cz\x3D56427..70905\non x\x3D838..32095\x2Cy\x3D-10367..1473\x2Cz\x3D66348..91274\non x\x3D-38303..-27022\x2Cy\x3D-67729..-47690\x2Cz\x3D36025..54732\non x\x3D42482..59286\x2Cy\x3D-63176..-53499\x2Cz\x3D-88..20671\non x\x3D59687..88930\x2Cy\x3D-26846..-7345\x2Cz\x3D17360..48177\non x\x3D-78095..-59447\x2Cy\x3D-20398..-14376\x2Cz\x3D-24333..-9265\non x\x3D62819..83787\x2Cy\x3D2948..33310\x2Cz\x3D-45780..-18588\non x\x3D49058..64597\x2Cy\x3D18216..37057\x2Cz\x3D-53609..-38627\non x\x3D-84327..-56771\x2Cy\x3D-23351..-11025\x2Cz\x3D30765..50457\non x\x3D55753..73851\x2Cy\x3D-58110..-46478\x2Cz\x3D-27031..-4119\non x\x3D-73675..-36607\x2Cy\x3D52154..67951\x2Cz\x3D-1402..12004\non x\x3D16248..37146\x2Cy\x3D-53084..-28138\x2Cz\x3D-66661..-48262\non x\x3D-70764..-36150\x2Cy\x3D-64440..-41720\x2Cz\x3D25054..39650\non x\x3D27819..42917\x2Cy\x3D-63843..-52656\x2Cz\x3D25355..53094\non x\x3D-64547..-49557\x2Cy\x3D-10197..13715\x2Cz\x3D-70067..-57853\non x\x3D-40915..-28519\x2Cy\x3D3206..31848\x2Cz\x3D-76553..-55947\non x\x3D-70985..-47962\x2Cy\x3D24987..33686\x2Cz\x3D38467..44038\noff x\x3D15513..36552\x2Cy\x3D21011..48806\x2Cz\x3D50480..70237\non x\x3D-8557..15504\x2Cy\x3D-15503..7934\x2Cz\x3D-80798..-65072\noff x\x3D17025..42179\x2Cy\x3D16804..40563\x2Cz\x3D-84618..-62252\non x\x3D-61122..-32540\x2Cy\x3D-62981..-60581\x2Cz\x3D-30833..-5260\non x\x3D-78311..-49021\x2Cy\x3D-36455..-26330\x2Cz\x3D-51072..-34510\non x\x3D-66969..-49411\x2Cy\x3D28962..57971\x2Cz\x3D-45809..-25056\noff x\x3D824..12291\x2Cy\x3D-76958..-47671\x2Cz\x3D35983..63416\non x\x3D-65217..-36321\x2Cy\x3D-36157..-12489\x2Cz\x3D48389..67998\non x\x3D-44405..-18201\x2Cy\x3D34984..66207\x2Cz\x3D44604..73727\non x\x3D-58665..-25483\x2Cy\x3D-27490..-7360\x2Cz\x3D54293..76012\noff x\x3D-37186..-16747\x2Cy\x3D-28709..-16239\x2Cz\x3D-74836..-58410\noff x\x3D-8413..11798\x2Cy\x3D-91473..-63503\x2Cz\x3D-28229..-8531\non x\x3D5456..33988\x2Cy\x3D44489..56095\x2Cz\x3D-67281..-58655\noff x\x3D-30552..-13433\x2Cy\x3D5159..26646\x2Cz\x3D65720..88268\non x\x3D44920..60318\x2Cy\x3D-66425..-43923\x2Cz\x3D605..29139\non x\x3D22458..46724\x2Cy\x3D-49969..-34674\x2Cz\x3D54391..60192\non x\x3D-1703..12351\x2Cy\x3D-87822..-72074\x2Cz\x3D-7800..22480\noff x\x3D47247..79163\x2Cy\x3D35616..56606\x2Cz\x3D-31735..-24909\non x\x3D11683..41539\x2Cy\x3D-95733..-73977\x2Cz\x3D-9681..16524\non x\x3D40812..55563\x2Cy\x3D-33578..4865\x2Cz\x3D64505..78897\non x\x3D-20036..15091\x2Cy\x3D46995..59326\x2Cz\x3D44884..77360\non x\x3D-62855..-39931\x2Cy\x3D29479..48353\x2Cz\x3D-51117..-45631\noff x\x3D-37592..-25941\x2Cy\x3D-34473..-13532\x2Cz\x3D-87487..-51376\non x\x3D-64214..-39688\x2Cy\x3D-1101..18763\x2Cz\x3D-67677..-50206\non x\x3D-50153..-24356\x2Cy\x3D-29250..-17320\x2Cz\x3D-86169..-62094\noff x\x3D-56208..-40169\x2Cy\x3D62759..70069\x2Cz\x3D-36809..-10249\non x\x3D30151..60484\x2Cy\x3D-24287..-12395\x2Cz\x3D46908..77720\noff x\x3D48362..71117\x2Cy\x3D-31069..-14945\x2Cz\x3D-68867..-35565\non x\x3D-56693..-31524\x2Cy\x3D-31916..-18443\x2Cz\x3D43623..76949\noff x\x3D-78038..-72092\x2Cy\x3D-5149..16099\x2Cz\x3D-44554..-9980\non x\x3D-577..25715\x2Cy\x3D74108..84624\x2Cz\x3D-4936..9637\non x\x3D-83031..-66932\x2Cy\x3D14557..32000\x2Cz\x3D6095..16066\non x\x3D-72143..-44594\x2Cy\x3D-15004..-10698\x2Cz\x3D38642..57085\noff x\x3D-65045..-38272\x2Cy\x3D-46823..-22080\x2Cz\x3D39554..58068\non x\x3D34800..51119\x2Cy\x3D51062..68236\x2Cz\x3D-27991..-5201\noff x\x3D-83416..-62320\x2Cy\x3D16473..33611\x2Cz\x3D12618..19218\non x\x3D25465..58543\x2Cy\x3D24046..54475\x2Cz\x3D53940..70358\non x\x3D-58596..-37090\x2Cy\x3D57992..62107\x2Cz\x3D-6659..7804\noff x\x3D53454..82767\x2Cy\x3D-21250..-1548\x2Cz\x3D22267..54071\noff x\x3D-79117..-60440\x2Cy\x3D-63622..-38775\x2Cz\x3D-8955..15394\non x\x3D-19536..6402\x2Cy\x3D-69997..-47256\x2Cz\x3D-62149..-43050\noff x\x3D19297..31924\x2Cy\x3D-76788..-55257\x2Cz\x3D-63942..-44359\non x\x3D-5012..24323\x2Cy\x3D63273..68750\x2Cz\x3D-46613..-33442\non x\x3D35328..58056\x2Cy\x3D31710..65651\x2Cz\x3D-34982..-15237\non x\x3D-48192..-33863\x2Cy\x3D-44827..-29117\x2Cz\x3D-63183..-34387\non x\x3D-61029..-34553\x2Cy\x3D-74065..-54148\x2Cz\x3D9801..31057\non x\x3D-68960..-61393\x2Cy\x3D95..25336\x2Cz\x3D34991..51604\noff x\x3D-22044..-2351\x2Cy\x3D69872..96136\x2Cz\x3D-10494..8286\non x\x3D1440..21268\x2Cy\x3D5182..37527\x2Cz\x3D74647..91431\non x\x3D44182..71181\x2Cy\x3D-45262..-34205\x2Cz\x3D46957..47598\noff x\x3D-41795..-20178\x2Cy\x3D-1286..12098\x2Cz\x3D61369..93110\non x\x3D57490..63189\x2Cy\x3D-38152..-27227\x2Cz\x3D-51053..-39584\noff x\x3D-63860..-30714\x2Cy\x3D-37055..-32656\x2Cz\x3D-69657..-35687\non x\x3D-74546..-47728\x2Cy\x3D25851..61864\x2Cz\x3D-37061..-17825\noff x\x3D-24437..3458\x2Cy\x3D53476..71199\x2Cz\x3D50862..72294\noff x\x3D-15044..-9328\x2Cy\x3D59935..76501\x2Cz\x3D-52378..-31589\non x\x3D-51655..-14304\x2Cy\x3D57699..76496\x2Cz\x3D-12947..16602\noff x\x3D52532..82259\x2Cy\x3D-42406..-24363\x2Cz\x3D-1001..32079\noff x\x3D41894..70607\x2Cy\x3D4977..11111\x2Cz\x3D43205..62849\noff x\x3D-23814..11255\x2Cy\x3D56959..88474\x2Cz\x3D10473..38908\non x\x3D-13096..14972\x2Cy\x3D71943..80228\x2Cz\x3D-3028..18251\non x\x3D-27486..-15251\x2Cy\x3D-86029..-54143\x2Cz\x3D-26263..-4307\noff x\x3D-91055..-73373\x2Cy\x3D-3498..9631\x2Cz\x3D4362..8282\non x\x3D-79152..-55232\x2Cy\x3D22406..44403\x2Cz\x3D13036..31288\non x\x3D8567..29474\x2Cy\x3D-58818..-28928\x2Cz\x3D-77992..-60316\non x\x3D2744..29974\x2Cy\x3D-81832..-58217\x2Cz\x3D-21689..10361\non x\x3D-40205..-20580\x2Cy\x3D-6071..5493\x2Cz\x3D-82965..-63879\noff x\x3D-35449..-22473\x2Cy\x3D-49684..-30492\x2Cz\x3D63409..79484\noff x\x3D-84114..-50896\x2Cy\x3D22123..40386\x2Cz\x3D19361..24349\noff x\x3D-71399..-43033\x2Cy\x3D-11721..9904\x2Cz\x3D-72892..-49712\noff x\x3D-35277..-5298\x2Cy\x3D58757..71355\x2Cz\x3D-59738..-31019\non x\x3D44485..68629\x2Cy\x3D26563..44102\x2Cz\x3D-40805..-27723\non x\x3D-69517..-45409\x2Cy\x3D-16306..1823\x2Cz\x3D-61229..-43343\non x\x3D14841..39436\x2Cy\x3D40612..73880\x2Cz\x3D-58735..-44090\noff x\x3D-2942..16032\x2Cy\x3D-91885..-70192\x2Cz\x3D9003..32942\non x\x3D-55760..-25386\x2Cy\x3D14465..39987\x2Cz\x3D51195..77198\non x\x3D28238..56447\x2Cy\x3D14808..33011\x2Cz\x3D50390..79789\noff x\x3D-92759..-55503\x2Cy\x3D20524..34310\x2Cz\x3D-23599..-9135\noff x\x3D-15929..1979\x2Cy\x3D61851..85083\x2Cz\x3D29933..50070\non x\x3D9225..22713\x2Cy\x3D1929..34143\x2Cz\x3D-94179..-69874\noff x\x3D7463..16496\x2Cy\x3D-71732..-37732\x2Cz\x3D-64922..-51893\noff x\x3D44380..74744\x2Cy\x3D-53121..-22361\x2Cz\x3D-48742..-27977\noff x\x3D46787..63581\x2Cy\x3D45095..69265\x2Cz\x3D-22173..4636\non x\x3D30769..50665\x2Cy\x3D-27918..-20696\x2Cz\x3D47470..75232\non x\x3D-21190..1756\x2Cy\x3D-16222..1903\x2Cz\x3D-90299..-75313\noff x\x3D58199..86595\x2Cy\x3D-9628..7129\x2Cz\x3D27544..30672\noff x\x3D-43628..-17336\x2Cy\x3D39627..58311\x2Cz\x3D-52613..-40574\noff x\x3D-23083..11401\x2Cy\x3D75825..85369\x2Cz\x3D-2312..12405\noff x\x3D62885..79995\x2Cy\x3D-15595..2351\x2Cz\x3D-17424..-9496\non x\x3D23650..50018\x2Cy\x3D-61353..-36734\x2Cz\x3D42359..60245\non x\x3D61306..78203\x2Cy\x3D-9179..5865\x2Cz\x3D23314..46707\non x\x3D42056..61788\x2Cy\x3D45171..66184\x2Cz\x3D12399..45341\noff x\x3D-3793..18756\x2Cy\x3D34734..58540\x2Cz\x3D-67271..-59301\non x\x3D71182..92230\x2Cy\x3D-10343..13589\x2Cz\x3D-39267..-21565\noff x\x3D8673..21938\x2Cy\x3D60905..76276\x2Cz\x3D32571..51045\noff x\x3D3228..21181\x2Cy\x3D-55369..-18898\x2Cz\x3D-78377..-67410\non x\x3D34378..54624\x2Cy\x3D-73840..-66767\x2Cz\x3D-10049..8656\noff x\x3D65360..88007\x2Cy\x3D2060..32471\x2Cz\x3D2333..11900\noff x\x3D66657..87364\x2Cy\x3D18928..42774\x2Cz\x3D-42310..-3806\non x\x3D21572..43731\x2Cy\x3D-54266..-44947\x2Cz\x3D50141..72391\non x\x3D-21538..1482\x2Cy\x3D-83291..-51586\x2Cz\x3D-41117..-33639\noff x\x3D3318..32804\x2Cy\x3D42894..69299\x2Cz\x3D46535..67272\noff x\x3D-35245..-27958\x2Cy\x3D5462..20046\x2Cz\x3D-79841..-66010\non x\x3D-12513..-1547\x2Cy\x3D-23669..7873\x2Cz\x3D-83425..-67259\noff x\x3D8909..41254\x2Cy\x3D-93808..-74009\x2Cz\x3D-4819..23133\non x\x3D-52200..-25835\x2Cy\x3D15960..30377\x2Cz\x3D42069..69104\non x\x3D36591..45810\x2Cy\x3D-77352..-60366\x2Cz\x3D-26787..1341\non x\x3D-77722..-44666\x2Cy\x3D14773..30746\x2Cz\x3D-61160..-34050\noff x\x3D-46582..-35737\x2Cy\x3D46260..81259\x2Cz\x3D-46889..-11312\noff x\x3D-71643..-56716\x2Cy\x3D14635..38747\x2Cz\x3D-61795..-43527\noff x\x3D39240..74444\x2Cy\x3D-51811..-27332\x2Cz\x3D28772..58190\non x\x3D-58340..-31522\x2Cy\x3D-66224..-44479\x2Cz\x3D23007..48233\non x\x3D18236..38285\x2Cy\x3D-66940..-47700\x2Cz\x3D16110..34304\noff x\x3D34869..53447\x2Cy\x3D48325..63893\x2Cz\x3D-51786..-34666\non x\x3D-79894..-43774\x2Cy\x3D-62405..-31453\x2Cz\x3D-29419..-7548\noff x\x3D67003..70197\x2Cy\x3D-47541..-15287\x2Cz\x3D2946..37743\noff x\x3D-27204..-12410\x2Cy\x3D-92512..-65886\x2Cz\x3D-29578..3556\non x\x3D23183..40749\x2Cy\x3D62519..80268\x2Cz\x3D-5202..3129\noff x\x3D20602..41386\x2Cy\x3D-70944..-53377\x2Cz\x3D-62742..-28208\noff x\x3D-81105..-54407\x2Cy\x3D-9120..26155\x2Cz\x3D40234..58924\noff x\x3D-57955..-43394\x2Cy\x3D37870..62660\x2Cz\x3D-34290..-3179\noff x\x3D-15827..1883\x2Cy\x3D-31681..-25066\x2Cz\x3D-87406..-55191\noff x\x3D23264..45566\x2Cy\x3D35567..48441\x2Cz\x3D-73415..-42638\non x\x3D21830..28720\x2Cy\x3D33175..51976\x2Cz\x3D53057..78741\non x\x3D-36115..-7643\x2Cy\x3D25118..34077\x2Cz\x3D-85444..-59203\noff x\x3D-68866..-54071\x2Cy\x3D-19472..4363\x2Cz\x3D36709..53410\noff x\x3D6073..29768\x2Cy\x3D-85905..-74717\x2Cz\x3D-3954..25642\non x\x3D-7680..15355\x2Cy\x3D-1280..15625\x2Cz\x3D-81294..-59380\noff x\x3D-23516..-11969\x2Cy\x3D-67257..-53053\x2Cz\x3D-62147..-53294\non x\x3D34228..67887\x2Cy\x3D-51953..-31540\x2Cz\x3D-63355..-36913\non x\x3D-31721..-17384\x2Cy\x3D-84942..-69374\x2Cz\x3D-25974..-4286\noff x\x3D8617..24564\x2Cy\x3D59625..82201\x2Cz\x3D23799..48653\noff x\x3D-74930..-51780\x2Cy\x3D-20815..6541\x2Cz\x3D28260..40960\noff x\x3D20994..35874\x2Cy\x3D1369..26269\x2Cz\x3D-94505..-56912\noff x\x3D64250..74106\x2Cy\x3D-59689..-31772\x2Cz\x3D-22200..-12533\noff x\x3D-34889..-12423\x2Cy\x3D-80068..-61748\x2Cz\x3D-12141..6704\noff x\x3D22706..39721\x2Cy\x3D-7213..2019\x2Cz\x3D-76680..-65357\noff x\x3D12977..30454\x2Cy\x3D44617..55414\x2Cz\x3D-73673..-46816\noff x\x3D18421..38150\x2Cy\x3D-1478..28709\x2Cz\x3D-90428..-66015\noff x\x3D33023..58631\x2Cy\x3D-48706..-29814\x2Cz\x3D-56022..-45248\noff x\x3D-3236..5109\x2Cy\x3D69874..87161\x2Cz\x3D-9318..17274\noff x\x3D-20560..6052\x2Cy\x3D24119..47449\x2Cz\x3D-75118..-53474\noff x\x3D56672..71355\x2Cy\x3D6287..18607\x2Cz\x3D35879..60566\noff x\x3D-45868..-26774\x2Cy\x3D-87658..-63722\x2Cz\x3D5520..22277\non x\x3D-21496..-12868\x2Cy\x3D55261..74982\x2Cz\x3D-54403..-48761\non x\x3D-82371..-70162\x2Cy\x3D10539..29774\x2Cz\x3D-42087..-16035\noff x\x3D18165..28274\x2Cy\x3D30681..46858\x2Cz\x3D57064..64733\non x\x3D-31955..-11653\x2Cy\x3D-83050..-70993\x2Cz\x3D-8732..1596\noff x\x3D54188..82626\x2Cy\x3D39940..66005\x2Cz\x3D-2835..7547\non x\x3D39725..68296\x2Cy\x3D-14146..21379\x2Cz\x3D52332..70999\non x\x3D68729..79757\x2Cy\x3D-26981..-12892\x2Cz\x3D-1005..18847\non x\x3D-89230..-55343\x2Cy\x3D-7039..21914\x2Cz\x3D-41530..-22135\noff x\x3D-74761..-52782\x2Cy\x3D-54591..-34050\x2Cz\x3D-23588..1682\noff x\x3D4588..38441\x2Cy\x3D-45595..-25312\x2Cz\x3D67291..73998\non x\x3D26181..42562\x2Cy\x3D13286..21558\x2Cz\x3D45515..72382\non x\x3D-48975..-32434\x2Cy\x3D25381..44962\x2Cz\x3D-68715..-38026\non x\x3D-56512..-28986\x2Cy\x3D-61324..-45574\x2Cz\x3D-52067..-31443\noff x\x3D-97629..-71452\x2Cy\x3D-9969..7612\x2Cz\x3D-11415..17685\non x\x3D20053..34006\x2Cy\x3D20406..41231\x2Cz\x3D59488..73021\noff x\x3D21900..51510\x2Cy\x3D-17327..-4900\x2Cz\x3D-82994..-71598\noff x\x3D-65182..-35081\x2Cy\x3D-45600..-23546\x2Cz\x3D53314..59882\non x\x3D-14048..11980\x2Cy\x3D-47734..-10267\x2Cz\x3D-76957..-57926\non x\x3D10786..24964\x2Cy\x3D-33833..-22273\x2Cz\x3D72870..80431\non x\x3D71392..76011\x2Cy\x3D18505..26763\x2Cz\x3D-30097..-7811\noff x\x3D5721..35848\x2Cy\x3D-70691..-61922\x2Cz\x3D-35016..-20564\noff x\x3D37966..67044\x2Cy\x3D-74895..-38819\x2Cz\x3D-11378..24619\noff x\x3D58047..87227\x2Cy\x3D-46608..-26640\x2Cz\x3D-4670..13147\noff x\x3D-9970..19768\x2Cy\x3D-9007..16226\x2Cz\x3D-81209..-68216\non x\x3D58592..69296\x2Cy\x3D-19057..6596\x2Cz\x3D45774..66020\non x\x3D-81176..-70642\x2Cy\x3D-7521..12540\x2Cz\x3D11474..31489\noff x\x3D51735..63155\x2Cy\x3D-28647..7980\x2Cz\x3D44811..64656\noff x\x3D-59355..-39775\x2Cy\x3D22154..55986\x2Cz\x3D45934..68592\noff x\x3D42785..65066\x2Cy\x3D20097..30749\x2Cz\x3D42691..67585\non x\x3D-78686..-56664\x2Cy\x3D36058..51298\x2Cz\x3D-46490..-32545\non x\x3D-80311..-57248\x2Cy\x3D16685..26536\x2Cz\x3D-1660..26257\noff x\x3D-470..23335\x2Cy\x3D-68058..-53549\x2Cz\x3D-60120..-50237\noff x\x3D-70801..-48788\x2Cy\x3D21764..49044\x2Cz\x3D12615..26202\noff x\x3D-73980..-59126\x2Cy\x3D10795..38972\x2Cz\x3D29913..34771\non x\x3D77138..91326\x2Cy\x3D-5153..22559\x2Cz\x3D-8498..22392\noff x\x3D-9498..4859\x2Cy\x3D71751..94896\x2Cz\x3D-15102..22812\non x\x3D23752..41322\x2Cy\x3D36509..66598\x2Cz\x3D-55985..-33177\non x\x3D32328..55201\x2Cy\x3D48991..74159\x2Cz\x3D14820..44520\noff x\x3D-60929..-31013\x2Cy\x3D47356..55252\x2Cz\x3D-50579..-32438\non x\x3D-72486..-55704\x2Cy\x3D-51776..-33226\x2Cz\x3D11436..25787\non x\x3D-15912..-9994\x2Cy\x3D-52777..-22910\x2Cz\x3D-68881..-54558\noff x\x3D2253..11637\x2Cy\x3D73284..83993\x2Cz\x3D12224..22275\noff x\x3D18360..27676\x2Cy\x3D11300..36836\x2Cz\x3D-92072..-72331\noff x\x3D37724..70027\x2Cy\x3D-59694..-27177\x2Cz\x3D-56310..-28993\non x\x3D-59217..-23702\x2Cy\x3D-51823..-38981\x2Cz\x3D-66296..-33273\non x\x3D31180..53449\x2Cy\x3D14631..30890\x2Cz\x3D-79341..-48736\noff x\x3D-36056..-19761\x2Cy\x3D-83624..-55630\x2Cz\x3D-24386..-9717\noff x\x3D-1545..9148\x2Cy\x3D21897..31020\x2Cz\x3D-88337..-70051\noff x\x3D-32989..-9724\x2Cy\x3D37526..63857\x2Cz\x3D-70387..-56746\noff x\x3D29903..51146\x2Cy\x3D-63108..-50491\x2Cz\x3D32857..41295\non x\x3D-46331..-35553\x2Cy\x3D-3044..13283\x2Cz\x3D62129..77317\non x\x3D33499..52700\x2Cy\x3D-70674..-45077\x2Cz\x3D-39327..-19649\non x\x3D58723..70030\x2Cy\x3D15231..36339\x2Cz\x3D-60353..-33130\non x\x3D-989..14391\x2Cy\x3D-78770..-65176\x2Cz\x3D22254..51047\noff x\x3D66499..89004\x2Cy\x3D7540..23824\x2Cz\x3D-22765..-8879\noff x\x3D44823..66466\x2Cy\x3D-10101..16210\x2Cz\x3D53856..61509", Scope = Private
+	#tag EndConstant
+
+	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"on x\x3D-20..26\x2Cy\x3D-36..17\x2Cz\x3D-47..7\non x\x3D-20..33\x2Cy\x3D-21..23\x2Cz\x3D-26..28\non x\x3D-22..28\x2Cy\x3D-29..23\x2Cz\x3D-38..16\non x\x3D-46..7\x2Cy\x3D-6..46\x2Cz\x3D-50..-1\non x\x3D-49..1\x2Cy\x3D-3..46\x2Cz\x3D-24..28\non x\x3D2..47\x2Cy\x3D-22..22\x2Cz\x3D-23..27\non x\x3D-27..23\x2Cy\x3D-28..26\x2Cz\x3D-21..29\non x\x3D-39..5\x2Cy\x3D-6..47\x2Cz\x3D-3..44\non x\x3D-30..21\x2Cy\x3D-8..43\x2Cz\x3D-13..34\non x\x3D-22..26\x2Cy\x3D-27..20\x2Cz\x3D-29..19\noff x\x3D-48..-32\x2Cy\x3D26..41\x2Cz\x3D-47..-37\non x\x3D-12..35\x2Cy\x3D6..50\x2Cz\x3D-50..-2\noff x\x3D-48..-32\x2Cy\x3D-32..-16\x2Cz\x3D-15..-5\non x\x3D-18..26\x2Cy\x3D-33..15\x2Cz\x3D-7..46\noff x\x3D-40..-22\x2Cy\x3D-38..-28\x2Cz\x3D23..41\non x\x3D-16..35\x2Cy\x3D-41..10\x2Cz\x3D-47..6\noff x\x3D-32..-23\x2Cy\x3D11..30\x2Cz\x3D-14..3\non x\x3D-49..-5\x2Cy\x3D-3..45\x2Cz\x3D-29..18\noff x\x3D18..30\x2Cy\x3D-20..-8\x2Cz\x3D-3..13\non x\x3D-41..9\x2Cy\x3D-7..43\x2Cz\x3D-33..15\non x\x3D-54112..-39298\x2Cy\x3D-85059..-49293\x2Cz\x3D-27449..7877\non x\x3D967..23432\x2Cy\x3D45373..81175\x2Cz\x3D27513..53682", Scope = Private
+	#tag EndConstant
+
+
+	#tag ViewBehavior
+		#tag ViewProperty
+			Name="Priority"
+			Visible=true
+			Group="Behavior"
+			InitialValue="5"
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="StackSize"
+			Visible=true
+			Group="Behavior"
+			InitialValue="0"
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="DebugIdentifier"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="String"
+			EditorType="MultiLineEditor"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="ThreadID"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="ThreadState"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="ThreadStates"
+			EditorType="Enum"
+			#tag EnumValues
+				"0 - Running"
+				"1 - Waiting"
+				"2 - Paused"
+				"3 - Sleeping"
+				"4 - NotRunning"
+			#tag EndEnumValues
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Name"
+			Visible=true
+			Group="ID"
+			InitialValue=""
+			Type="String"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Index"
+			Visible=true
+			Group="ID"
+			InitialValue="-2147483648"
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Super"
+			Visible=true
+			Group="ID"
+			InitialValue=""
+			Type="String"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Left"
+			Visible=true
+			Group="Position"
+			InitialValue="0"
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Top"
+			Visible=true
+			Group="Position"
+			InitialValue="0"
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+	#tag EndViewBehavior
+End Class
+#tag EndClass
