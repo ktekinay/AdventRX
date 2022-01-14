@@ -50,6 +50,13 @@ Inherits Thread
 
 
 	#tag Method, Flags = &h1
+		Protected Function Normalize(s As String) As String
+		  return s.Trim.ReplaceLineEndings( EndOfLine )
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
 		Protected Sub Print(msg As Variant)
 		  #pragma BackgroundTasks true
 		  WndConsole.Print msg
@@ -70,6 +77,12 @@ Inherits Thread
 		  
 		  return arr
 		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
+		Protected Function ToStringArray(s As String) As String()
+		  return Normalize( s ).Split( EndOfLine )
 		End Function
 	#tag EndMethod
 

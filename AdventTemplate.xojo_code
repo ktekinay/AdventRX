@@ -3,27 +3,27 @@ Protected Class AdventTemplate
 Inherits AdventBase
 	#tag Event
 		Function RunA() As Integer
-		  return CalculateResultA( kInput )
+		  return CalculateResultA( Normalize( kInput ) )
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function RunB() As Integer
-		  return CalculateResultB( kInput )
+		  return CalculateResultB( Normalize( kInput ) )
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function RunTestA() As Integer
-		  return CalculateResultA( kTestInput )
+		  return CalculateResultA( Normalize( kTestInput ) )
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function RunTestB() As Integer
-		  return CalculateResultB( kTestInput )
+		  return CalculateResultB( Normalize( kTestInput ) )
 		  
 		End Function
 	#tag EndEvent
