@@ -46,12 +46,12 @@ Inherits AdventBase
 		  for i as integer = 0 to s.Beacons.LastIndex
 		    var b as Beacon = s.Beacons( i )
 		    
-		    if dict.HasKey( b.Coordinates ) then
-		      var existingBeacon as Beacon = dict.Value( b.Coordinates )
+		    if dict.HasKey( b.Hash ) then
+		      var existingBeacon as Beacon = dict.Value( b.Hash )
 		      existingBeacon = existingBeacon
 		    end if
 		    
-		    dict.Value( b.Coordinates ) = b
+		    dict.Value( b.Hash ) = b
 		  next
 		  
 		End Sub
@@ -110,7 +110,6 @@ Inherits AdventBase
 		  loop until identificationCount = scanners.Count
 		  
 		  var knownBeacons as new Dictionary
-		  var beaconCoords() as string
 		  
 		  for each s as Scanner in scanners
 		    var dict as Dictionary = s.KnownBeacons
@@ -120,32 +119,8 @@ Inherits AdventBase
 		      var k as variant = keys( i )
 		      var b as Beacon = values( i )
 		      knownBeacons.Value( k ) = b
-		      beaconCoords.Add b.Coordinates
 		    next
 		  next
-		  
-		  'beaconCoords.Sort AddressOf CoordSorter
-		  '
-		  'var expectedCoords() as string = kTestingExpected.Trim.ReplaceLineEndings( EndOfLine ).Split( EndOfLine )
-		  'expectedCoords.Sort AddressOf CoordSorter
-		  '
-		  'print ""
-		  'print "EXPECTED BUT MISSING"
-		  '
-		  'for each coord as string in expectedCoords
-		  'if beaconCoords.IndexOf( coord ) = -1 then
-		  'print coord
-		  'end if
-		  'next coord
-		  '
-		  'print ""
-		  'print "PRESENT BUT NOT EXPECTED"
-		  '
-		  'for each coord as string in beaconCoords
-		  'if expectedCoords.IndexOf( coord ) = -1 then
-		  'print coord
-		  'end if
-		  'next
 		  
 		  self.Scanners = scanners
 		  
@@ -243,7 +218,7 @@ Inherits AdventBase
 		          candidate.X + otherBeacon.RelativeX, _
 		          candidate.Y + otherBeacon.RelativeY, _
 		          candidate.Z + otherBeacon.RelativeZ
-		          if goodScanner.KnownBeacons.HasKey( otherBeacon.Coordinates ) then
+		          if goodScanner.KnownBeacons.HasKey( otherBeacon.Hash ) then
 		            matchCount = matchCount + 1
 		          end if 
 		          

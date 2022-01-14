@@ -2,9 +2,13 @@
 Protected Class Advent3DObject
 	#tag Method, Flags = &h0
 		Sub SetCoordinates(x As Integer, y As Integer, z As Integer)
-		  self.X = x
-		  self.Y = y
-		  self.Z = z
+		  self.mX = x
+		  self.mY = y
+		  self.mZ = z
+		  
+		  const kAdder as integer = 1000000000000000
+		  
+		  mHash = ( ( x + kAdder ) * 1000000000000000 ) + ( ( y + kAdder ) * 1000000000000 ) + ( z + kAdder )
 		  
 		End Sub
 	#tag EndMethod
@@ -19,17 +23,57 @@ Protected Class Advent3DObject
 		Coordinates As String
 	#tag EndComputedProperty
 
-	#tag Property, Flags = &h0
+	#tag ComputedProperty, Flags = &h0
+		#tag Getter
+			Get
+			  return mHash
+			End Get
+		#tag EndGetter
+		Hash As Integer
+	#tag EndComputedProperty
+
+	#tag Property, Flags = &h21
+		Private mHash As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private mX As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private mY As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private mZ As Integer
+	#tag EndProperty
+
+	#tag ComputedProperty, Flags = &h0
+		#tag Getter
+			Get
+			  Return mX
+			End Get
+		#tag EndGetter
 		X As Integer
-	#tag EndProperty
+	#tag EndComputedProperty
 
-	#tag Property, Flags = &h0
+	#tag ComputedProperty, Flags = &h0
+		#tag Getter
+			Get
+			  Return mY
+			End Get
+		#tag EndGetter
 		Y As Integer
-	#tag EndProperty
+	#tag EndComputedProperty
 
-	#tag Property, Flags = &h0
+	#tag ComputedProperty, Flags = &h0
+		#tag Getter
+			Get
+			  Return mZ
+			End Get
+		#tag EndGetter
 		Z As Integer
-	#tag EndProperty
+	#tag EndComputedProperty
 
 
 	#tag ViewBehavior
@@ -74,7 +118,7 @@ Protected Class Advent3DObject
 			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="X"
+			Name="mX"
 			Visible=false
 			Group="Behavior"
 			InitialValue=""
@@ -82,7 +126,7 @@ Protected Class Advent3DObject
 			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="Y"
+			Name="mY"
 			Visible=false
 			Group="Behavior"
 			InitialValue=""
@@ -90,7 +134,7 @@ Protected Class Advent3DObject
 			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="Z"
+			Name="mZ"
 			Visible=false
 			Group="Behavior"
 			InitialValue=""

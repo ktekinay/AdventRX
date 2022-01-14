@@ -14,9 +14,7 @@ Inherits Advent3DObject
 		    RelativeY = fromBeacon.RelativeY
 		    RelativeZ = fromBeacon.RelativeZ
 		    
-		    X = fromBeacon.X
-		    Y = fromBeacon.Y
-		    Z = fromBeacon.Z
+		    SetCoordinates fromBeacon.X, fromBeacon.Y, fromBeacon.Z
 		  end if
 		  
 		End Sub
