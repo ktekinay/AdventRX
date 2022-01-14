@@ -203,10 +203,6 @@ Inherits AdventBase
 		  
 		  goodScanner.AttemptedAgainstScannerIndexes.Add candidate.Index
 		  
-		  //
-		  // We are going to test half the beacons to see if we can match up the 
-		  // required number in the candidatge
-		  //
 		  for anchorBeaconIndex as integer = 0 to goodScanner.Beacons.LastIndex
 		    'print "... pulling anchor beacon " + anchorBeaconIndex.ToString
 		    
@@ -239,6 +235,7 @@ Inherits AdventBase
 		        // See if the other beacons match up
 		        //
 		        var matchCount as integer
+		        var remaining as integer = candidate.Beacons.Count
 		        for otherBeaconIndex as integer = 0 to candidate.Beacons.LastIndex
 		          var otherBeacon as Beacon = candidate.Beacons( otherBeaconIndex )
 		          
@@ -249,6 +246,11 @@ Inherits AdventBase
 		          if goodScanner.KnownBeacons.HasKey( otherBeacon.Coordinates ) then
 		            matchCount = matchCount + 1
 		          end if 
+		          
+		          remaining = remaining - 1
+		          if ( remaining + matchCount ) < targetCount then
+		            exit
+		          end if
 		        next
 		        
 		        if matchCount = targetCount then
