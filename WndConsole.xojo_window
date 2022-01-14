@@ -40,7 +40,7 @@ Begin DesktopWindow WndConsole
       HasBorder       =   True
       HasHorizontalScrollbar=   False
       HasVerticalScrollbar=   True
-      Height          =   576
+      Height          =   546
       HideSelection   =   True
       Index           =   -2147483648
       Italic          =   False
@@ -79,6 +79,35 @@ Begin DesktopWindow WndConsole
       RunMode         =   2
       Scope           =   2
       TabPanelIndex   =   0
+   End
+   Begin DesktopCheckBox CbKeepPinned
+      AllowAutoDeactivate=   True
+      Bold            =   False
+      Caption         =   "Keep Pinned"
+      Enabled         =   True
+      FontName        =   "SmallSystem"
+      FontSize        =   0.0
+      FontUnit        =   0
+      Height          =   20
+      Index           =   -2147483648
+      Italic          =   False
+      Left            =   786
+      LockBottom      =   True
+      LockedInPosition=   False
+      LockLeft        =   False
+      LockRight       =   True
+      LockTop         =   False
+      Scope           =   2
+      TabIndex        =   1
+      TabPanelIndex   =   0
+      TabStop         =   True
+      Tooltip         =   ""
+      Top             =   549
+      Transparent     =   False
+      Underline       =   False
+      Visible         =   True
+      VisualState     =   1
+      Width           =   100
    End
 End
 #tag EndDesktopWindow
@@ -134,6 +163,10 @@ End
 		    Messages.RemoveAll
 		    
 		    FldConsole.AddText toPrint + EndOfLine
+		    
+		    if CbKeepPinned.Value then
+		      FldConsole.VerticalScrollPosition = FldConsole.LineNumber( FldConsole.Text.Bytes * 4 )
+		    end if
 		  end if
 		  
 		End Sub
