@@ -171,6 +171,7 @@ End
 		  AddRow new Advent_2020_12_06
 		  AddRow new Advent_2020_12_07
 		  AddRow new Advent_2020_12_08
+		  AddRow new Advent_2020_12_09
 		  
 		  AddRow new Advent_2021_12_01
 		  AddRow new Advent_2021_12_02
