@@ -124,6 +124,7 @@ Inherits AdventBase
 		  
 		  self.Scanners = scanners
 		  
+		  print ""
 		  return knownBeacons.KeyCount
 		  
 		End Function
@@ -174,7 +175,7 @@ Inherits AdventBase
 		    return false
 		  end if
 		  
-		  print "Checking scanner " + goodScanner.Index.ToString + " against scanner " + candidate.Index.ToString
+		  'print "Checking scanner " + goodScanner.Index.ToString + " against scanner " + candidate.Index.ToString
 		  
 		  goodScanner.AttemptedAgainstScannerIndexes.Add candidate.Index
 		  
@@ -229,7 +230,7 @@ Inherits AdventBase
 		        next
 		        
 		        if matchCount = targetCount then
-		          print "... MATCHED!"
+		          print "Scanner " + candidate.Index.ToString + " matched scanner " + goodScanner.Index.ToString + " on orientation " + orientation.ToString
 		          return true
 		        end if
 		      next
