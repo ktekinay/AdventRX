@@ -105,6 +105,7 @@ Begin DesktopWindow WndConsole
       Top             =   549
       Transparent     =   False
       Underline       =   False
+      Value           =   False
       Visible         =   True
       VisualState     =   1
       Width           =   100
@@ -168,6 +169,14 @@ End
 		      FldConsole.VerticalScrollPosition = FldConsole.LineNumber( FldConsole.Text.Bytes * 4 )
 		    end if
 		  end if
+		  
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events CbKeepPinned
+	#tag Event
+		Sub Opening()
+		  me.Value = true
 		  
 		End Sub
 	#tag EndEvent

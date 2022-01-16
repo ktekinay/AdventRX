@@ -1,84 +1,109 @@
 #tag Class
-Class Advent3DObject
+Class ObjectGrid
 	#tag Method, Flags = &h0
-		Sub SetCoordinates(x As Integer, y As Integer, z As Integer)
-		  self.mX = x
-		  self.mY = y
-		  self.mZ = z
+		Function Operator_Convert() As String
+		  return ToString
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function Operator_Subscript(row As Integer, col As Integer) As GridMember
+		  return Grid( row, col )
 		  
-		  const kAdder as integer = 1000000
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub Operator_Subscript(row As Integer, col As Integer, Assigns m As GridMember)
+		  Grid( row, col ) = m
+		  m.Grid = self
+		  m.Row = row
+		  m.Column = col
 		  
-		  x = x + kAdder
-		  y = y + kAdder
-		  z = z + kAdder
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ResizeTo(row As Integer, col As Integer)
+		  mLastRowIndex = row
+		  mLastColIndex = col
 		  
-		  const kMask as UInt64 = &b111111111111111111111 // 21
-		  
-		  mHash = Bitwise.ShiftLeft( x and kMask, 42 ) or Bitwise.ShiftLeft( y and kMask, 21 ) or ( z and kMask ) 
+		  Grid.ResizeTo row, col
 		  
 		End Sub
 	#tag EndMethod
 
 
-	#tag ComputedProperty, Flags = &h0
-		#tag Getter
-			Get
-			  return X.ToString + "," + Y.ToString + "," + Z.ToString
-			End Get
-		#tag EndGetter
-		Coordinates As String
-	#tag EndComputedProperty
-
-	#tag ComputedProperty, Flags = &h0
-		#tag Getter
-			Get
-			  return mHash
-			End Get
-		#tag EndGetter
-		Hash As Integer
-	#tag EndComputedProperty
-
 	#tag Property, Flags = &h21
-		Private mHash As Integer
-	#tag EndProperty
-
-	#tag Property, Flags = &h21
-		Private mX As Integer
-	#tag EndProperty
-
-	#tag Property, Flags = &h21
-		Private mY As Integer
-	#tag EndProperty
-
-	#tag Property, Flags = &h21
-		Private mZ As Integer
+		Private Grid(-1,-1) As GridMember
 	#tag EndProperty
 
 	#tag ComputedProperty, Flags = &h0
 		#tag Getter
 			Get
-			  Return mX
+			  Return mLastColIndex
 			End Get
 		#tag EndGetter
-		X As Integer
+		LastColIndex As Integer
 	#tag EndComputedProperty
 
 	#tag ComputedProperty, Flags = &h0
 		#tag Getter
 			Get
-			  Return mY
+			  Return mLastRowIndex
 			End Get
 		#tag EndGetter
-		Y As Integer
+		LastRowIndex As Integer
+	#tag EndComputedProperty
+
+	#tag Property, Flags = &h21
+		Private mLastColIndex As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private mLastRowIndex As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private mWeakRef As WeakRef
+	#tag EndProperty
+
+	#tag ComputedProperty, Flags = &h0
+		#tag Getter
+			Get
+			  var rowBuilder() as string
+			  for row as integer = 0 to mLastRowIndex
+			    var colBuilder() as string
+			    for col as integer = 0 to mLastColIndex
+			      var m as GridMember = Grid( row, col )
+			      if m is nil then
+			        colBuilder.Add &uFF0E
+			      else
+			        colBuilder.Add Grid( row, col ).ToString
+			      end if
+			    next
+			    rowBuilder.Add String.FromArray( colBuilder, "" )
+			  next
+			  
+			  return String.FromArray( rowBuilder, EndOfLine )
+			  
+			End Get
+		#tag EndGetter
+		ToString As String
 	#tag EndComputedProperty
 
 	#tag ComputedProperty, Flags = &h0
 		#tag Getter
 			Get
-			  Return mZ
+			  if mWeakRef is nil then
+			    mWeakRef = new WeakRef( self )
+			  end if
+			  
+			  return mWeakRef
+			  
 			End Get
 		#tag EndGetter
-		Z As Integer
+		WeakRef As WeakRef
 	#tag EndComputedProperty
 
 
@@ -124,15 +149,7 @@ Class Advent3DObject
 			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="Coordinates"
-			Visible=false
-			Group="Behavior"
-			InitialValue=""
-			Type="String"
-			EditorType="MultiLineEditor"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="X"
+			Name="LastColIndex"
 			Visible=false
 			Group="Behavior"
 			InitialValue=""
@@ -140,23 +157,7 @@ Class Advent3DObject
 			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="Y"
-			Visible=false
-			Group="Behavior"
-			InitialValue=""
-			Type="Integer"
-			EditorType=""
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Z"
-			Visible=false
-			Group="Behavior"
-			InitialValue=""
-			Type="Integer"
-			EditorType=""
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Hash"
+			Name="LastRowIndex"
 			Visible=false
 			Group="Behavior"
 			InitialValue=""
