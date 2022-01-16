@@ -6,21 +6,25 @@ Inherits Thread
 		  var startµs as double
 		  var duration as double
 		  
+		  mIsTest = true
 		  startµs = System.Microseconds
 		  var result as integer = RaiseEvent RunTestA
 		  duration = System.Microseconds - startµs
 		  self.AddUserInterfaceUpdate new Dictionary( Types.TestA : result, kKeyDuration : duration )
 		  
+		  mIsTest = false
 		  startµs = System.Microseconds
 		  result = RaiseEvent RunA
 		  duration = System.Microseconds - startµs
 		  self.AddUserInterfaceUpdate new Dictionary( Types.A : result, kKeyDuration : duration )
 		  
+		  mIsTest = true
 		  startµs = System.Microseconds
 		  result = RaiseEvent RunTestB
 		  duration = System.Microseconds - startµs
 		  self.AddUserInterfaceUpdate new Dictionary( Types.TestB : result, kKeyDuration : duration )
 		  
+		  mIsTest = false
 		  startµs = System.Microseconds
 		  result = RaiseEvent RunB
 		  duration = System.Microseconds - startµs
@@ -106,6 +110,20 @@ Inherits Thread
 	#tag Hook, Flags = &h0
 		Event RunTestB() As Integer
 	#tag EndHook
+
+
+	#tag ComputedProperty, Flags = &h1
+		#tag Getter
+			Get
+			  Return mIsTest
+			End Get
+		#tag EndGetter
+		Protected IsTest As Boolean
+	#tag EndComputedProperty
+
+	#tag Property, Flags = &h21
+		Private mIsTest As Boolean
+	#tag EndProperty
 
 
 	#tag Constant, Name = kKeyDuration, Type = String, Dynamic = False, Default = \"duration", Scope = Private
