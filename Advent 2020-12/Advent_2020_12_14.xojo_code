@@ -99,11 +99,9 @@ Inherits AdventBase
 		      memAddress = memAddress or mask1 // Force the 1s
 		      memAddress = memAddress and mask2 // Clear the X bits
 		      
-		      var newMask() as string = maskMap.Clone
-		       
 		      var num as UInt64 = value.ToInteger
 		      
-		      StoreToRegisters( registers, memAddress, num, maskMap, newMask )
+		      StoreToRegisters( registers, memAddress, num, maskMap )
 		      
 		    end select
 		  next
@@ -115,15 +113,14 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub StoreToRegisters(registers As Dictionary, memAddress As UInt64, value As Integer, maskMap() As String, newMask() As String, startingIndex As Integer = 0)
+		Private Sub StoreToRegisters(registers As Dictionary, memAddress As UInt64, value As Integer, maskMap() As String, startingIndex As Integer = 0)
 		  for i as integer = startingIndex to maskMap.LastIndex
 		    var map as string = maskMap( i )
 		    
 		    if map = "X" then
-		      for inner as integer = 0 to 1
-		        newMask( i ) = inner.ToString
-		        StoreToRegisters( registers, memAddress, value, maskMap, newMask, i + 1 )
-		      next
+		      StoreToRegisters( registers, memAddress, value, maskMap, i + 1 )
+		      memAddress = memAddress or CType( 2 ^ ( maskMap.LastIndex - i ), UInt64 )
+		      StoreToRegisters( registers, memAddress, value, maskMap, i + 1 )
 		      return
 		    end if
 		  next
@@ -131,11 +128,7 @@ Inherits AdventBase
 		  //
 		  // If we get here, we didn't find another "X", so store it here
 		  //
-		  var maskString as string = "&b" + String.FromArray( newMask, "" )
-		  var mask as UInt64 = maskString.ToInteger
-		  
-		  var maskedMemAddress as UInt64 = memAddress or mask
-		  registers.Value( maskedMemAddress ) = value
+		  registers.Value( memAddress ) = value
 		  
 		End Sub
 	#tag EndMethod
