@@ -1,6 +1,20 @@
 #tag Module
 Protected Module Advent
 	#tag Method, Flags = &h0
+		Function Clone(Extends arr() As String) As String()
+		  var newArr() as string
+		  newArr.ResizeTo arr.LastIndex
+		  
+		  for i as integer = 0 to arr.LastIndex
+		    newArr( i ) = arr( i )
+		  next
+		  
+		  return newArr
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function IsBelow(Extends pt As Xojo.Point, rect As Advent.GraphRect) As Boolean
 		  return pt.Y < rect.Bottom
 		  
