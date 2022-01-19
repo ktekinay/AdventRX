@@ -48,6 +48,28 @@ Protected Module Advent
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function MultiplyArray(arr() As Integer, includeZeros As Boolean) As Integer
+		  var result as integer = 1
+		  var foundItems as boolean
+		  
+		  for each num as integer in arr
+		    if includeZeros or num <> 0 then
+		      foundItems = true
+		      result = result * num
+		    end if
+		  next
+		  
+		  if foundItems then
+		    return result
+		  else
+		    return 0
+		  end if
+		  
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function SumArray(arr() As Integer) As Integer
 		  var sum as integer
 		  
