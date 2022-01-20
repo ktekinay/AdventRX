@@ -62,6 +62,12 @@ Protected Module Advent
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function IsWithin(Extends value As Integer, range As Advent.Range) As Boolean
+		  return value >= range.Minimum and value <= range.Maximum
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function MultiplyArray(arr() As Integer, includeZeros As Boolean) As Integer
 		  var result as integer = 1
 		  var foundItems as boolean
