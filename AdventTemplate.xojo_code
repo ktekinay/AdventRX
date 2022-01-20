@@ -23,7 +23,12 @@ Inherits AdventBase
 
 	#tag Event
 		Function RunTestB() As Integer
-		  return CalculateResultB( Normalize( kTestInput ) )
+		  var input as string = kTestInputB
+		  if input = "" then
+		    input = kTestInput
+		  end if
+		  
+		  return CalculateResultB( Normalize( input ) )
 		  
 		End Function
 	#tag EndEvent
@@ -46,6 +51,9 @@ Inherits AdventBase
 	#tag EndConstant
 
 	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"", Scope = Private
+	#tag EndConstant
+
+	#tag Constant, Name = kTestInputB, Type = String, Dynamic = False, Default = \"", Scope = Private
 	#tag EndConstant
 
 
