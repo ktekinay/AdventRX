@@ -55,11 +55,11 @@ Inherits AdventBase
 		Private Function ResultOnTurn(targetTurn As Integer, values() As Integer) As Integer
 		  var lastValue as integer = values.Pop
 		  
-		  var trace as new Dictionary
-		  trace.BinCount = max( ( targetTurn * 10 ) + 1, 100001 )
+		  var trace() as integer
+		  trace.ResizeTo max( targetTurn + 1, 1000 )
 		  
 		  for i as integer = 0 to values.LastIndex
-		    trace.Value( values( i ) ) = i + 1
+		    trace( values( i ) ) = i + 1
 		  next
 		  
 		  var turn as integer = values.Count + 1
@@ -69,18 +69,17 @@ Inherits AdventBase
 		    
 		    var thisValue as integer
 		    
-		    var v as variant = trace.Lookup( lastValue, nil )
+		    var lookup as integer = if( trace.LastIndex < lastValue, 0, trace( lastValue ) )
 		    
-		    if v is nil then
-		      thisValue = 0
-		      trace.Value( lastValue ) = turn - 1
-		      
-		    else
-		      thisValue = ( turn - 1 ) - v.IntegerValue
-		      trace.Value( lastValue ) = turn - 1
-		      
+		    if lookup <> 0 then
+		      thisValue = ( turn - 1 ) - lookup
 		    end if
 		    
+		    if trace.LastIndex < lastValue then
+		      trace.ResizeTo lastValue + lastValue
+		    end if
+		    
+		    trace( lastValue ) = turn - 1
 		    lastValue = thisValue
 		  loop until turn = targetTurn
 		  
