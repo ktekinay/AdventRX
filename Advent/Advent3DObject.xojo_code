@@ -1,11 +1,7 @@
 #tag Class
 Class Advent3DObject
 	#tag Method, Flags = &h0
-		Sub SetCoordinates(x As Integer, y As Integer, z As Integer)
-		  self.mX = x
-		  self.mY = y
-		  self.mZ = z
-		  
+		Shared Function HashOf(x As Integer, y As Integer, z As Integer) As Integer
 		  const kAdder as integer = 1000000
 		  
 		  x = x + kAdder
@@ -14,7 +10,53 @@ Class Advent3DObject
 		  
 		  const kMask as UInt64 = &b111111111111111111111 // 21
 		  
-		  mHash = Bitwise.ShiftLeft( x and kMask, 42 ) or Bitwise.ShiftLeft( y and kMask, 21 ) or ( z and kMask ) 
+		  var result as integer = _
+		  Bitwise.ShiftLeft( x and kMask, 42 ) or _
+		  Bitwise.ShiftLeft( y and kMask, 21 ) or _
+		  ( z and kMask ) 
+		  
+		  return result
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Shared Function HashOf(x As Integer, y As Integer, z As Integer, w As Integer) As Integer
+		  var result as integer
+		  
+		  var ux as UInt16 = x
+		  var uy as UInt16 = y
+		  var uz as UInt16 = z
+		  var uw as UInt16 = w
+		  
+		  result = _
+		  Bitwise.ShiftLeft( ux, 48 ) or _
+		  Bitwise.ShiftLeft( uy, 32 ) or _
+		  Bitwise.ShiftLeft( uz, 16 ) or _
+		  uw
+		  
+		  return result
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub SetCoordinates(x As Integer, y As Integer, z As Integer)
+		  self.mX = x
+		  self.mY = y
+		  self.mZ = z
+		  
+		  mHash = HashOf( x, y, z )
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub SetCoordinates(x As Integer, y As Integer, z As Integer, w As Integer)
+		  self.mX = x
+		  self.mY = y
+		  self.mZ = z
+		  self.mW = w
+		  
+		  mHash = HashOf( x, y, z, w )
 		  
 		End Sub
 	#tag EndMethod
@@ -43,6 +85,14 @@ Class Advent3DObject
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
+		Private mW As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private mWeakRef As WeakRef
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
 		Private mX As Integer
 	#tag EndProperty
 
@@ -54,10 +104,37 @@ Class Advent3DObject
 		Private mZ As Integer
 	#tag EndProperty
 
+	#tag Property, Flags = &h0
+		Value As Variant
+	#tag EndProperty
+
 	#tag ComputedProperty, Flags = &h0
 		#tag Getter
 			Get
-			  Return mX
+			  return mW
+			End Get
+		#tag EndGetter
+		W As Integer
+	#tag EndComputedProperty
+
+	#tag ComputedProperty, Flags = &h0
+		#tag Getter
+			Get
+			  if mWeakRef is nil then
+			    mWeakRef = new WeakRef( self )
+			  end if
+			  
+			  return mWeakRef
+			  
+			End Get
+		#tag EndGetter
+		WeakRef As WeakRef
+	#tag EndComputedProperty
+
+	#tag ComputedProperty, Flags = &h0
+		#tag Getter
+			Get
+			  return mX
 			End Get
 		#tag EndGetter
 		X As Integer
