@@ -102,6 +102,46 @@ Protected Module Advent
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Function ToFixedWidth(Extends s As String) As String
+		  static fixedWidthArr() as string
+		  
+		  if fixedWidthArr.Count = 0 then
+		    fixedWidthArr.ResizeTo 126
+		    
+		    fixedWidthArr( 0 ) = &u3000
+		    
+		    for i as integer = 1 to fixedWidthArr.LastIndex
+		      fixedWidthArr( i ) = Encodings.UTF8.Chr( &hFF00 + i )
+		    next
+		  end if
+		  
+		  var chars() as string = s.Split( "" )
+		  
+		  for i as integer = 0 to chars.LastIndex
+		    var char as string = chars( i )
+		    var code as integer = char.Asc
+		    var fixedWidthIndex as integer = code - 32
+		    
+		    if fixedWidthIndex >= 0 and fixedWidthIndex <= fixedWidthArr.LastIndex then
+		      chars( i ) = fixedWidthArr( fixedWidthIndex )
+		    end if
+		  next
+		  
+		  s = String.FromArray( chars, "" )
+		  
+		  return s
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function ToFixedWidth(s As String) As String
+		  return s.ToFixedWidth
+		  
+		End Function
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty

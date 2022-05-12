@@ -63,6 +63,7 @@ Inherits AdventBase
 		  
 		  display = ToDisplay( grid, lastXIndex, lastYIndex )
 		  display = display
+		  Print display
 		  
 		  return 0
 		  

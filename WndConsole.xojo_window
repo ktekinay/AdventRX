@@ -48,7 +48,7 @@ Begin DesktopWindow WndConsole
       LineHeight      =   0.0
       LineSpacing     =   1.0
       LockBottom      =   True
-      LockedInPosition=   False
+      LockedInPosition=   True
       LockLeft        =   True
       LockRight       =   True
       LockTop         =   True
@@ -93,7 +93,7 @@ Begin DesktopWindow WndConsole
       Italic          =   False
       Left            =   786
       LockBottom      =   True
-      LockedInPosition=   False
+      LockedInPosition=   True
       LockLeft        =   False
       LockRight       =   True
       LockTop         =   False

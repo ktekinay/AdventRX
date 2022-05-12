@@ -86,7 +86,16 @@ Inherits Thread
 
 	#tag Method, Flags = &h1
 		Protected Function ToStringArray(s As String) As String()
-		  return Normalize( s ).Split( EndOfLine )
+		  s = Normalize( s )
+		  
+		  var arr() as string
+		  
+		  if s <> "" then
+		    arr = s.Split( EndOfLine )
+		  end if
+		  
+		  return arr
+		  
 		End Function
 	#tag EndMethod
 
