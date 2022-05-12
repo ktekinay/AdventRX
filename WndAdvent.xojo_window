@@ -163,6 +163,7 @@ End
 
 	#tag Method, Flags = &h21
 		Private Sub InitAdvent()
+		  // 2020
 		  AddRow new Advent_2020_12_01
 		  AddRow new Advent_2020_12_02
 		  AddRow new Advent_2020_12_03
@@ -183,6 +184,7 @@ End
 		  AddRow new Advent_2020_12_18
 		  AddRow new Advent_2020_12_19
 		  
+		  // 2021
 		  AddRow new Advent_2021_12_01
 		  AddRow new Advent_2021_12_02
 		  AddRow new Advent_2021_12_03
@@ -209,8 +211,10 @@ End
 		  AddRow new Advent_2021_12_24
 		  AddRow new Advent_2021_12_25
 		  
+		  // 2022
 		  AddRow new Advent_2022_12_01
 		  
+		  // Expand
 		  ExpandYear 2022
 		End Sub
 	#tag EndMethod
