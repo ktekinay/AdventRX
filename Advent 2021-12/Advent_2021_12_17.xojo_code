@@ -3,14 +3,14 @@ Protected Class Advent_2021_12_17
 Inherits AdventBase
 	#tag Event
 		Function RunA() As Integer
-		  return CalculateResultA( kInput )
+		  return CalculateResultA( GetPuzzleInput )
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function RunB() As Integer
-		  return CalculateResultB( kInput )
+		  return CalculateResultB( GetPuzzleInput )
 		End Function
 	#tag EndEvent
 
@@ -138,7 +138,7 @@ Inherits AdventBase
 	#tag EndMethod
 
 
-	#tag Constant, Name = kInput, Type = String, Dynamic = False, Default = \"target area: x\x3D117..164\x2C y\x3D-140..-89", Scope = Private
+	#tag Constant, Name = kPuzzleInput, Type = String, Dynamic = False, Default = \"", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"target area: x\x3D20..30\x2C y\x3D-10..-5", Scope = Private

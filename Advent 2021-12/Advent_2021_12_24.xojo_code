@@ -3,14 +3,14 @@ Protected Class Advent_2021_12_24
 Inherits AdventBase
 	#tag Event
 		Function RunA() As Integer
-		  return CalculateResultA( kInput )
+		  return CalculateResultA( GetPuzzleInput )
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function RunB() As Integer
-		  return CalculateResultB( kInput )
+		  return CalculateResultB( GetPuzzleInput )
 		End Function
 	#tag EndEvent
 
@@ -454,7 +454,7 @@ Inherits AdventBase
 	#tag EndProperty
 
 
-	#tag Constant, Name = kInput, Type = String, Dynamic = False, Default = \"inp w\nmul x 0\nadd x z\nmod x 26\ndiv z 1\nadd x 15\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 15\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 1\nadd x 12\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 5\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 1\nadd x 13\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 6\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 26\nadd x -14\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 7\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 1\nadd x 15\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 9\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 26\nadd x -7\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 6\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 1\nadd x 14\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 14\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 1\nadd x 15\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 3\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 1\nadd x 15\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 1\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 26\nadd x -7\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 3\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 26\nadd x -8\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 4\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 26\nadd x -7\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 6\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 26\nadd x -5\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 7\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 26\nadd x -10\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 1\nmul y x\nadd z y", Scope = Private
+	#tag Constant, Name = kPuzzleInput, Type = String, Dynamic = False, Default = \"", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = kScriptBase, Type = String, Dynamic = False, Default = \"const kDebugThreshold as integer \x3D // DEBUG THRESHOLD //\n\nconst kLastDigitIndex as integer \x3D 13\n\nvar Digits( kLastDigitIndex ) as integer\nvar Counter as Integer\n\nSub Initialize()\n  for i as integer \x3D 0 to Digits.LastIndex\n    Digits( i ) \x3D 1\n  next\nEnd Sub\n\nSub Decrement()\n  for i as integer \x3D Digits.LastIndex downto 0\n    Digits( i ) \x3D Digits( i ) - 1\n    if Digits( i ) <> 0 then\n      exit\n    end if\n    Digits( i ) \x3D 9\n  next i\nEnd Sub\n\nSub Increment()\n  for i as integer \x3D Digits.LastIndex downto 0\n    Digits( i ) \x3D Digits( i ) + 1\n    if Digits( i ) <> 10 then\n      exit\n    end if\n    Digits( i ) \x3D 1\n  next i\nEnd Sub\n\nFunction DigitsToString () As String\n  var stringBuilder() as string\n  for each digit as integer in Digits\n    stringBuilder.Add digit.ToString\n  next\n  return String.FromArray( stringBuilder\x2C \"\" )\nEnd Function\n\n\nFunction ALU () As Boolean\n  var w\x2C x\x2C y\x2C z as integer\n  \n// Code here //\n  \n  if kDebugThreshold > 0 then\n    Counter \x3D Counter + 1\n    if Counter \x3D kDebugThreshold then\n      Counter \x3D 0\n      print DigitsToString\n    end if\n  end if\n\n  return z \x3D 0\nEnd Function\n\n\n//\n// MAIN\n//\nInitialize\n\nwhile not ALU\n  Increment\n  \'Decrement\nwend\n\nScriptResult \x3D DigitsToString\n", Scope = Private

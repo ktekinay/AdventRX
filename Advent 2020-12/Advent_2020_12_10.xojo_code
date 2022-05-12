@@ -3,14 +3,14 @@ Protected Class Advent_2020_12_10
 Inherits AdventBase
 	#tag Event
 		Function RunA() As Integer
-		  return CalculateResultA( Normalize( kInput ) )
+		  return CalculateResultA( Normalize( GetPuzzleInput ) )
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function RunB() As Integer
-		  return CalculateResultB( Normalize( kInput ) )
+		  return CalculateResultB( Normalize( GetPuzzleInput ) )
 		End Function
 	#tag EndEvent
 
@@ -90,7 +90,7 @@ Inherits AdventBase
 	#tag EndMethod
 
 
-	#tag Constant, Name = kInput, Type = String, Dynamic = False, Default = \"99\n128\n154\n160\n61\n107\n75\n38\n15\n11\n129\n94\n157\n84\n121\n14\n119\n48\n30\n10\n55\n108\n74\n104\n91\n45\n134\n109\n164\n66\n146\n44\n116\n89\n79\n32\n149\n1\n136\n58\n96\n7\n60\n23\n31\n3\n65\n110\n90\n37\n43\n115\n122\n52\n113\n123\n161\n50\n95\n150\n120\n101\n126\n151\n114\n127\n73\n82\n162\n140\n51\n144\n36\n4\n163\n85\n42\n59\n67\n64\n86\n49\n2\n145\n135\n22\n24\n33\n137\n16\n27\n70\n133\n130\n20\n21\n83\n143\n100\n41\n76\n17", Scope = Private
+	#tag Constant, Name = kPuzzleInput, Type = String, Dynamic = False, Default = \"", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"28\n33\n18\n42\n31\n14\n46\n20\n48\n47\n24\n23\n49\n45\n19\n38\n39\n11\n1\n32\n25\n35\n8\n17\n7\n9\n4\n2\n34\n10\n3", Scope = Private

@@ -3,14 +3,14 @@ Protected Class Advent_2021_12_23
 Inherits AdventBase
 	#tag Event
 		Function RunA() As Integer
-		  return CalculateResultA( kInput )
+		  return CalculateResultA( GetPuzzleInput )
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function RunB() As Integer
-		  return CalculateResultB( kInput )
+		  return CalculateResultB( GetPuzzleInput )
 		End Function
 	#tag EndEvent
 
@@ -322,13 +322,13 @@ Inherits AdventBase
 	#tag Constant, Name = kInfiniteEnergy, Type = Double, Dynamic = False, Default = \"&hFFFFFFFFFFFFFF", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = kInput, Type = String, Dynamic = False, Default = \"#############\n#...........#\n###C#A#B#C###\n  #D#D#B#A#\n  #########", Scope = Private
-	#tag EndConstant
-
 	#tag Constant, Name = kInsertForB, Type = String, Dynamic = False, Default = \"  #D#C#B#A#\n  #D#B#A#C#", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = kLastColumnIndex, Type = Double, Dynamic = False, Default = \"10", Scope = Private
+	#tag EndConstant
+
+	#tag Constant, Name = kPuzzleInput, Type = String, Dynamic = False, Default = \"", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = kRowHall, Type = Double, Dynamic = False, Default = \"0", Scope = Private

@@ -3,14 +3,14 @@ Protected Class Advent_2020_12_17
 Inherits AdventBase
 	#tag Event
 		Function RunA() As Integer
-		  return CalculateResultA( Normalize( kInput ) )
+		  return CalculateResultA( Normalize( GetPuzzleInput ) )
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function RunB() As Integer
-		  return CalculateResultB( Normalize( kInput ) )
+		  return CalculateResultB( Normalize( GetPuzzleInput ) )
 		End Function
 	#tag EndEvent
 
@@ -228,7 +228,7 @@ Inherits AdventBase
 	#tag EndMethod
 
 
-	#tag Constant, Name = kInput, Type = String, Dynamic = False, Default = \"..##.#.#\n.#####..\n#.....##\n##.##.#.\n..#...#.\n.#..##..\n.#...#.#\n#..##.##", Scope = Private
+	#tag Constant, Name = kPuzzleInput, Type = String, Dynamic = False, Default = \"", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \".#.\n..#\n###", Scope = Private

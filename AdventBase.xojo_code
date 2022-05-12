@@ -54,6 +54,36 @@ Inherits Thread
 
 
 	#tag Method, Flags = &h1
+		Protected Function GetPuzzleInput() As String
+		  if StoredPuzzleInput <> "" then
+		    return StoredPuzzleInput
+		  end if
+		  
+		  var data as string
+		  
+		  var ti as Introspection.TypeInfo = Introspection.GetType( self )
+		  
+		  var dataFileName as string = ti.Name + ".txt"
+		  var dataFolder as FolderItem = SpecialFolder.Resource( "Puzzle Data" )
+		  var dataFile as FolderItem = dataFolder.Child( dataFileName )
+		  
+		  
+		  if dataFile.Exists then
+		    var tis as TextInputStream = TextInputStream.Open( dataFile )
+		    data = tis.ReadAll
+		    tis.Close
+		    
+		  else
+		    System.DebugLog "No puzzle data for " + ti.Name
+		    
+		  end if
+		  
+		  StoredPuzzleInput = data
+		  return data
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
 		Protected Function Normalize(s As String) As String
 		  return s.Trim.ReplaceLineEndings( EndOfLine )
 		  
@@ -132,6 +162,10 @@ Inherits Thread
 
 	#tag Property, Flags = &h21
 		Private mIsTest As Boolean
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private StoredPuzzleInput As String
 	#tag EndProperty
 
 

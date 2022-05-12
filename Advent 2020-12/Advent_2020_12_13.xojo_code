@@ -3,14 +3,14 @@ Protected Class Advent_2020_12_13
 Inherits AdventBase
 	#tag Event
 		Function RunA() As Integer
-		  return CalculateResultA( Normalize( kInput ) )
+		  return CalculateResultA( Normalize( GetPuzzleInput ) )
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function RunB() As Integer
-		  return CalculateResultB( Normalize( kInput ) )
+		  return CalculateResultB( Normalize( GetPuzzleInput ) )
 		End Function
 	#tag EndEvent
 
@@ -176,7 +176,7 @@ Inherits AdventBase
 	#tag EndMethod
 
 
-	#tag Constant, Name = kInput, Type = String, Dynamic = False, Default = \"1001938\n41\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2C37\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2C431\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2C23\x2Cx\x2Cx\x2Cx\x2Cx\x2C13\x2Cx\x2Cx\x2Cx\x2C17\x2Cx\x2C19\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2C863\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2Cx\x2C29", Scope = Private
+	#tag Constant, Name = kPuzzleInput, Type = String, Dynamic = False, Default = \"", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"939\n7\x2C13\x2Cx\x2Cx\x2C59\x2Cx\x2C31\x2C19", Scope = Private

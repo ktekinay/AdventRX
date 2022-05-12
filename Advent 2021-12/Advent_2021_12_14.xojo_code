@@ -3,14 +3,14 @@ Protected Class Advent_2021_12_14
 Inherits AdventBase
 	#tag Event
 		Function RunA() As Integer
-		  return CalculateResultA( kInput )
+		  return CalculateResultA( GetPuzzleInput )
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function RunB() As Integer
-		  return CalculateResultB( kInput )
+		  return CalculateResultB( GetPuzzleInput )
 		End Function
 	#tag EndEvent
 
@@ -191,7 +191,7 @@ Inherits AdventBase
 	#tag Constant, Name = kA, Type = Double, Dynamic = False, Default = \"65", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = kInput, Type = String, Dynamic = False, Default = \"CBNBOKHVBONCPPBBCKVH\n\nFK -> O\nBK -> B\nPB -> N\nVS -> P\nOF -> H\nKP -> K\nPS -> K\nOV -> N\nFO -> H\nKN -> P\nHF -> K\nBV -> N\nOO -> B\nKC -> V\nCK -> H\nBC -> P\nVV -> S\nNS -> C\nSF -> O\nBN -> V\nNH -> N\nVP -> F\nKH -> S\nBO -> N\nVN -> K\nBB -> H\nCH -> H\nHP -> O\nKK -> O\nCB -> S\nVC -> P\nFH -> B\nSP -> C\nNF -> O\nHN -> N\nPO -> P\nPP -> C\nSO -> F\nFB -> B\nSB -> B\nSC -> B\nHK -> O\nBF -> V\nOB -> B\nNC -> V\nHC -> F\nKO -> C\nNV -> C\nHB -> H\nFP -> S\nOS -> O\nHH -> K\nOK -> B\nOH -> C\nNP -> V\nSN -> H\nSK -> B\nHV -> F\nVF -> P\nCP -> H\nFN -> H\nFV -> B\nCN -> H\nOC -> O\nKV -> P\nCF -> B\nOP -> B\nFC -> O\nPC -> B\nCV -> S\nPV -> H\nVK -> N\nSS -> C\nHO -> F\nVH -> C\nNB -> S\nNN -> F\nFF -> K\nCC -> H\nSV -> H\nCO -> K\nBP -> O\nSH -> H\nKS -> K\nFS -> F\nPF -> S\nBS -> H\nVO -> H\nNK -> F\nPK -> B\nKB -> K\nCS -> C\nVB -> V\nBH -> O\nKF -> N\nHS -> H\nPH -> K\nON -> H\nPN -> K\nNO -> S", Scope = Private
+	#tag Constant, Name = kPuzzleInput, Type = String, Dynamic = False, Default = \"", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"NNCB\n\nCH -> B\nHH -> N\nCB -> H\nNH -> C\nHB -> C\nHC -> B\nHN -> C\nNN -> C\nBH -> H\nNC -> B\nNB -> B\nBN -> B\nBB -> N\nBC -> B\nCC -> N\nCN -> C", Scope = Private
