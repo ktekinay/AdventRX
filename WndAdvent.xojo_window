@@ -209,7 +209,9 @@ End
 		  AddRow new Advent_2021_12_24
 		  AddRow new Advent_2021_12_25
 		  
-		  ExpandYear 2020
+		  AddRow new Advent_2022_12_01
+		  
+		  ExpandYear 2022
 		End Sub
 	#tag EndMethod
 
