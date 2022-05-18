@@ -236,9 +236,15 @@ Inherits AdventBase
 		    return usedSoFar
 		  end if
 		  
+		  if runningEnergy >= BestMinimum then
+		    var bestMinimum as integer = self.BestMinimum
+		    return BestMinimum
+		  end if
+		  
 		  var minEnergyUsed as integer = kInfiniteEnergy
 		  
 		  for each candidate as Amphipod in amphipods
+		    
 		    var candidateLetter as string = candidate.Letter
 		    #pragma unused candidateLetter
 		    
@@ -285,7 +291,7 @@ Inherits AdventBase
 		          myEnergyUsed = MoveTo( candidate, grid, kRowHall, hallColumn )
 		          
 		          if ( myEnergyUsed + runningEnergy ) < BestMinimum then
-		            MyEnergyUsed = StartTheCommotion( grid, amphipods, myEnergyUsed, myEnergyUsed + runningEnergy )
+		            myEnergyUsed = StartTheCommotion( grid, amphipods, myEnergyUsed, myEnergyUsed + runningEnergy )
 		            if myEnergyUsed <> kInfiniteEnergy then
 		              minEnergyUsed = min( minEnergyUsed, MyEnergyUsed )
 		            end if
