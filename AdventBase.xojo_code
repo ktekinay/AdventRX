@@ -3,6 +3,32 @@ Protected Class AdventBase
 Inherits Thread
 	#tag Event
 		Sub Run()
+		  DoRun
+		End Sub
+	#tag EndEvent
+
+	#tag Event
+		Sub UserInterfaceUpdate(data() as Dictionary)
+		  for each d as Dictionary in data
+		    var duration as double = 0.0
+		    if d.HasKey( kKeyDuration ) then
+		      duration = d.Value( kKeyDuration )
+		      d.Remove kKeyDuration
+		    end if
+		    
+		    var keys() as variant = d.Keys
+		    var values() as variant = d.Values
+		    for i as integer = 0 to keys.LastIndex
+		      RaiseEvent ResultReturned( keys( i ), values( i ), duration )
+		    next
+		  next d
+		  
+		End Sub
+	#tag EndEvent
+
+
+	#tag Method, Flags = &h21
+		Private Sub DoRun()
 		  var startµs as double
 		  var duration as double
 		  
@@ -31,27 +57,7 @@ Inherits Thread
 		  self.AddUserInterfaceUpdate new Dictionary( Types.B : result, kKeyDuration : duration )
 		  
 		End Sub
-	#tag EndEvent
-
-	#tag Event
-		Sub UserInterfaceUpdate(data() as Dictionary)
-		  for each d as Dictionary in data
-		    var duration as double = 0.0
-		    if d.HasKey( kKeyDuration ) then
-		      duration = d.Value( kKeyDuration )
-		      d.Remove kKeyDuration
-		    end if
-		    
-		    var keys() as variant = d.Keys
-		    var values() as variant = d.Values
-		    for i as integer = 0 to keys.LastIndex
-		      RaiseEvent ResultReturned( keys( i ), values( i ), duration )
-		    next
-		  next d
-		  
-		End Sub
-	#tag EndEvent
-
+	#tag EndMethod
 
 	#tag Method, Flags = &h1
 		Protected Function GetPuzzleInput() As String
@@ -96,6 +102,23 @@ Inherits Thread
 		  WndConsole.Print msg
 		  'System.DebugLog "console: " + msg.StringValue
 		  Thread.YieldToNext
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Attributes( Deprecated = "Start" )  Sub Run()
+		  Start
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub Start()
+		  if IsThreaded then
+		    super.Start
+		  else
+		    DoRun
+		  end if
+		  
 		End Sub
 	#tag EndMethod
 
@@ -159,6 +182,10 @@ Inherits Thread
 		#tag EndGetter
 		Protected IsTest As Boolean
 	#tag EndComputedProperty
+
+	#tag Property, Flags = &h0
+		Shared IsThreaded As Boolean = True
+	#tag EndProperty
 
 	#tag Property, Flags = &h21
 		Private mIsTest As Boolean

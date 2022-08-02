@@ -311,7 +311,7 @@ End
 		    next
 		    
 		    AddHandler advent.ResultReturned, WeakAddressOf Advent_ResultReturned
-		    advent.Run
+		    advent.Start
 		    
 		    status = kLabelRunning
 		    
