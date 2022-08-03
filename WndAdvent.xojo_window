@@ -34,7 +34,7 @@ Begin DesktopWindow WndAdvent
       AllowRowReordering=   False
       Bold            =   False
       ColumnCount     =   6
-      ColumnWidths    =   "240, 75"
+      ColumnWidths    =   "300, 75"
       DefaultRowHeight=   -1
       DropIndicatorVisible=   False
       Enabled         =   True
