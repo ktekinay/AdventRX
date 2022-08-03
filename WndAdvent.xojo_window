@@ -183,6 +183,7 @@ End
 		  AddRow new Advent_2020_12_17
 		  AddRow new Advent_2020_12_18
 		  AddRow new Advent_2020_12_19
+		  AddRow new Advent_2020_12_20
 		  AddRow new Advent_2020_12_21
 		  
 		  // 2021
