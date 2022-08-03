@@ -2,6 +2,25 @@
 Protected Class Advent_2021_12_11
 Inherits AdventBase
 	#tag Event
+		Function ReturnDescription() As String
+		  return "Flash energy levels"
+		End Function
+	#tag EndEvent
+
+	#tag Event
+		Function ReturnIsComplete() As Boolean
+		  return true
+		End Function
+	#tag EndEvent
+
+	#tag Event
+		Function ReturnName() As String
+		  return "Dumbo Octopus"
+		  
+		End Function
+	#tag EndEvent
+
+	#tag Event
 		Function RunA() As Integer
 		  return CalculateResultA( GetPuzzleInput )
 		  
@@ -162,6 +181,22 @@ Inherits AdventBase
 
 
 	#tag ViewBehavior
+		#tag ViewProperty
+			Name="IsComplete"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Description"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="String"
+			EditorType="MultiLineEditor"
+		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Priority"
 			Visible=true
