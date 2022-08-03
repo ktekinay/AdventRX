@@ -158,6 +158,18 @@ Inherits Thread
 	#tag EndHook
 
 	#tag Hook, Flags = &h0
+		Event ReturnDescription() As String
+	#tag EndHook
+
+	#tag Hook, Flags = &h0
+		Event ReturnIsComplete() As Boolean
+	#tag EndHook
+
+	#tag Hook, Flags = &h0
+		Event ReturnName() As String
+	#tag EndHook
+
+	#tag Hook, Flags = &h0
 		Event RunA() As Integer
 	#tag EndHook
 
@@ -173,6 +185,26 @@ Inherits Thread
 		Event RunTestB() As Integer
 	#tag EndHook
 
+
+	#tag ComputedProperty, Flags = &h0
+		#tag Getter
+			Get
+			  return RaiseEvent ReturnDescription
+			  
+			End Get
+		#tag EndGetter
+		Description As String
+	#tag EndComputedProperty
+
+	#tag ComputedProperty, Flags = &h0
+		#tag Getter
+			Get
+			  return RaiseEvent ReturnIsComplete
+			  
+			End Get
+		#tag EndGetter
+		IsComplete As Boolean
+	#tag EndComputedProperty
 
 	#tag ComputedProperty, Flags = &h1
 		#tag Getter
@@ -190,6 +222,15 @@ Inherits Thread
 	#tag Property, Flags = &h21
 		Private mIsTest As Boolean
 	#tag EndProperty
+
+	#tag ComputedProperty, Flags = &h0
+		#tag Getter
+			Get
+			  return RaiseEvent ReturnName
+			End Get
+		#tag EndGetter
+		Name As String
+	#tag EndComputedProperty
 
 	#tag Property, Flags = &h21
 		Private StoredPuzzleInput As String
@@ -295,6 +336,14 @@ Inherits Thread
 			InitialValue="0"
 			Type="Integer"
 			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Description"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="String"
+			EditorType="MultiLineEditor"
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class

@@ -2,6 +2,26 @@
 Protected Class AdventTemplate
 Inherits AdventBase
 	#tag Event
+		Function ReturnDescription() As String
+		  return "Unknown"
+		End Function
+	#tag EndEvent
+
+	#tag Event
+		Function ReturnIsComplete() As Boolean
+		  return false
+		  
+		End Function
+	#tag EndEvent
+
+	#tag Event
+		Function ReturnName() As String
+		  return ""
+		  
+		End Function
+	#tag EndEvent
+
+	#tag Event
 		Function RunA() As Integer
 		  return CalculateResultA( Normalize( GetPuzzleInput ) )
 		  
@@ -58,6 +78,22 @@ Inherits AdventBase
 
 
 	#tag ViewBehavior
+		#tag ViewProperty
+			Name="IsComplete"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Description"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="String"
+			EditorType="MultiLineEditor"
+		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Priority"
 			Visible=true

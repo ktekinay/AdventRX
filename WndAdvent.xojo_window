@@ -23,7 +23,7 @@ Begin DesktopWindow WndAdvent
    Title           =   "Advent"
    Type            =   0
    Visible         =   True
-   Width           =   890
+   Width           =   1106
    Begin DesktopListBox LbAdvent
       AllowAutoDeactivate=   True
       AllowAutoHideScrollbars=   True
@@ -34,7 +34,7 @@ Begin DesktopWindow WndAdvent
       AllowRowReordering=   False
       Bold            =   False
       ColumnCount     =   6
-      ColumnWidths    =   "120, 75"
+      ColumnWidths    =   "240, 75"
       DefaultRowHeight=   -1
       DropIndicatorVisible=   False
       Enabled         =   True
@@ -68,7 +68,7 @@ Begin DesktopWindow WndAdvent
       Transparent     =   False
       Underline       =   False
       Visible         =   True
-      Width           =   850
+      Width           =   1066
       _ScrollOffset   =   0
       _ScrollWidth    =   -1
    End
@@ -183,6 +183,7 @@ End
 		  AddRow new Advent_2020_12_17
 		  AddRow new Advent_2020_12_18
 		  AddRow new Advent_2020_12_19
+		  AddRow new Advent_2020_12_21
 		  
 		  // 2021
 		  AddRow new Advent_2021_12_01
@@ -382,6 +383,15 @@ End
 		    return false
 		  end if
 		  
+		  if column = integer( Columns.Name ) then
+		    var advent as AdventBase = me.RowTagAt( row )
+		    if advent.IsComplete then
+		      g.DrawingColor = &c00AE0000
+		    end if
+		    
+		    return false
+		  end if
+		  
 		  if column < integer( Columns.ResultTestA ) then
 		    return false
 		  end if
@@ -420,8 +430,14 @@ End
 		    name = name.ReplaceAll( "_", "-" )
 		    name = name.Trim
 		    
+		    var puzzleName as string = advent.Name
+		    if puzzleName <> "" then
+		      name = name + " (" + puzzleName + ")"
+		    end if
+		    
 		    me.AddRow name
 		    me.RowTagAt( me.LastAddedRowIndex ) = advent
+		    me.CellTooltipAt( me.LastAddedRowIndex, integer( Columns.Name ) ) = advent.Description
 		  next
 		End Sub
 	#tag EndEvent
