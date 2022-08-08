@@ -56,6 +56,37 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Integer
+		  //
+		  // Split the ingredients and allergens
+		  //
+		  
+		  var allergens as new Dictionary
+		  
+		  var rows() as string = self.ToStringArray( input )
+		  
+		  for each row as string in rows
+		    var parts() as string = row.Split( "(contains " )
+		    parts( 1 ) = parts( 1 ).TrimRight( ")" )
+		    var allergenList() as string = parts( 1 ).Split( ", " )
+		    
+		    var ingredients() as string = parts( 0 ).Split( " " )
+		    
+		    for each allergen as string in allergenList
+		      var allergenDict as Dictionary = allergens.Lookup( allergen, nil )
+		      if allergenDict is nil then
+		        allergenDict = new Dictionary
+		        allergens.Value( allergen ) = allergenDict
+		        
+		        for each ingredient as string in ingredients
+		          allergenDict.Value( ingredient ) = nil
+		        next
+		        
+		      else
+		        
+		      end if
+		      
+		    next
+		  next
 		  
 		End Function
 	#tag EndMethod
