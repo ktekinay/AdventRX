@@ -99,9 +99,44 @@ Inherits Thread
 	#tag Method, Flags = &h1
 		Protected Sub Print(msg As Variant)
 		  #pragma BackgroundTasks true
+		  
+		  if msg isa RowSet then
+		    PrintRowSet msg
+		    return
+		  end if
+		  
+		  if msg.IsArray or msg isa Dictionary then
+		    msg = GenerateJSON( msg )
+		  end if
+		  
 		  WndConsole.Print msg
 		  'System.DebugLog "console: " + msg.StringValue
 		  Thread.YieldToNext
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub PrintRowSet(rs As RowSet)
+		  #pragma BackgroundTasks true
+		  
+		  if rs.AfterLastRow then
+		    Print "No records!"
+		    return
+		  end if
+		  
+		  while not rs.AfterLastRow
+		    
+		    for colIndex as integer = 0 to rs.LastColumnIndex
+		      WndConsole.Print rs.ColumnAt( colIndex ).Name + ": " + rs.ColumnAt( colIndex ).StringValue
+		    next
+		    
+		    Print "-------------------------------------"
+		    
+		    rs.MoveToNextRow
+		  wend
+		  
+		  Print ""
+		  
 		End Sub
 	#tag EndMethod
 
@@ -344,6 +379,14 @@ Inherits Thread
 			InitialValue=""
 			Type="String"
 			EditorType="MultiLineEditor"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="IsComplete"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class
