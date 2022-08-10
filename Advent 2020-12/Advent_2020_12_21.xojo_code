@@ -60,33 +60,21 @@ Inherits AdventBase
 		  // Split the ingredients and allergens
 		  //
 		  
-		  var allergens as new Dictionary
+		  var db as Database = CreateDatabase
+		  PopulateDatabase db, input
+		  PrintDbInfo db, "Populated"
 		  
-		  var rows() as string = self.ToStringArray( input )
+		  DeleteImpossibleIngredients db
+		  PrintDbInfo db, "Deleted"
 		  
-		  for each row as string in rows
-		    var parts() as string = row.Split( "(contains " )
-		    parts( 1 ) = parts( 1 ).TrimRight( ")" )
-		    var allergenList() as string = parts( 1 ).Split( ", " )
-		    
-		    var ingredients() as string = parts( 0 ).Split( " " )
-		    
-		    for each allergen as string in allergenList
-		      var allergenDict as Dictionary = allergens.Lookup( allergen, nil )
-		      if allergenDict is nil then
-		        allergenDict = new Dictionary
-		        allergens.Value( allergen ) = allergenDict
-		        
-		        for each ingredient as string in ingredients
-		          allergenDict.Value( ingredient ) = nil
-		        next
-		        
-		      else
-		        
-		      end if
-		      
-		    next
-		  next
+		  '//
+		  '// Get the stats
+		  '//
+		  'var rs as RowSet = db.SelectSQL( _
+		  '"SELECT COUNT(*)" + EndOfLine + _
+		  '"FROM imported_row
+		  ')
+		  db = db
 		  
 		End Function
 	#tag EndMethod
@@ -95,6 +83,150 @@ Inherits AdventBase
 		Private Function CalculateResultB(input As String) As Integer
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CreateDatabase() As Database
+		  var db as new SQLiteDatabase
+		  db.WriteAheadLogging = true
+		  
+		  call db.Connect
+		  
+		  db.ExecuteSQL "CREATE TABLE allergen (name TEXT UNIQUE)"
+		  
+		  db.ExecuteSQL "CREATE TABLE ingredient (name TEXT UNIQUE)"
+		  
+		  db.ExecuteSQL "CREATE TABLE imported_row (row_num INTEGER, ingredient TEXT, allergen TEXT)"
+		  db.ExecuteSQL "CREATE INDEX imported_row_row_num_idx ON imported_row (row_num)"
+		  db.ExecuteSQL "CREATE INDEX imported_row_ingredient_idx ON imported_row (ingredient)"
+		  db.ExecuteSQL "CREATE INDEX imported_row_allergen_idx ON imported_row (allergen)"
+		  
+		  db.ExecuteSQL "CREATE TABLE potential_match (allergen TEXT, ingredient TEXT)"
+		  db.ExecuteSQL "CREATE UNIQUE INDEX potential_match_unique_idx ON potential_match (allergen, ingredient)"
+		  
+		  db.ExecuteSQL "CREATE TABLE confirmed_match (allergen TEXT, ingredient TEXT)"
+		  db.ExecuteSQL "CREATE UNIQUE INDEX confirmed_match_unique_idx ON confirmed_match (allergen, ingredient)"
+		  
+		  db.ExecuteSQL "CREATE TABLE imported_row_stats (row_num INTEGER UNIQUE, ingredient_count INTEGER, allergen_count INTEGER)"
+		  db.ExecuteSQL "CREATE INDEX imported_row_stats_allergen_count_idx ON imported_row_stats (allergen_count)"
+		  db.ExecuteSQL "CREATE INDEX imported_row_stats_ingredient_count_idx ON imported_row_stats (ingredient_count)"
+		  
+		  
+		  return db
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub DeleteImpossibleIngredients(db As Database)
+		  var rs as RowSet  = db.SelectSQL( _
+		  "DELETE FROM imported_row AS this_row" + EndOfLine + _
+		  "WHERE" + EndOfLine + _
+		  "  NOT EXISTS (" + EndOfLine + _
+		  "    SELECT * FROM imported_row AS prev_row" + EndOfLine + _
+		  "    WHERE" + EndOfLine + _
+		  "      prev_row.row_num < this_row.row_num" + EndOfLine + _
+		  "      AND prev_row.allergen = this_row.allergen" + EndOfLine + _
+		  "      AND prev_row.ingredient = this_row.ingredient" + EndOfLine + _
+		  "  ) AND EXISTS (" + EndOfLine + _
+		  "    SELECT * FROM imported_row AS prev_row" + EndOfLine + _
+		  "    WHERE" + EndOfLine + _
+		  "      prev_row.row_num < this_row.row_num" + EndOfLine + _
+		  "      AND prev_row.allergen = this_row.allergen" + EndOfLine + _
+		  "  ) RETURNING *" _
+		  )
+		  
+		  print "IMPOSSIBLE ROWS:"
+		  while not rs.AfterLastRow
+		    print rs.Column( "row_num" ).StringValue + " " + rs.Column( "allergen" ).StringValue + " " + rs.Column( "ingredient" ).StringValue
+		    rs.MoveToNextRow
+		  wend
+		  
+		  print ""
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub PopulateDatabase(db As Database, input As String)
+		  'db.ExecuteSQL "CREATE TABLE allergen (name TEXT)"
+		  'db.ExecuteSQL "CREATE TABLE ingredient (name TEXT)"
+		  'db.ExecuteSQL "CREATE TABLE imported_row (row_num INTEGER, ingredient TEXT, allergen TEXT)"
+		  'db.ExecuteSQL "CREATE TABLE imported_row_stats (row_num INTEGER, ingredient_count INTEGER, allergen_count INTEGER)"
+		  
+		  
+		  var insertIngredientPs as PreparedSQLStatement = db.Prepare( "INSERT INTO ingredient (name) VALUES (?) ON CONFLICT DO NOTHING" )
+		  insertIngredientPs.BindType( 0, SQLitePreparedStatement.SQLITE_TEXT )
+		  
+		  var insertAllergenPs as PreparedSQLStatement = db.Prepare( "INSERT INTO allergen (name) VALUES (?) ON CONFLICT DO NOTHING" )
+		  insertAllergenPs.BindType( 0, SQLitePreparedStatement.SQLITE_TEXT )
+		  
+		  var insertRowPs as PreparedSQLStatement = db.Prepare( "INSERT INTO imported_row (row_num, ingredient, allergen) VALUES (?, ?, ?)" )
+		  insertRowPs.BindType( 0, SQLitePreparedStatement.SQLITE_INTEGER )
+		  insertRowPs.BindType( 1, SQLitePreparedStatement.SQLITE_TEXT )
+		  insertRowPs.BindType( 2, SQLitePreparedStatement.SQLITE_TEXT )
+		  
+		  var insertRowStatPs as PreparedSQLStatement = db.Prepare( "INSERT INTO imported_row_stats (row_num, ingredient_count, allergen_count) VALUES (?, ?, ?)" )
+		  insertRowStatPs.BindType( 0, SQLitePreparedStatement.SQLITE_INTEGER )
+		  insertRowStatPs.BindType( 1, SQLitePreparedStatement.SQLITE_INTEGER )
+		  insertRowStatPs.BindType( 2, SQLitePreparedStatement.SQLITE_INTEGER )
+		  
+		  var rows() as string = self.ToStringArray( input )
+		  
+		  var rowIndex as integer = 0
+		  
+		  for each row as string in rows
+		    rowIndex = rowIndex + 1
+		    
+		    var parts() as string = row.Split( "(contains " )
+		    parts( 1 ) = parts( 1 ).TrimRight( ")" )
+		    var allergens() as string = parts( 1 ).Split( ", " )
+		    
+		    var ingredients() as string = parts( 0 ).Split( " " )
+		    
+		    insertRowStatPs.ExecuteSQL rowIndex, ingredients.Count, allergens.Count
+		    
+		    for each ingredient as string in ingredients
+		      insertIngredientPs.ExecuteSQL ingredient
+		    next
+		    
+		    for each allergen as string in allergens
+		      insertAllergenPs.ExecuteSQL allergen
+		    next
+		    
+		    for each ingredient as string in ingredients
+		      for each allergen as string in allergens
+		        insertRowPs.ExecuteSQL rowIndex, ingredient, allergen
+		      next
+		    next
+		  next
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub PrintDbInfo(db As Database, tag As String)
+		  print tag
+		  print "================================="
+		  
+		  var rs as RowSet
+		  var tables() as string = array( "ingredient", "allergen", "imported_row", "imported_row_stats" )
+		  
+		  for each table as string in tables
+		    rs = db.SelectSQL( "SELECT COUNT (*) FROM " + table )
+		    print table + ": " + rs.ColumnAt( 0 ).StringValue
+		  next
+		  
+		  rs = db.SelectSQL( "SELECT COUNT(*) FROM imported_row_stats WHERE allergen_count = 1" )
+		  print "  rows where allergen_count = 1: " + rs.ColumnAt( 0 ).StringValue
+		  
+		  rs = db.SelectSQL( "SELECT COUNT(*) FROM imported_row_stats WHERE ingredient_count = 1" )
+		  print "  rows where ingredient_count = 1: " + rs.ColumnAt( 0 ).StringValue
+		  
+		  
+		  print ""
+		  
+		End Sub
 	#tag EndMethod
 
 
