@@ -11,7 +11,6 @@ Class=Advent3DObject;Advent/Advent3DObject.xojo_code;&h00000000062C57FF;&h000000
 BuildSteps=Build Automation;Build Automation.xojo_code;&h0000000046FCD7FF;&h0000000000000000;false
 Class=AdventBase;AdventBase.xojo_code;&h00000000575CAFFF;&h0000000000000000;false
 Class=AdventTemplate;AdventTemplate.xojo_code;&h000000003860A7FF;&h0000000000000000;false
-Class=Advent_2020_12_20;Advent_2020_12_20.xojo_code;&h000000002A3277FF;&h0000000000000000;false
 Folder=Advent 2020-12;Advent 2020-12;&h00000000677627FF;&h0000000000000000;false
 Class=Advent_2020_12_01;Advent 2020-12/Advent_2020_12_01.xojo_code;&h000000001501E7FF;&h00000000677627FF;false
 Class=Advent_2020_12_02;Advent 2020-12/Advent_2020_12_02.xojo_code;&h0000000025676FFF;&h00000000677627FF;false
