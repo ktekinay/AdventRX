@@ -90,6 +90,7 @@ Class=Rule;Advent 2021-12/Support 2021_12/Rule.xojo_code;&h00000000739EA7FF;&h00
 Class=Scanner;Advent 2021-12/Support 2021_12/Scanner.xojo_code;&h00000000145C47FF;&h0000000011E5A7FF;false
 Folder=Support 2020-12;Advent 2020-12/Support 2020-12;&h00000000761227FF;&h00000000677627FF;false
 Class=Luggage;Advent 2020-12/Support 2020-12/Luggage.xojo_code;&h000000003B7FFFFF;&h00000000761227FF;false
+Class=SatelliteTile;Advent 2020-12/Support 2020-12/SatelliteTile.xojo_code;&h000000000331EFFF;&h00000000761227FF;false
 Class=StringGrid;Advent/StringGrid.xojo_code;&h00000000048437FF;&h0000000010970FFF;false
 Class=Seat;Advent 2020-12/Support 2020-12/Seat.xojo_code;&h00000000297EF7FF;&h00000000761227FF;false
 Class=SeatGrid;Advent 2020-12/Support 2020-12/SeatGrid.xojo_code;&h000000006632BFFF;&h00000000761227FF;false
