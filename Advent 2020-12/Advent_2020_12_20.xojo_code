@@ -2,6 +2,434 @@
 Protected Class Advent_2020_12_20
 Inherits AdventBase
 	#tag Event
+		Function CancelRun(type As Types) As Boolean
+		  if type <> Types.TestA then
+		    return false
+		  end if
+		  
+		  var data as string = _
+		  "Tile 1:" + EndOfLine + _
+		  "ABCDE" + EndOfLine + _
+		  "FGHIJ" + EndOfLine + _
+		  "KLMNO" + EndOfLine + _
+		  "PQRST" + EndOfLine + _
+		  "UVWXY"
+		  
+		  var tile as new SatelliteTile( data )
+		  if tile.ID <> 1 then
+		    Print "Test failed at ID"
+		    return true
+		  end if
+		  
+		  if tile.LeftHash <> Crypto.SHA2_256( "AFKPU" ) then
+		    Print "Test failed at 1"
+		    return true
+		  end if
+		  
+		  if tile.TopHash <> Crypto.SHA2_256( "ABCDE" ) then
+		    Print "Test failed at 2"
+		    return true
+		  end if
+		  
+		  if tile.RightHash <> Crypto.SHA2_256( "EJOTY" ) then
+		    Print "Test failed at 3"
+		    return true
+		  end if
+		  
+		  if tile.BottomHash <> Crypto.SHA2_256( "UVWXY" ) then
+		    Print "Test failed at 4"
+		    return true
+		  end if
+		  
+		  tile.Orientation = SatelliteTile.Orientations.R90
+		  
+		  if tile.LeftHash <> Crypto.SHA2_256( "UVWXY" ) then
+		    Print "Test failed at 5"
+		    return true
+		  end if
+		  
+		  if tile.TopHash <> Crypto.SHA2_256( "UPKFA" ) then
+		    Print "Test failed at 6"
+		    return true
+		  end if
+		  
+		  if tile.RightHash <> Crypto.SHA2_256( "ABCDE" ) then
+		    Print "Test failed at 7"
+		    return true
+		  end if
+		  
+		  if tile.BottomHash <> Crypto.SHA2_256( "YTOJE" ) then
+		    Print "Test failed at 8"
+		    return true
+		  end if
+		  
+		  '"ABCDE" + EndOfLine + _
+		  '"FGHIJ" + EndOfLine + _
+		  '"KLMNO" + EndOfLine + _
+		  '"PQRST" + EndOfLine + _
+		  '"UVWXY"
+		  
+		  tile.Orientation = SatelliteTile.Orientations.R180
+		  
+		  if tile.LeftHash <> Crypto.SHA2_256( "YTOJE" ) then
+		    Print "Test failed at 9"
+		    return true
+		  end if
+		  
+		  if tile.TopHash <> Crypto.SHA2_256( "YXWVU" ) then
+		    Print "Test failed at 10"
+		    return true
+		  end if
+		  
+		  if tile.RightHash <> Crypto.SHA2_256( "UPKFA" ) then
+		    Print "Test failed at 11"
+		    return true
+		  end if
+		  
+		  if tile.BottomHash <> Crypto.SHA2_256( "EDCBA" ) then
+		    Print "Test failed at 12"
+		    return true
+		  end if
+		  
+		  '"ABCDE" + EndOfLine + _
+		  '"FGHIJ" + EndOfLine + _
+		  '"KLMNO" + EndOfLine + _
+		  '"PQRST" + EndOfLine + _
+		  '"UVWXY"
+		  
+		  tile.Orientation = SatelliteTile.Orientations.R270
+		  
+		  if tile.LeftHash <> Crypto.SHA2_256( "EDCBA" ) then
+		    Print "Test failed at 12"
+		    return true
+		  end if
+		  
+		  if tile.TopHash <> Crypto.SHA2_256( "EJOTY" ) then
+		    Print "Test failed at 14"
+		    return true
+		  end if
+		  
+		  if tile.RightHash <> Crypto.SHA2_256( "YXWVU" ) then
+		    Print "Test failed at 15"
+		    return true
+		  end if
+		  
+		  if tile.BottomHash <> Crypto.SHA2_256( "AFKPU" ) then
+		    Print "Test failed at 16"
+		    return true
+		  end if
+		  
+		  '"ABCDE" + EndOfLine + _
+		  '"FGHIJ" + EndOfLine + _
+		  '"KLMNO" + EndOfLine + _
+		  '"PQRST" + EndOfLine + _
+		  '"UVWXY"
+		  
+		  tile.Orientation = SatelliteTile.Orientations.R0FlippedHorizontal
+		  
+		  if tile.LeftHash <> Crypto.SHA2_256( "EJOTY" ) then
+		    Print "Test failed at 17"
+		    return true
+		  end if
+		  
+		  if tile.TopHash <> Crypto.SHA2_256( "EDCBA" ) then
+		    Print "Test failed at 18"
+		    return true
+		  end if
+		  
+		  if tile.RightHash <> Crypto.SHA2_256( "AFKPU" ) then
+		    Print "Test failed at 19"
+		    return true
+		  end if
+		  
+		  if tile.BottomHash <> Crypto.SHA2_256( "YXWVU" ) then
+		    Print "Test failed at 20"
+		    return true
+		  end if
+		  
+		  '"ABCDE" + EndOfLine + _
+		  '"FGHIJ" + EndOfLine + _
+		  '"KLMNO" + EndOfLine + _
+		  '"PQRST" + EndOfLine + _
+		  '"UVWXY"
+		  
+		  tile.Orientation = SatelliteTile.Orientations.R90FlippedHorizontal
+		  
+		  if tile.LeftHash <> Crypto.SHA2_256( "ABCDE" ) then
+		    Print "Test failed at 21"
+		    return true
+		  end if
+		  
+		  if tile.TopHash <> Crypto.SHA2_256( "AFKPU" ) then
+		    Print "Test failed at 22"
+		    return true
+		  end if
+		  
+		  if tile.RightHash <> Crypto.SHA2_256( "UVWXY" ) then
+		    Print "Test failed at 23"
+		    return true
+		  end if
+		  
+		  if tile.BottomHash <> Crypto.SHA2_256( "EJOTY" ) then
+		    Print "Test failed at 24"
+		    return true
+		  end if
+		  
+		  '"ABCDE" + EndOfLine + _
+		  '"FGHIJ" + EndOfLine + _
+		  '"KLMNO" + EndOfLine + _
+		  '"PQRST" + EndOfLine + _
+		  '"UVWXY"
+		  
+		  tile.Orientation = SatelliteTile.Orientations.R180FlippedHorizontal
+		  
+		  if tile.LeftHash <> Crypto.SHA2_256( "UPKFA" ) then
+		    Print "Test failed at 25"
+		    return true
+		  end if
+		  
+		  if tile.TopHash <> Crypto.SHA2_256( "UVWXY" ) then
+		    Print "Test failed at 26"
+		    return true
+		  end if
+		  
+		  if tile.RightHash <> Crypto.SHA2_256( "YTOJE" ) then
+		    Print "Test failed at 27"
+		    return true
+		  end if
+		  
+		  if tile.BottomHash <> Crypto.SHA2_256( "ABCDE" ) then
+		    Print "Test failed at 28"
+		    return true
+		  end if
+		  
+		  '"ABCDE" + EndOfLine + _
+		  '"FGHIJ" + EndOfLine + _
+		  '"KLMNO" + EndOfLine + _
+		  '"PQRST" + EndOfLine + _
+		  '"UVWXY"
+		  
+		  tile.Orientation = SatelliteTile.Orientations.R270FlippedHorizontal
+		  
+		  if tile.LeftHash <> Crypto.SHA2_256( "YXWVU" ) then
+		    Print "Test failed at 29"
+		    return true
+		  end if
+		  
+		  if tile.TopHash <> Crypto.SHA2_256( "YTOJE" ) then
+		    Print "Test failed at 30"
+		    return true
+		  end if
+		  
+		  if tile.RightHash <> Crypto.SHA2_256( "EDCBA" ) then
+		    Print "Test failed at 31"
+		    return true
+		  end if
+		  
+		  if tile.BottomHash <> Crypto.SHA2_256( "UPKFA" ) then
+		    Print "Test failed at 32"
+		    return true
+		  end if
+		  
+		  '"ABCDE" + EndOfLine + _
+		  '"FGHIJ" + EndOfLine + _
+		  '"KLMNO" + EndOfLine + _
+		  '"PQRST" + EndOfLine + _
+		  '"UVWXY"
+		  
+		  tile.Orientation = SatelliteTile.Orientations.R0FlippedVertical
+		  
+		  if tile.LeftHash <> Crypto.SHA2_256( "UPKFA" ) then
+		    Print "Test failed at 33"
+		    return true
+		  end if
+		  
+		  if tile.TopHash <> Crypto.SHA2_256( "UVWXY" ) then
+		    Print "Test failed at 34"
+		    return true
+		  end if
+		  
+		  if tile.RightHash <> Crypto.SHA2_256( "YTOJE" ) then
+		    Print "Test failed at 35"
+		    return true
+		  end if
+		  
+		  if tile.BottomHash <> Crypto.SHA2_256( "ABCDE" ) then
+		    Print "Test failed at 36"
+		    return true
+		  end if
+		  
+		  '"ABCDE" + EndOfLine + _
+		  '"FGHIJ" + EndOfLine + _
+		  '"KLMNO" + EndOfLine + _
+		  '"PQRST" + EndOfLine + _
+		  '"UVWXY"
+		  
+		  tile.Orientation = SatelliteTile.Orientations.R90FlippedVertical
+		  
+		  if tile.LeftHash <> Crypto.SHA2_256( "YXWVU" ) then
+		    Print "Test failed at 37"
+		    return true
+		  end if
+		  
+		  if tile.TopHash <> Crypto.SHA2_256( "YTOJE" ) then
+		    Print "Test failed at 38"
+		    return true
+		  end if
+		  
+		  if tile.RightHash <> Crypto.SHA2_256( "EDCBA" ) then
+		    Print "Test failed at 39"
+		    return true
+		  end if
+		  
+		  if tile.BottomHash <> Crypto.SHA2_256( "UPKFA" ) then
+		    Print "Test failed at 40"
+		    return true
+		  end if
+		  
+		  '"ABCDE" + EndOfLine + _
+		  '"FGHIJ" + EndOfLine + _
+		  '"KLMNO" + EndOfLine + _
+		  '"PQRST" + EndOfLine + _
+		  '"UVWXY"
+		  
+		  tile.Orientation = SatelliteTile.Orientations.R180FlippedVertical
+		  
+		  if tile.LeftHash <> Crypto.SHA2_256( "EJOTY" ) then
+		    Print "Test failed at 41"
+		    return true
+		  end if
+		  
+		  if tile.TopHash <> Crypto.SHA2_256( "EDCBA" ) then
+		    Print "Test failed at 42"
+		    return true
+		  end if
+		  
+		  if tile.RightHash <> Crypto.SHA2_256( "AFKPU" ) then
+		    Print "Test failed at 43"
+		    return true
+		  end if
+		  
+		  if tile.BottomHash <> Crypto.SHA2_256( "YXWVU" ) then
+		    Print "Test failed at 44"
+		    return true
+		  end if
+		  
+		  '"ABCDE" + EndOfLine + _
+		  '"FGHIJ" + EndOfLine + _
+		  '"KLMNO" + EndOfLine + _
+		  '"PQRST" + EndOfLine + _
+		  '"UVWXY"
+		  
+		  tile.Orientation = SatelliteTile.Orientations.R270FlippedVertical
+		  
+		  if tile.LeftHash <> Crypto.SHA2_256( "ABCDE" ) then
+		    Print "Test failed at 45"
+		    return true
+		  end if
+		  
+		  if tile.TopHash <> Crypto.SHA2_256( "AFKPU" ) then
+		    Print "Test failed at 46"
+		    return true
+		  end if
+		  
+		  if tile.RightHash <> Crypto.SHA2_256( "UVWXY" ) then
+		    Print "Test failed at 47"
+		    return true
+		  end if
+		  
+		  if tile.BottomHash <> Crypto.SHA2_256( "EJOTY" ) then
+		    Print "Test failed at 48"
+		    return true
+		  end if
+		  
+		  '"ABCDE" + EndOfLine + _
+		  '"FGHIJ" + EndOfLine + _
+		  '"KLMNO" + EndOfLine + _
+		  '"PQRST" + EndOfLine + _
+		  '"UVWXY"
+		  
+		  tile.Orientation = SatelliteTile.Orientations.R0FlippedBoth
+		  
+		  if tile.LeftHash <> Crypto.SHA2_256( "YTOJE" ) then
+		    Print "Test failed at 49"
+		    return true
+		  end if
+		  
+		  if tile.TopHash <> Crypto.SHA2_256( "YXWVU" ) then
+		    Print "Test failed at 50"
+		    return true
+		  end if
+		  
+		  if tile.RightHash <> Crypto.SHA2_256( "UPKFA" ) then
+		    Print "Test failed at 51"
+		    return true
+		  end if
+		  
+		  if tile.BottomHash <> Crypto.SHA2_256( "EDCBA" ) then
+		    Print "Test failed at 52"
+		    return true
+		  end if
+		  
+		  '"ABCDE" + EndOfLine + _
+		  '"FGHIJ" + EndOfLine + _
+		  '"KLMNO" + EndOfLine + _
+		  '"PQRST" + EndOfLine + _
+		  '"UVWXY"
+		  
+		  tile.Orientation = SatelliteTile.Orientations.R90FlippedBoth
+		  
+		  if tile.LeftHash <> Crypto.SHA2_256( "EDCBA" ) then
+		    Print "Test failed at 53"
+		    return true
+		  end if
+		  
+		  if tile.TopHash <> Crypto.SHA2_256( "EJOTY" ) then
+		    Print "Test failed at 54"
+		    return true
+		  end if
+		  
+		  if tile.RightHash <> Crypto.SHA2_256( "YXWVU" ) then
+		    Print "Test failed at 55"
+		    return true
+		  end if
+		  
+		  if tile.BottomHash <> Crypto.SHA2_256( "AFKPU" ) then
+		    Print "Test failed at 56"
+		    return true
+		  end if
+		  
+		  '"ABCDE" + EndOfLine + _
+		  '"FGHIJ" + EndOfLine + _
+		  '"KLMNO" + EndOfLine + _
+		  '"PQRST" + EndOfLine + _
+		  '"UVWXY"
+		  
+		  tile.Orientation = SatelliteTile.Orientations.R270FlippedBoth
+		  
+		  if tile.LeftHash <> Crypto.SHA2_256( "UVWXY" ) then
+		    Print "Test failed at 57"
+		    return true
+		  end if
+		  
+		  if tile.TopHash <> Crypto.SHA2_256( "UPKFA" ) then
+		    Print "Test failed at 58"
+		    return true
+		  end if
+		  
+		  if tile.RightHash <> Crypto.SHA2_256( "ABCDE" ) then
+		    Print "Test failed at 59"
+		    return true
+		  end if
+		  
+		  if tile.BottomHash <> Crypto.SHA2_256( "YTOJE" ) then
+		    Print "Test failed at 60"
+		    return true
+		  end if
+		End Function
+	#tag EndEvent
+
+	#tag Event
 		Function ReturnDescription() As String
 		  return "Rearrange satellite images by matching borders."
 		End Function
