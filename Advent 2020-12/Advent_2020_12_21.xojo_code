@@ -382,8 +382,6 @@ Inherits AdventBase
 		  print tag
 		  print "================================="
 		  
-		  var tables() as string = array( "ingredient", "allergen", "imported_row", "imported_row_stats" )
-		  
 		  var tableRs as RowSet = db.Tables
 		  while not tableRs.AfterLastRow
 		    var table as string = tableRs.ColumnAt( 0 ).StringValue

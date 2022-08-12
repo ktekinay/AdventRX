@@ -492,12 +492,12 @@ Inherits AdventBase
 		    tilesDict.Value( tile.Id ) = tile
 		  next
 		  
-		  var matchDict as new Dictionary
-		  
 		  //
 		  // Cycle through each tile in turn
 		  //
-		  for tileIndex as integer = 0 to tiles.LastIndex
+		  var tileLastIndex as integer = tiles.LastIndex
+		  
+		  for tileIndex as integer = 0 to tileLastIndex
 		    var firstTile as SatelliteTile = tiles.Pop
 		    grid( 0, 0 ) = firstTile
 		    
@@ -505,7 +505,7 @@ Inherits AdventBase
 		      var o as SatelliteTile.Orientations = Ctype( orientationIndex, SatelliteTile.Orientations )
 		      firstTile.Orientation = o
 		      
-		      if PlaceNext( grid, tiles, tilesDict, matchDict ) then
+		      if PlaceNext( grid, tiles, tilesDict ) then
 		        //
 		        // Success!
 		        //
@@ -516,7 +516,7 @@ Inherits AdventBase
 		    //
 		    // Put back the tile
 		    //
-		    tiles.AddAt 0, grid( 0, 0 )
+		    tiles.AddAt 0, firstTile
 		  next tileIndex
 		  
 		  return
@@ -526,7 +526,15 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Integer
+		  'if IsTest then
+		  'return -1
+		  'end if
+		  
 		  var tiles() as SatelliteTile = ParseInput( input )
+		  if IsTest then
+		    tiles.Shuffle
+		  end if
+		  
 		  LinkTiles tiles
 		  
 		  var grid( -1, -1 ) as SatelliteTile
@@ -554,8 +562,7 @@ Inherits AdventBase
 		  for outer as integer = 0 to tiles.LastIndex
 		    var outerTile as SatelliteTile = tiles( outer )
 		    
-		    var firstInner as integer = outer + 1
-		    for inner as integer = firstInner to tiles.LastIndex
+		    for inner as integer = 0 to tiles.LastIndex
 		      outerTile.Link tiles( inner )
 		    next
 		  next
@@ -601,15 +608,18 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function PlaceNext(grid(, ) As SatelliteTile, tiles() As SatelliteTile, tilesDict As Dictionary, matchDict As Dictionary) As Boolean
+		Private Function PlaceNext(grid(, ) As SatelliteTile, tiles() As SatelliteTile, tilesDict As Dictionary) As Boolean
+		  static aaaIndex as integer = 0
+		  
 		  if tiles.Count = 0 then
 		    return true
 		  end if
 		  
+		  aaaIndex = aaaIndex + 1
+		  
 		  //
 		  // What slot are we in?
 		  //
-		  var gridLastIndex as integer = grid.LastIndex
 		  var currentSlot as integer = ( grid.Count * grid.Count ) - tiles.Count
 		  
 		  var gridRow as integer = currentSlot \ grid.Count
@@ -621,24 +631,13 @@ Inherits AdventBase
 		  //
 		  // Get the intersection of ids that are linked
 		  //
-		  var linkedIds() as integer
-		  if tileToLeft is nil then
-		    linkedIds = tileAbove.LinkedIDs
-		    
-		  elseif tileAbove is nil then
-		    linkedIds = tileToLeft.LinkedIDs
-		    
-		  else
-		    for each id as integer in tileAbove.LinkedIDs
-		      if tileToLeft.LinkedIDs.IndexOf( id ) <> -1 then
-		        linkedIds.Add id
-		      end if
-		    next
-		    
-		  end if
+		  var linkedTileInfo() as pair = PossibleTiles( tileToLeft, tileAbove )
 		  
-		  for each linkedId as integer in linkedIds
-		    var tile as SatelliteTile = tilesDict.Value( linkedId )
+		  for each info as pair in linkedTileInfo
+		    var id as integer = info.Left
+		    var orientation as SatelliteTile.Orientations = info.Right
+		    
+		    var tile as SatelliteTile = tilesDict.Value( id )
 		    
 		    var tilePos as integer = tiles.IndexOf( tile )
 		    if tilePos = -1 then
@@ -653,40 +652,55 @@ Inherits AdventBase
 		    grid( gridRow, gridCol ) = tile
 		    PrintGrid grid
 		    
-		    for orientationIndex as integer = SatelliteTile.kFirstOrientationIndex to SatelliteTile.kLastOrientationIndex
-		      tile.Orientation = Ctype( orientationIndex, SatelliteTile.Orientations )
-		      
-		      var mKey as string =  MatchDictKey( tile, tileToLeft, tileAbove )
-		      
-		      if matchDict.HasKey( mKey ) then
-		        if matchDict.Lookup( mKey, false ).BooleanValue and PlaceNext( grid, tiles, tilesDict, matchDict ) then
-		          return true
-		        end if
-		        
-		        continue
-		      end if
-		      
-		      var isMatch as boolean = tileToLeft is nil or tile.LeftHash = tileToLeft.RightHash
-		      isMatch = isMatch and _
-		      ( tileAbove is nil or tile.TopHash = tileAbove.BottomHash )
-		      
-		      matchDict.Value( mKey ) = isMatch
-		      
-		      if isMatch then
-		        if PlaceNext( grid, tiles, tilesDict, matchDict ) then
-		          return true
-		        end if
-		      end if
-		    next
+		    tile.Orientation = orientation
+		    
+		    if PlaceNext( grid, tiles, tilesDict ) then
+		      return true
+		    end if
 		    
 		    //
 		    // Put back this tile
 		    //
 		    tiles.AddAt tilePos, tile
+		    tile.Orientation = SatelliteTile.Orientations.R0
 		  next
 		  
 		  grid( gridRow, gridCol ) = nil
+		  aaaIndex = aaaIndex - 1
 		  return false
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function PossibleTiles(tileToLeft As SatelliteTile, tileAbove As SatelliteTile) As Pair()
+		  if tileToLeft is nil then
+		    return tileAbove.LinkedBelow
+		  end if
+		  
+		  if tileAbove is nil then
+		    return tileToLeft.LinkedAtRight
+		  end if
+		  
+		  var linkedBelow() as pair = tileAbove.LinkedBelow
+		  var linkedAtRight() as pair = tileToLeft.LinkedAtRight
+		  
+		  var result() as Pair
+		  
+		  for each link1 as Pair in linkedAtRight
+		    var id as integer = link1.Left
+		    var orientation as SatelliteTile.Orientations = link1.Right
+		    
+		    for each link2 as Pair in linkedBelow
+		      if link2.Left = id and link2.Right = orientation then
+		        result.Add link2
+		        continue for link1
+		      end if
+		    next
+		    
+		  next
+		  
+		  return result
 		  
 		End Function
 	#tag EndMethod

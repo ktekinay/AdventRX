@@ -2,6 +2,10 @@
 Protected Class SatelliteTile
 	#tag Method, Flags = &h0
 		Sub Constructor(data As String)
+		  LinkTested = new Dictionary
+		  OrientationLinkedAtRightDict = new Dictionary
+		  OrientationLinkedBelowDict = new Dictionary
+		  
 		  var rows() as string = data.Trim.ReplaceLineEndings( EndOfLine ).Split( EndOfLine )
 		  
 		  //
@@ -90,12 +94,6 @@ Protected Class SatelliteTile
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function IsLinkedTo(other As SatelliteTile) As Boolean
-		  return LinkedIDs.IndexOf( other.ID ) <> -1
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
 		Sub Link(other As SatelliteTile)
 		  if other.ID = ID then
 		    //
@@ -104,24 +102,65 @@ Protected Class SatelliteTile
 		    return
 		  end if
 		  
-		  if LinkedIDs.IndexOf( other.ID ) <> -1 then
+		  if LinkTested.HasKey( other.ID ) then
 		    //
-		    // Already linked
+		    // Already tested
 		    //
 		    return
 		  end if
 		  
-		  for each thisHash as MemoryBlock in BorderHashes
-		    for each otherHash as MemoryBlock in other.BorderHashes
-		      if thisHash = otherHash then
-		        LinkedIDs.Add other.ID
-		        other.LinkedIDs.Add ID
-		        return
+		  LinkTested.Value( other.ID ) = nil
+		  
+		  var startingOrientation as Orientations = Orientation
+		  
+		  for thisOrientationIndex as integer = kFirstOrientationIndex to kLastOrientationIndex
+		    Orientation = Ctype( thisOrientationIndex, Orientations )
+		    
+		    var rightHash as MemoryBlock = self.RightHash
+		    var bottomHash as MemoryBlock = self.BottomHash
+		    
+		    var otherStartingOrientation as Orientations = other.Orientation
+		    
+		    for otherOrientationIndex as integer = kFirstOrientationIndex to kLastOrientationIndex
+		      other.Orientation = Ctype( otherOrientationIndex, Orientations )
+		      
+		      if other.LeftHash = rightHash then
+		        var empty() as Pair
+		        var arr() as Pair = OrientationLinkedAtRightDict.Lookup( Orientation, empty )
+		        arr.Add other.ID : other.Orientation
+		        OrientationLinkedAtRightDict.Value( Orientation ) = arr
+		      end if
+		      
+		      if other.TopHash = bottomHash then
+		        var empty() as Pair
+		        var arr() as Pair = OrientationLinkedBelowDict.Lookup( Orientation, empty )
+		        arr.Add other.ID : other.Orientation
+		        OrientationLinkedBelowDict.Value( Orientation ) = arr
 		      end if
 		    next
+		    
+		    other.Orientation = otherStartingOrientation
 		  next
 		  
+		  Orientation = startingOrientation
+		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function LinkedAtRight() As Pair()
+		  var empty() as Pair
+		  return OrientationLinkedAtRightDict.Lookup( Orientation, empty )
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function LinkedBelow() As Pair()
+		  var empty() as Pair
+		  return OrientationLinkedBelowDict.Lookup( Orientation, empty )
+		  
+		End Function
 	#tag EndMethod
 
 
@@ -263,12 +302,20 @@ Protected Class SatelliteTile
 		LeftHash As MemoryBlock
 	#tag EndComputedProperty
 
-	#tag Property, Flags = &h0
-		LinkedIDs() As Integer
+	#tag Property, Flags = &h21
+		Private LinkTested As Dictionary
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
 		Orientation As Orientations = Orientations.R0
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private OrientationLinkedAtRightDict As Dictionary
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private OrientationLinkedBelowDict As Dictionary
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
