@@ -59,6 +59,14 @@ Inherits AdventBase
 
 	#tag ViewBehavior
 		#tag ViewProperty
+			Name="IsComplete"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
 			Name="Description"
 			Visible=false
 			Group="Behavior"

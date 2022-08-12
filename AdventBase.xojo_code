@@ -33,24 +33,36 @@ Inherits Thread
 		  var duration as double
 		  
 		  mIsTest = true
+		  if CancelRun( Types.TestA ) then
+		    return
+		  end if
 		  startµs = System.Microseconds
 		  var result as integer = RaiseEvent RunTestA
 		  duration = System.Microseconds - startµs
 		  self.AddUserInterfaceUpdate new Dictionary( Types.TestA : result, kKeyDuration : duration )
 		  
 		  mIsTest = false
+		  if CancelRun( Types.A ) then
+		    return
+		  end if
 		  startµs = System.Microseconds
 		  result = RaiseEvent RunA
 		  duration = System.Microseconds - startµs
 		  self.AddUserInterfaceUpdate new Dictionary( Types.A : result, kKeyDuration : duration )
 		  
 		  mIsTest = true
+		  if CancelRun( Types.TestB ) then
+		    return
+		  end if
 		  startµs = System.Microseconds
 		  result = RaiseEvent RunTestB
 		  duration = System.Microseconds - startµs
 		  self.AddUserInterfaceUpdate new Dictionary( Types.TestB : result, kKeyDuration : duration )
 		  
 		  mIsTest = false
+		  if CancelRun( Types.B ) then
+		    return
+		  end if
 		  startµs = System.Microseconds
 		  result = RaiseEvent RunB
 		  duration = System.Microseconds - startµs
@@ -187,6 +199,10 @@ Inherits Thread
 		End Function
 	#tag EndMethod
 
+
+	#tag Hook, Flags = &h0
+		Event CancelRun(type As Types) As Boolean
+	#tag EndHook
 
 	#tag Hook, Flags = &h0
 		Event ResultReturned(type As AdventBase.Types, result As Integer, duration As Double)
