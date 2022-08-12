@@ -55,11 +55,62 @@ Inherits AdventBase
 
 
 	#tag Method, Flags = &h21
+		Private Sub Assemble(tiles() As SatelliteTile, grid(, ) As SatelliteTile)
+		  var lastIndex as integer = ( tiles.Count ^ 0.5 ) - 1
+		  grid.ResizeTo lastIndex, lastIndex
+		  
+		  var tilesDict as new Dictionary
+		  for each tile as SatelliteTile in tiles
+		    tilesDict.Value( tile.Id ) = tile
+		  next
+		  
+		  var matchDict as new Dictionary
+		  
+		  //
+		  // Cycle through each tile in turn
+		  //
+		  for tileIndex as integer = 0 to tiles.LastIndex
+		    var firstTile as SatelliteTile = tiles.Pop
+		    grid( 0, 0 ) = firstTile
+		    
+		    for orientationIndex as integer = SatelliteTile.kFirstOrientationIndex to SatelliteTile.kLastOrientationIndex
+		      var o as SatelliteTile.Orientations = Ctype( orientationIndex, SatelliteTile.Orientations )
+		      firstTile.Orientation = o
+		      
+		      if PlaceNext( grid, tiles, tilesDict, matchDict ) then
+		        //
+		        // Success!
+		        //
+		        return
+		      end if
+		    next
+		    
+		    //
+		    // Put back the tile
+		    //
+		    tiles.AddAt 0, grid( 0, 0 )
+		  next tileIndex
+		  
+		  return
+		  return
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Integer
 		  var tiles() as SatelliteTile = ParseInput( input )
-		  var matches() as SatelliteTile = MatchingTiles( tiles( 0 ), tiles )
+		  LinkTiles tiles
 		  
-		  return -1
+		  var grid( -1, -1 ) as SatelliteTile
+		  Assemble( tiles, grid )
+		  
+		  var result as integer = _
+		  grid( 0, 0 ).ID * _
+		  grid( 0, grid.LastIndex ).ID * _
+		  grid( grid.LastIndex, 0 ).ID * _
+		  grid( grid.LastIndex, grid.LastIndex ).ID
+		  
+		  return result
 		  
 		End Function
 	#tag EndMethod
@@ -71,34 +122,38 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function MatchingTiles(toTile As SatelliteTile, tiles() As SatelliteTile) As SatelliteTile()
-		  var matches() as SatelliteTile
-		  
-		  for each candidate as SatelliteTile in tiles
-		    if candidate is toTile then
-		      continue
-		    end if
+		Private Sub LinkTiles(tiles() As SatelliteTile)
+		  for outer as integer = 0 to tiles.LastIndex
+		    var outerTile as SatelliteTile = tiles( outer )
 		    
-		    var matchCount as integer
-		    for each toHash as MemoryBlock in toTile.BorderHashes
-		      for each candidateHash as MemoryBlock in candidate.BorderHashes
-		        if candidateHash = toHash then
-		          matchCount = matchCount + 1
-		        end if
-		      next
-		    next 
-		    
-		    select case matchCount
-		    case 0
-		      // no match
-		    case 1
-		      matches.Add candidate
-		    case else
-		      break
-		    end select
+		    var firstInner as integer = outer + 1
+		    for inner as integer = firstInner to tiles.LastIndex
+		      outerTile.Link tiles( inner )
+		    next
 		  next
 		  
-		  return matches
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function MatchDictKey(tile As SatelliteTile, tileToLeft As SatelliteTile, tileAbove As SatelliteTile) As String
+		  var builder( 5 ) as string
+		  
+		  builder( 0 ) = tile.ID.ToString
+		  builder( 1 ) = integer( tile.Orientation ).ToString
+		  
+		  if tileToLeft isa object then
+		    builder( 2 ) = tileToLeft.ID.ToString
+		    builder( 3 ) = integer( tileToLeft.Orientation ).ToString
+		  end if
+		  
+		  if tileAbove isa object then
+		    builder( 4 ) = tileAbove.ID.ToString
+		    builder( 5 ) = integer( tileAbove.Orientation ).ToString
+		  end if
+		  
+		  return String.FromArray( builder, ":" )
+		  
 		End Function
 	#tag EndMethod
 
@@ -115,6 +170,136 @@ Inherits AdventBase
 		  return arr
 		  return arr
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function PlaceNext(grid(, ) As SatelliteTile, tiles() As SatelliteTile, tilesDict As Dictionary, matchDict As Dictionary) As Boolean
+		  if tiles.Count = 0 then
+		    return true
+		  end if
+		  
+		  //
+		  // What slot are we in?
+		  //
+		  var gridLastIndex as integer = grid.LastIndex
+		  var currentSlot as integer = ( grid.Count * grid.Count ) - tiles.Count
+		  
+		  var gridRow as integer = currentSlot \ grid.Count
+		  var gridCol as integer = currentSlot mod grid.Count
+		  
+		  var tileToLeft as SatelliteTile = if( gridCol > 0, grid( gridRow, gridCol - 1 ), nil )
+		  var tileAbove as SatelliteTile = if( gridRow > 0, grid( gridRow - 1, gridCol ), nil )
+		  
+		  //
+		  // Get the intersection of ids that are linked
+		  //
+		  var linkedIds() as integer
+		  if tileToLeft is nil then
+		    linkedIds = tileAbove.LinkedIDs
+		    
+		  elseif tileAbove is nil then
+		    linkedIds = tileToLeft.LinkedIDs
+		    
+		  else
+		    for each id as integer in tileAbove.LinkedIDs
+		      if tileToLeft.LinkedIDs.IndexOf( id ) <> -1 then
+		        linkedIds.Add id
+		      end if
+		    next
+		    
+		  end if
+		  
+		  for each linkedId as integer in linkedIds
+		    var tile as SatelliteTile = tilesDict.Value( linkedId )
+		    
+		    var tilePos as integer = tiles.IndexOf( tile )
+		    if tilePos = -1 then
+		      //
+		      // Already in use
+		      //
+		      continue
+		    end if
+		    
+		    tiles.RemoveAt tilePos
+		    
+		    grid( gridRow, gridCol ) = tile
+		    PrintGrid grid
+		    
+		    for orientationIndex as integer = SatelliteTile.kFirstOrientationIndex to SatelliteTile.kLastOrientationIndex
+		      tile.Orientation = Ctype( orientationIndex, SatelliteTile.Orientations )
+		      
+		      var mKey as string =  MatchDictKey( tile, tileToLeft, tileAbove )
+		      
+		      if matchDict.HasKey( mKey ) then
+		        if matchDict.Lookup( mKey, false ).BooleanValue and PlaceNext( grid, tiles, tilesDict, matchDict ) then
+		          return true
+		        end if
+		        
+		        continue
+		      end if
+		      
+		      var isMatch as boolean = tileToLeft is nil or tile.LeftHash = tileToLeft.RightHash
+		      isMatch = isMatch and _
+		      ( tileAbove is nil or tile.TopHash = tileAbove.BottomHash )
+		      
+		      matchDict.Value( mKey ) = isMatch
+		      
+		      if isMatch then
+		        if PlaceNext( grid, tiles, tilesDict, matchDict ) then
+		          return true
+		        end if
+		      end if
+		    next
+		    
+		    //
+		    // Put back this tile
+		    //
+		    tiles.AddAt tilePos, tile
+		  next
+		  
+		  grid( gridRow, gridCol ) = nil
+		  return false
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub PrintGrid(grid(, ) As SatelliteTile)
+		  const kDebug as boolean = true
+		  
+		  #if not kDebug then
+		    #pragma unused grid
+		    
+		  #else
+		    
+		    const kSlots as string = "      "
+		    
+		    var lastIndex as integer = grid.LastIndex
+		    
+		    
+		    for row as integer = 0 to lastIndex
+		      var builder() as string
+		      
+		      for col as integer = 0 to lastIndex
+		        var tile as SatelliteTile = grid( row, col )
+		        if tile is nil then
+		          Print String.FromArray( builder, "" )
+		          exit for row
+		        end if
+		        
+		        var item as string = kSlots + tile.ID.ToString
+		        item = item.Right( kSlots.Length )
+		        builder.Add item
+		      next
+		      
+		      Print String.FromArray( builder, "" )
+		    next
+		    
+		    Print ""
+		    
+		  #endif
+		  
+		End Sub
 	#tag EndMethod
 
 
