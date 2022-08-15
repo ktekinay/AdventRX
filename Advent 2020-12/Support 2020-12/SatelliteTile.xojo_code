@@ -239,6 +239,10 @@ Protected Class SatelliteTile
 		ID As Integer
 	#tag EndProperty
 
+	#tag Property, Flags = &h0
+		IsInUse As Boolean
+	#tag EndProperty
+
 	#tag Property, Flags = &h21
 		Private LeftBorderHash As Pair
 	#tag EndProperty

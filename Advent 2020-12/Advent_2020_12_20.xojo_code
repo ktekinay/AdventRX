@@ -492,20 +492,23 @@ Inherits AdventBase
 		    tilesDict.Value( tile.Id ) = tile
 		  next
 		  
+		  var breadcrumbs as new Dictionary
+		  
 		  //
 		  // Cycle through each tile in turn
 		  //
 		  var tileLastIndex as integer = tiles.LastIndex
 		  
 		  for tileIndex as integer = 0 to tileLastIndex
-		    var firstTile as SatelliteTile = tiles.Pop
-		    grid( 0, 0 ) = firstTile
+		    var thisTile as SatelliteTile = tiles( tileIndex )
+		    grid( 0, 0 ) = thisTile
+		    thisTile.IsInUse = true
 		    
 		    for orientationIndex as integer = SatelliteTile.kFirstOrientationIndex to SatelliteTile.kLastOrientationIndex
 		      var o as SatelliteTile.Orientations = Ctype( orientationIndex, SatelliteTile.Orientations )
-		      firstTile.Orientation = o
+		      thisTile.Orientation = o
 		      
-		      if PlaceNext( grid, tiles, tilesDict ) then
+		      if PlaceNext( grid, 1, tilesDict, breadcrumbs ) then
 		        //
 		        // Success!
 		        //
@@ -516,7 +519,7 @@ Inherits AdventBase
 		    //
 		    // Put back the tile
 		    //
-		    tiles.AddAt 0, firstTile
+		    thisTile.IsInUse = false
 		  next tileIndex
 		  
 		  return
@@ -545,6 +548,12 @@ Inherits AdventBase
 		  grid( 0, grid.LastIndex ).ID * _
 		  grid( grid.LastIndex, 0 ).ID * _
 		  grid( grid.LastIndex, grid.LastIndex ).ID
+		  
+		  if IsTest then
+		    TestGrid = grid
+		  else
+		    PuzzleGrid = grid
+		  end if
 		  
 		  return result
 		  
@@ -608,10 +617,10 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function PlaceNext(grid(, ) As SatelliteTile, tiles() As SatelliteTile, tilesDict As Dictionary) As Boolean
+		Private Function PlaceNext(grid(, ) As SatelliteTile, currentSlot As Integer, tilesDict As Dictionary, breadcrumbs As Dictionary) As Boolean
 		  static aaaIndex as integer = 0
 		  
-		  if tiles.Count = 0 then
+		  if currentSlot = tilesDict.KeyCount then
 		    return true
 		  end if
 		  
@@ -620,8 +629,6 @@ Inherits AdventBase
 		  //
 		  // What slot are we in?
 		  //
-		  var currentSlot as integer = ( grid.Count * grid.Count ) - tiles.Count
-		  
 		  var gridRow as integer = currentSlot \ grid.Count
 		  var gridCol as integer = currentSlot mod grid.Count
 		  
@@ -637,33 +644,42 @@ Inherits AdventBase
 		    var id as integer = info.Left
 		    var orientation as SatelliteTile.Orientations = info.Right
 		    
-		    var tile as SatelliteTile = tilesDict.Value( id )
+		    var bkey as string = gridRow.ToString + ":" + gridCol.ToString + ":" + id.ToString + ":" + integer( orientation ).ToString
 		    
-		    var tilePos as integer = tiles.IndexOf( tile )
-		    if tilePos = -1 then
-		      //
-		      // Already in use
-		      //
+		    if breadcrumbs.HasKey( bkey ) then
+		      'Print aaaIndex.ToString + ": ALREADY TRIED ID " + id.ToString
+		      continue for info
+		    end if
+		    
+		    'Print aaaIndex.ToString + ": Trying id " + id.ToString + ", orientation " + integer( orientation ).ToString
+		    
+		    var tile as SatelliteTile = tilesDict.Value( id )
+		    if tile.IsInUse then
+		      'Print aaaIndex.ToString + ": ...in use, continuing"
 		      continue
 		    end if
 		    
-		    tiles.RemoveAt tilePos
-		    
-		    grid( gridRow, gridCol ) = tile
-		    PrintGrid grid
-		    
+		    tile.IsInUse = true
 		    tile.Orientation = orientation
 		    
-		    if PlaceNext( grid, tiles, tilesDict ) then
+		    grid( gridRow, gridCol ) = tile
+		    'PrintGrid grid
+		    
+		    breadcrumbs.Value( bkey ) = nil
+		    
+		    if PlaceNext( grid, currentSlot + 1, tilesDict, breadcrumbs ) then
 		      return true
 		    end if
 		    
 		    //
 		    // Put back this tile
 		    //
-		    tiles.AddAt tilePos, tile
+		    tile.IsInUse = false
 		    tile.Orientation = SatelliteTile.Orientations.R0
+		    grid( gridRow, gridCol ) = nil
 		  next
+		  
+		  'Print aaaIndex.ToString + ": ...no more to try"
 		  
 		  grid( gridRow, gridCol ) = nil
 		  aaaIndex = aaaIndex - 1
@@ -706,6 +722,16 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
+		Private Sub Print(msg As Variant)
+		  #if kDebug then
+		    Super.Print(msg)
+		  #else
+		    #pragma unused msg
+		  #endif
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Sub PrintGrid(grid(, ) As SatelliteTile)
 		  const kDebug as boolean = true
 		  
@@ -744,6 +770,18 @@ Inherits AdventBase
 		End Sub
 	#tag EndMethod
 
+
+	#tag Property, Flags = &h21
+		Private PuzzleGrid(-1,-1) As SatelliteTile
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private TestGrid(-1,-1) As SatelliteTile
+	#tag EndProperty
+
+
+	#tag Constant, Name = kDebug, Type = Boolean, Dynamic = False, Default = \"True", Scope = Private
+	#tag EndConstant
 
 	#tag Constant, Name = kPuzzleInput, Type = String, Dynamic = False, Default = \"", Scope = Private, Description = 5768656E2070617374696E67207468652064617461206973206E65636573736172792E
 	#tag EndConstant
