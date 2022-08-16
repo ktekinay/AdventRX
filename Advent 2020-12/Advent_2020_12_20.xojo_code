@@ -671,28 +671,6 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function MatchDictKey(tile As SatelliteTile, tileToLeft As SatelliteTile, tileAbove As SatelliteTile) As String
-		  var builder( 5 ) as string
-		  
-		  builder( 0 ) = tile.ID.ToString
-		  builder( 1 ) = integer( tile.Orientation ).ToString
-		  
-		  if tileToLeft isa object then
-		    builder( 2 ) = tileToLeft.ID.ToString
-		    builder( 3 ) = integer( tileToLeft.Orientation ).ToString
-		  end if
-		  
-		  if tileAbove isa object then
-		    builder( 4 ) = tileAbove.ID.ToString
-		    builder( 5 ) = integer( tileAbove.Orientation ).ToString
-		  end if
-		  
-		  return String.FromArray( builder, ":" )
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
 		Private Function ParseInput(data As String) As SatelliteTile()
 		  var rows() as string = Normalize( data ).Split( EndOfLine + EndOfLine )
 		  
