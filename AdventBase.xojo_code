@@ -153,6 +153,33 @@ Inherits Thread
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub PrintStringGrid(grid(, ) As String, colDefault As String = "")
+		  var lastRowIndex as integer = grid.LastIndex( 1 )
+		  var lastColIndex as integer = grid.LastIndex( 2 )
+		  
+		  var colMin as integer = colDefault.Length
+		  
+		  for row as integer = 0 to lastRowIndex
+		    var builder() as string
+		    for col as integer = 0 to lastColIndex
+		      var item as string = grid( row, col )
+		      if item.Length < colMin then
+		        item = colDefault + item
+		        item = item.Right( colMin )
+		      end if
+		      
+		      builder.Add item
+		    next
+		    
+		    Print String.FromArray( builder, "" )
+		  next
+		  
+		  Print ""
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Attributes( Deprecated = "Start" )  Sub Run()
 		  Start
 		End Sub
@@ -195,6 +222,25 @@ Inherits Thread
 		  end if
 		  
 		  return arr
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
+		Protected Function ToStringGrid(input As String) As String(,)
+		  var rows() as string = input.ReplaceLineEndings( EndOfLine ).Split( EndOfLine )
+		  
+		  var grid( -1, -1 ) as string
+		  grid.ResizeTo rows.LastIndex, rows( 0 ).Bytes - 1
+		  
+		  for row as integer = 0 to rows.LastIndex
+		    var cols() as string = rows( row ).Split( "" )
+		    for col as integer = 0 to cols.LastIndex
+		      grid( row, col ) = cols( col )
+		    next
+		  next
+		  
+		  return grid
 		  
 		End Function
 	#tag EndMethod
