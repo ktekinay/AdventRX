@@ -163,6 +163,225 @@ Protected Class SatelliteTile
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21
+		Private Function NextCol0(ByRef row As Integer, ByRef col As Integer, lastIndex As Integer, leftToRight As Boolean, topToBottom As Boolean) As Boolean
+		  var rowStepper as integer = if( topToBottom, 1, -1 )
+		  
+		  if leftToRight then
+		    col = col + 1
+		    if col > lastIndex then
+		      row = row + rowStepper
+		      col = 1
+		    end if
+		    
+		  else
+		    col = col - 1
+		    if col < 1 then
+		      col = lastIndex
+		      row = row + rowStepper
+		    end if
+		    
+		  end if
+		  
+		  if row > lastIndex or row < 1 then
+		    return false
+		  end if
+		  
+		  return true
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function NextCol90(ByRef row As Integer, ByRef col As Integer, lastIndex As Integer, leftToRight As Boolean, topToBottom As Boolean) As Boolean
+		  var colStepper as integer = if( leftToRight, 1, -1 )
+		  
+		  if topToBottom then
+		    row = row + 1
+		    if row > lastIndex then
+		      row = 1
+		      col = col + colStepper
+		    end if
+		    
+		  else
+		    row = row - 1
+		    if row < 1 then
+		      row = lastIndex
+		      col = col + colStepper
+		    end if
+		    
+		  end if
+		  
+		  if col > lastIndex or col < 1 then
+		    return false
+		  end if
+		  
+		  return true
+		  
+		End Function
+	#tag EndMethod
+
+	#tag DelegateDeclaration, Flags = &h21
+		Private Delegate Function NextColDelegate(ByRef row As Integer, ByRef col As Integer, lastIndex As Integer, leftToRight As Boolean, topToBottom As Boolean) As Boolean
+	#tag EndDelegateDeclaration
+
+	#tag Method, Flags = &h0
+		Sub WriteTo(stringGrid(, ) As String, startRow As Integer, startCol As Integer)
+		  var lastIndex as integer = Grid.LastIndex - 1
+		  
+		  var firstRow as integer
+		  var firstCol as integer
+		  
+		  var stepper as NextColDelegate
+		  var leftToRight as boolean
+		  var topToBottom as boolean
+		  
+		  select case Orientation
+		  case Orientations.R0
+		    firstRow = 1
+		    firstCol = 1
+		    
+		    stepper = AddressOf NextCol0
+		    leftToRight = true
+		    topToBottom = true
+		    
+		  case Orientations.R0FlippedBoth
+		    firstRow = lastIndex
+		    firstCol = lastIndex
+		    
+		    stepper = AddressOf nextCol0
+		    leftToRight = false
+		    topToBottom = false
+		    
+		  case Orientations.R0FlippedHorizontal
+		    firstRow = 1
+		    firstCol = lastIndex
+		    
+		    stepper = AddressOf NextCol0
+		    leftToRight = false
+		    topToBottom = true
+		    
+		  case Orientations.R0FlippedVertical
+		    firstRow = lastIndex
+		    firstCol = 1
+		    
+		    stepper = AddressOf nextCol0
+		    leftToRight = true
+		    topToBottom = false
+		    
+		    
+		  case Orientations.R90
+		    firstRow = 1
+		    firstCol = lastIndex
+		    
+		    stepper = AddressOf NextCol90
+		    leftToRight = false
+		    topToBottom = true
+		    
+		  case Orientations.R90FlippedBoth
+		    firstRow = lastIndex
+		    firstCol = 1
+		    
+		    stepper = AddressOf nextCol90
+		    leftToRight = true
+		    topToBottom = false
+		    
+		  case Orientations.R90FlippedHorizontal
+		    firstRow = 1
+		    firstCol = 1
+		    
+		    stepper = AddressOf nextCol90
+		    leftToRight = true
+		    topToBottom = true
+		    
+		  case Orientations.R90FlippedVertical
+		    firstRow = lastIndex
+		    firstCol = lastIndex
+		    
+		    stepper = AddressOf NextCol90
+		    leftToRight = false
+		    topToBottom = false
+		    
+		    
+		  case Orientations.R180
+		    firstRow = lastIndex
+		    firstCol = lastIndex
+		    
+		    stepper = AddressOf NextCol0
+		    leftToRight = false
+		    topToBottom = false
+		    
+		  case Orientations.R180FlippedHorizontal
+		    firstRow = lastIndex
+		    firstCol = 1
+		    
+		    stepper = AddressOf NextCol0
+		    leftToRight = true
+		    topToBottom = false
+		    
+		  case Orientations.R180FlippedVertical
+		    firstRow = 1
+		    firstCol = lastIndex
+		    
+		    stepper = AddressOf NextCol0
+		    leftToRight = false
+		    topToBottom = true
+		    
+		    
+		  case Orientations.R270
+		    firstRow = lastIndex
+		    firstCol = 1
+		    
+		    stepper = AddressOf NextCol90
+		    leftToRight = true
+		    topToBottom = false
+		    
+		  case Orientations.R270FlippedBoth
+		    firstRow = 1
+		    firstCol = lastIndex
+		    
+		    stepper = AddressOf nextCol90
+		    leftToRight = false
+		    topToBottom = true
+		    
+		  case Orientations.R270FlippedHorizontal
+		    firstRow = lastIndex
+		    firstCol = lastIndex
+		    
+		    stepper = AddressOf nextCol90
+		    leftToRight = false
+		    topToBottom = false
+		    
+		  case Orientations.R270FlippedVertical
+		    firstRow = 1
+		    firstCol = 1
+		    
+		    stepper = AddressOf NextCol90
+		    leftToRight = true
+		    topToBottom = true
+		    
+		  end select
+		  
+		  var row as integer = firstRow
+		  var col as integer = firstCol
+		  
+		  var writeRow as integer = startRow
+		  var writeCol as integer = startCol
+		  var lastWriteCol as integer = startCol + lastIndex - 1
+		  
+		  do
+		    stringGrid( writeRow, writeCol ) = grid( row, col )
+		    
+		    writeCol = writeCol + 1
+		    if writeCol > lastWriteCol then
+		      writeCol = startCol
+		      writeRow = writeRow + 1
+		    end if
+		  loop until stepper.Invoke( row, col, lastIndex, leftToRight, topToBottom ) = false
+		  
+		End Sub
+	#tag EndMethod
+
 
 	#tag Property, Flags = &h1, Description = 416C6C2074686520626F72646572206861736865733A20546F7020466F72776172642C20546F7020526576657273652C204C65667420466F72776172642C204C65667420526576657273652C206574632E
 		Protected BorderHashes() As MemoryBlock

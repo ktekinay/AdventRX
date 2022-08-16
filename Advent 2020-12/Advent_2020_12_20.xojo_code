@@ -7,6 +7,8 @@ Inherits AdventBase
 		    return false
 		  end if
 		  
+		  var writeGrid( 2, 2 ) as string
+		  
 		  var data as string = _
 		  "Tile 1:" + EndOfLine + _
 		  "ABCDE" + EndOfLine + _
@@ -41,6 +43,11 @@ Inherits AdventBase
 		    return true
 		  end if
 		  
+		  tile.WriteTo writeGrid, 0, 0
+		  if writeGrid( 0, 0 ) <> "G" or writeGrid( 2, 2 ) <> "S" then
+		    Print "Failed WriteTo R0"
+		  end if
+		  
 		  tile.Orientation = SatelliteTile.Orientations.R90
 		  
 		  if tile.LeftHash <> Crypto.SHA2_256( "UVWXY" ) then
@@ -62,6 +69,12 @@ Inherits AdventBase
 		    Print "Test failed at 8"
 		    return true
 		  end if
+		  
+		  tile.WriteTo writeGrid, 0, 0
+		  if writeGrid( 0, 0 ) <> "I" or writeGrid( 2, 2 ) <> "Q" then
+		    Print "Failed WriteTo R90"
+		  end if
+		  
 		  
 		  '"ABCDE" + EndOfLine + _
 		  '"FGHIJ" + EndOfLine + _
@@ -426,6 +439,8 @@ Inherits AdventBase
 		    Print "Test failed at 60"
 		    return true
 		  end if
+		  
+		  
 		End Function
 	#tag EndEvent
 
@@ -562,7 +577,44 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Integer
+		  #pragma unused input
 		  
+		  var tiles( -1, -1 ) as SatelliteTile = if( IsTest, TestGrid, PuzzleGrid )
+		  
+		  var tilesAcross as integer = tiles.Count
+		  var tileWidth as integer = tiles( 0, 0 ).Grid.Count - 2
+		  
+		  var gridWidth as integer = tilesAcross * tileWidth
+		  var lastIndex as integer = gridWidth - 1
+		  
+		  var grid( -1, -1 ) as string
+		  grid.ResizeTo lastIndex, lastIndex
+		  
+		  var writeRow as integer
+		  var writeCol as integer
+		  
+		  for tileRow as integer = 0 to tiles.LastIndex
+		    for tileCol as integer = 0 to tiles.LastIndex
+		      var tile as SatelliteTile = tiles( tileRow, tileCol )
+		      tile.WriteTo grid, writeRow, writeCol
+		      
+		      writeCol = writeCol + tileWidth
+		      if writeCol > lastIndex then
+		        writeCol = 0
+		        writeRow = writeRow + tileWidth
+		      end if
+		    next
+		  next
+		  
+		  'if IsTest then
+		  'PrintGrid TestGrid
+		  'PrintStringGrid grid
+		  'end if
+		  
+		  var monsterMap() as Xojo.Point = MapMonster
+		  
+		  return -1
+		  return -1
 		End Function
 	#tag EndMethod
 
@@ -577,6 +629,45 @@ Inherits AdventBase
 		  next
 		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function MapMonster() As Xojo.Point()
+		  var monsterGrid( -1, -1 ) as string
+		  monsterGrid = ToStringGrid( kMonster )
+		  
+		  var map() as Xojo.Point
+		  
+		  var lastRowIndex as integer = monsterGrid.LastIndex( 1 )
+		  var lastColIndex as integer = monsterGrid.LastIndex( 2 )
+		  
+		  var prevRow as integer = -1
+		  var prevCol as integer = -1
+		  
+		  for row as integer = 0 to lastRowIndex
+		    for col as integer = 0 to lastColIndex
+		      var char as string = monsterGrid( row, col )
+		      
+		      if char = "#" then
+		        var rowDiff as integer = row
+		        var colDiff as integer = col
+		        
+		        if prevRow <> -1 then
+		          rowDiff = row - prevRow
+		          colDiff = col - prevCol
+		        end if
+		        
+		        map.Add new Xojo.Point( colDiff, rowDiff )
+		        prevRow = row
+		        prevCol = col
+		      end if
+		    next
+		  next
+		  
+		  return map
+		  
+		  
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
@@ -781,6 +872,9 @@ Inherits AdventBase
 
 
 	#tag Constant, Name = kDebug, Type = Boolean, Dynamic = False, Default = \"True", Scope = Private
+	#tag EndConstant
+
+	#tag Constant, Name = kMonster, Type = String, Dynamic = False, Default = \"                  # \n#    ##    ##    ###\n #  #  #  #  #  #   ", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = kPuzzleInput, Type = String, Dynamic = False, Default = \"", Scope = Private, Description = 5768656E2070617374696E67207468652064617461206973206E65636573736172792E
