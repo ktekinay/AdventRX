@@ -613,8 +613,158 @@ Inherits AdventBase
 		  
 		  var monsterMap() as Xojo.Point = MapMonster
 		  
+		  var identifiedMonsterMap() as Xojo.Point = FindMonsterVertical( grid, monsterMap )
+		  if identifiedMonsterMap.Count = 0 then
+		    identifiedMonsterMap = FindMonsterHorizontal( grid, monsterMap )
+		  end if
+		  
+		  //
+		  // Count the "#" in the grid
+		  //
+		  var cnt as integer
+		  for row as integer = 0 to grid.LastIndex
+		    for col as integer = 0 to grid.LastIndex
+		      if grid( row, col ) = "#" then
+		        cnt = cnt + 1
+		      end if
+		    next
+		  next
+		  
+		  cnt = cnt - identifiedMonsterMap.Count
+		  return cnt // NOT 2294
 		  return -1
-		  return -1
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function FindMonsterHorizontal(grid(, ) As String, monsterMap() As Xojo.Point) As Xojo.Point()
+		  var result() as Xojo.Point
+		  
+		  var lastIndex as integer = grid.LastIndex
+		  
+		  var firstRow as integer = 0
+		  var lastRow as integer = lastIndex
+		  
+		  var firstCol as integer = 0
+		  var lastCol as integer = lastIndex
+		  
+		  var rowStep as integer = 1
+		  var colStep as integer = 1
+		  
+		  for repeats as integer = 1 to 4
+		    for row as integer = firstRow to lastRow step rowStep
+		      for col as integer = firstCol to lastCol step colStep
+		        var testRow as integer = row
+		        var testCol as integer = col
+		        var cleanResultIndex as integer = result.LastIndex
+		        
+		        for each pt as Xojo.Point in monsterMap
+		          testRow = testRow + ( pt.Y * rowStep )
+		          testCol = testCol + ( pt.X * colStep )
+		          if testRow < 0 or testRow > lastIndex or testCol < 0 or testCol > lastIndex or grid( testCol, testRow ) <> "#" then
+		            result.ResizeTo cleanResultIndex
+		            continue for col
+		          end if
+		          
+		          result.Add new Xojo.Point( testCol, testRow )
+		        next
+		      next col
+		    next row
+		    
+		    if result.Count <> 0 then
+		      return result
+		    end if
+		    
+		    if colStep = 1 then
+		      firstCol = lastIndex
+		      lastCol = 0
+		      colStep = -1
+		      
+		    elseif rowStep = 1 then
+		      firstRow = lastIndex
+		      lastRow = 0
+		      rowStep = -1
+		      
+		    else
+		      firstCol = 0
+		      lastCol = lastIndex
+		      colStep = 1
+		      
+		    end if
+		  next repeats
+		  
+		  return result
+		  
+		  // 1: 1, 1
+		  // 2: -1, 1
+		  // 3: -1, -1
+		  // 4: 1, -1
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function FindMonsterVertical(grid(, ) As String, monsterMap() As Xojo.Point) As Xojo.Point()
+		  var result() as Xojo.Point
+		  
+		  var lastIndex as integer = grid.LastIndex
+		  
+		  var firstRow as integer = 0
+		  var lastRow as integer = lastIndex
+		  
+		  var firstCol as integer = 0
+		  var lastCol as integer = lastIndex
+		  
+		  var rowStep as integer = 1
+		  var colStep as integer = 1
+		  
+		  for repeats as integer = 1 to 4
+		    for row as integer = firstRow to lastRow step rowStep
+		      for col as integer = firstCol to lastCol step colStep
+		        var testRow as integer = row
+		        var testCol as integer = col
+		        var cleanResultIndex as integer = result.LastIndex
+		        
+		        for each pt as Xojo.Point in monsterMap
+		          testRow = testRow + ( pt.Y * rowStep )
+		          testCol = testCol + ( pt.X * colStep )
+		          if testRow < 0 or testRow > lastIndex or testCol < 0 or testCol > lastIndex or grid( testRow, testCol ) <> "#" then
+		            result.ResizeTo cleanResultIndex
+		            continue for col
+		          end if
+		          
+		          result.Add new Xojo.Point( testCol, testRow )
+		        next
+		      next col
+		    next row
+		    
+		    if result.Count <> 0 then
+		      return result
+		    end if
+		    
+		    if colStep = 1 then
+		      firstCol = lastIndex
+		      lastCol = 0
+		      colStep = -1
+		      
+		    elseif rowStep = 1 then
+		      firstRow = lastIndex
+		      lastRow = 0
+		      rowStep = -1
+		      
+		    else
+		      firstCol = 0
+		      lastCol = lastIndex
+		      colStep = 1
+		      
+		    end if
+		  next repeats
+		  
+		  return result
+		  
+		  // 1: 1, 1
+		  // 2: -1, 1
+		  // 3: -1, -1
+		  // 4: 1, -1
 		End Function
 	#tag EndMethod
 
