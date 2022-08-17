@@ -271,20 +271,20 @@ Protected Class SatelliteTile
 		    
 		    
 		  case Orientations.R90
-		    firstRow = 1
-		    firstCol = lastIndex
-		    
-		    stepper = AddressOf NextCol90
-		    leftToRight = false
-		    topToBottom = true
-		    
-		  case Orientations.R90FlippedBoth
 		    firstRow = lastIndex
 		    firstCol = 1
 		    
-		    stepper = AddressOf nextCol90
+		    stepper = AddressOf NextCol90
 		    leftToRight = true
 		    topToBottom = false
+		    
+		  case Orientations.R90FlippedBoth
+		    firstRow = 1
+		    firstCol = lastIndex
+		    
+		    stepper = AddressOf nextCol90
+		    leftToRight = false
+		    topToBottom = true
 		    
 		  case Orientations.R90FlippedHorizontal
 		    firstRow = 1
@@ -767,6 +767,14 @@ Protected Class SatelliteTile
 				"13 - R270FlippedVertical"
 				"14 - R270FlippedBoth"
 			#tag EndEnumValues
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="IsInUse"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Boolean"
+			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class
