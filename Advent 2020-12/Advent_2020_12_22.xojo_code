@@ -9,7 +9,7 @@ Inherits AdventBase
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return false
+		  return true
 		  
 		End Function
 	#tag EndEvent
@@ -86,6 +86,16 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Integer
+		  var player1() as integer
+		  var player2() as integer
+		  
+		  GetDecks( input, player1, player2 )
+		  
+		  RGame( player1, player2 )
+		  
+		  var winner() as integer = if( player1.Count = 0, player2, player1 )
+		  var score as integer = Score( winner )
+		  return score
 		  
 		End Function
 	#tag EndMethod
@@ -112,6 +122,51 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
+		Private Sub RGame(player1() As Integer, player2() As Integer)
+		  var breadcrumbs as new Dictionary
+		  
+		  while player1.Count <> 0 and player2.Count <> 0
+		    var key as integer = ( 1000000 * Score( player1 ) * player1.Count ) + ( Score( player2 ) * player2.Count )
+		    if breadcrumbs.HasKey( key ) then
+		      player2.RemoveAll
+		      return
+		    end if
+		    
+		    breadcrumbs.Value( key ) = nil
+		    
+		    var p1 as integer = player1( 0 )
+		    var p2 as integer = player2( 0 )
+		    player1.RemoveAt( 0 )
+		    player2.RemoveAt( 0 )
+		    
+		    if player1.Count >= p1 and player2.Count >= p2 then
+		      var player1Subdeck() as integer = Slice( player1, p1 )
+		      var player2Subdeck() as integer = Slice( player2, p2 )
+		      
+		      RGame( player1Subdeck, player2Subdeck )
+		      
+		      if player2Subdeck.Count = 0 then
+		        player1.Add p1
+		        player1.Add p2
+		      else
+		        player2.Add p2
+		        player2.Add p1
+		      end if
+		      
+		    elseif p1 > p2 then
+		      player1.Add p1
+		      player1.Add p2
+		      
+		    else
+		      player2.Add p2
+		      player2.Add p1
+		    end if
+		  wend
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Function Score(winner() As Integer) As Integer
 		  var score as integer
 		  for i as integer = winner.LastIndex downto 0
@@ -119,6 +174,17 @@ Inherits AdventBase
 		  next
 		  
 		  return score
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function Slice(arr() As Integer, count As Integer) As Integer()
+		  var slice() as integer
+		  for i as integer = 0 to count - 1
+		    slice.Add arr( i )
+		  next
+		  
+		  return slice
 		End Function
 	#tag EndMethod
 
