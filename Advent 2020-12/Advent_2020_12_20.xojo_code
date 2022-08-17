@@ -457,7 +457,7 @@ Inherits AdventBase
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return false
+		  return true
 		  
 		End Function
 	#tag EndEvent
@@ -554,7 +554,7 @@ Inherits AdventBase
 		  'end if
 		  
 		  var tiles() as SatelliteTile = ParseInput( input )
-		  if IsTest then
+		  if IsTest OR TRUE then
 		    tiles.Shuffle
 		  end if
 		  
@@ -636,8 +636,8 @@ Inherits AdventBase
 		  next
 		  
 		  cnt = cnt - identifiedMonsterMap.Count
-		  return cnt // NOT 2294
-		  return -1
+		  
+		  return cnt 
 		End Function
 	#tag EndMethod
 
