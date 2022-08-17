@@ -71,7 +71,7 @@ Inherits AdventBase
 		  end if
 		  
 		  tile.WriteTo writeGrid, 0, 0
-		  if writeGrid( 0, 0 ) <> "I" or writeGrid( 2, 2 ) <> "Q" then
+		  if writeGrid( 0, 0 ) <> "Q" or writeGrid( 2, 2 ) <> "I" then
 		    Print "Failed WriteTo R90"
 		  end if
 		  
@@ -410,6 +410,11 @@ Inherits AdventBase
 		  if tile.BottomHash <> Crypto.SHA2_256( "AFKPU" ) then
 		    Print "Test failed at 56"
 		    return true
+		  end if
+		  
+		  tile.WriteTo writeGrid, 0, 0
+		  if writeGrid( 0, 0 ) <> "I" or writeGrid( 2, 2 ) <> "Q" then
+		    Print "Failed WriteTo R90FlippedBoth"
 		  end if
 		  
 		  '"ABCDE" + EndOfLine + _
