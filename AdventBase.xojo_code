@@ -63,6 +63,8 @@ Inherits Thread
 		    result = RaiseEvent RunB
 		    duration = System.Microseconds - startµs
 		    self.AddUserInterfaceUpdate new Dictionary( Types.B : result, kKeyDuration : duration )
+		  else
+		    self.AddUserInterfaceUpdate new Dictionary( Types.B : -1, kKeyDuration : 0.0 )
 		  end if
 		End Sub
 	#tag EndMethod
