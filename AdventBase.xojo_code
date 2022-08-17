@@ -31,43 +31,39 @@ Inherits Thread
 		Private Sub DoRun()
 		  var startµs as double
 		  var duration as double
+		  var result as integer
 		  
 		  mIsTest = true
-		  if CancelRun( Types.TestA ) then
-		    return
+		  if not CancelRun( Types.TestA ) then
+		    startµs = System.Microseconds
+		    result = RaiseEvent RunTestA
+		    duration = System.Microseconds - startµs
+		    self.AddUserInterfaceUpdate new Dictionary( Types.TestA : result, kKeyDuration : duration )
 		  end if
-		  startµs = System.Microseconds
-		  var result as integer = RaiseEvent RunTestA
-		  duration = System.Microseconds - startµs
-		  self.AddUserInterfaceUpdate new Dictionary( Types.TestA : result, kKeyDuration : duration )
 		  
 		  mIsTest = false
-		  if CancelRun( Types.A ) then
-		    return
+		  if not CancelRun( Types.A ) then
+		    startµs = System.Microseconds
+		    result = RaiseEvent RunA
+		    duration = System.Microseconds - startµs
+		    self.AddUserInterfaceUpdate new Dictionary( Types.A : result, kKeyDuration : duration )
 		  end if
-		  startµs = System.Microseconds
-		  result = RaiseEvent RunA
-		  duration = System.Microseconds - startµs
-		  self.AddUserInterfaceUpdate new Dictionary( Types.A : result, kKeyDuration : duration )
 		  
 		  mIsTest = true
-		  if CancelRun( Types.TestB ) then
-		    return
+		  if not CancelRun( Types.TestB ) then
+		    startµs = System.Microseconds
+		    result = RaiseEvent RunTestB
+		    duration = System.Microseconds - startµs
+		    self.AddUserInterfaceUpdate new Dictionary( Types.TestB : result, kKeyDuration : duration )
 		  end if
-		  startµs = System.Microseconds
-		  result = RaiseEvent RunTestB
-		  duration = System.Microseconds - startµs
-		  self.AddUserInterfaceUpdate new Dictionary( Types.TestB : result, kKeyDuration : duration )
 		  
 		  mIsTest = false
-		  if CancelRun( Types.B ) then
-		    return
+		  if not CancelRun( Types.B ) then
+		    startµs = System.Microseconds
+		    result = RaiseEvent RunB
+		    duration = System.Microseconds - startµs
+		    self.AddUserInterfaceUpdate new Dictionary( Types.B : result, kKeyDuration : duration )
 		  end if
-		  startµs = System.Microseconds
-		  result = RaiseEvent RunB
-		  duration = System.Microseconds - startµs
-		  self.AddUserInterfaceUpdate new Dictionary( Types.B : result, kKeyDuration : duration )
-		  
 		End Sub
 	#tag EndMethod
 
