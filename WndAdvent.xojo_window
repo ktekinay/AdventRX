@@ -438,7 +438,7 @@ End
 		    
 		    me.AddRow name
 		    me.RowTagAt( me.LastAddedRowIndex ) = advent
-		    me.CellTooltipAt( me.LastAddedRowIndex, integer( Columns.Name ) ) = advent.Description
+		    me.CellTooltipAt( me.LastAddedRowIndex, integer( Columns.Status ) ) = advent.Description
 		  next
 		End Sub
 	#tag EndEvent
