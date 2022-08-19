@@ -2,17 +2,11 @@
 Protected Class CircularLinkedList
 	#tag Method, Flags = &h0
 		Sub Clear()
-		  var this as LinkedListItem = Current
-		  
-		  while this isa object
-		    var that as LinkedListItem = this.NextItem
-		    this.NextItem = nil
-		    this.PreviousItem = nil
-		    this = that
-		  wend
-		  
+		  Current.NextItem = nil
 		  Current = nil
 		  InitialFirstItem = nil
+		  mCount = 0
+		  
 		End Sub
 	#tag EndMethod
 
@@ -46,17 +40,13 @@ Protected Class CircularLinkedList
 
 	#tag Method, Flags = &h0
 		Sub FetchNextTo(arr() As LinkedListItem)
-		  for i as integer = 0 to arr.LastIndex
-		    arr( i ) = nil
-		  next
+		  if arr.Count > mCount then
+		    raise new OutOfBoundsException
+		  end if
 		  
 		  var this as LinkedListItem = Current
 		  
 		  for i as integer = 0 to arr.LastIndex
-		    if arr.IndexOf( this.NextItem ) <> -1 then
-		      raise new OutOfBoundsException
-		    end if
-		    
 		    arr( i ) = this.NextItem
 		    this = this.NextItem
 		  next
@@ -71,10 +61,6 @@ Protected Class CircularLinkedList
 		    return
 		  end if
 		  
-		  for i as integer = 1 to items.LastIndex
-		    items( i ).PreviousItem = items( i - 1 )
-		  next
-		  
 		  for i as integer = 0 to items.LastIndex - 1
 		    items( i ).NextItem = items( i + 1 )
 		  next
@@ -84,7 +70,6 @@ Protected Class CircularLinkedList
 		  
 		  if Current is nil then
 		    Current = first
-		    Current.PreviousItem = last
 		    last.NextItem = Current
 		    
 		    InitialFirstItem = first
@@ -92,9 +77,6 @@ Protected Class CircularLinkedList
 		  else
 		    var insertBefore as LinkedListItem = Current.NextItem
 		    Current.NextItem = first
-		    first.PreviousItem = Current
-		    
-		    insertBefore.PreviousItem = last
 		    last.NextItem = insertBefore
 		    
 		  end if
@@ -111,6 +93,9 @@ Protected Class CircularLinkedList
 		      MaximumValue = item.Value
 		    end if
 		  next
+		  
+		  mCount = mCount + items.Count
+		  
 		End Sub
 	#tag EndMethod
 
@@ -121,15 +106,6 @@ Protected Class CircularLinkedList
 		    count = count - 1
 		  wend
 		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub MovePrevious(count As Integer = 1)
-		  while Current isa object and count > 0
-		    Current = Current.PreviousItem
-		    count = count - 1
-		  wend
 		End Sub
 	#tag EndMethod
 
@@ -156,13 +132,12 @@ Protected Class CircularLinkedList
 		  var original as LinkedListItem = Current
 		  
 		  FetchNextTo( arr )
-		  MoveNext arr.Count + 1
+		  Current = arr( arr.LastIndex ).NextItem
 		  
 		  original.NextItem = Current
-		  Current.PreviousItem = original
 		  
 		  Current = original
-		  
+		  mCount = mCount - arr.Count
 		  
 		End Sub
 	#tag EndMethod
@@ -181,9 +156,9 @@ Protected Class CircularLinkedList
 		  
 		  do
 		    if Current is original then
-		      builder.Add "(" + Current.Value.StringValue + ")"
+		      builder.Add "(" + Current.Value.ToString + ")"
 		    else
-		      builder.Add Current.Value.StringValue
+		      builder.Add Current.Value.ToString
 		    end if
 		    MoveNext
 		  loop until Current = InitialFirstItem
@@ -196,6 +171,15 @@ Protected Class CircularLinkedList
 	#tag EndMethod
 
 
+	#tag ComputedProperty, Flags = &h0
+		#tag Getter
+			Get
+			  return mCount
+			End Get
+		#tag EndGetter
+		Count As Integer
+	#tag EndComputedProperty
+
 	#tag Property, Flags = &h0
 		Current As LinkedListItem
 	#tag EndProperty
@@ -206,6 +190,10 @@ Protected Class CircularLinkedList
 
 	#tag Property, Flags = &h0
 		MaximumValue As Variant
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Attributes( Hidden ) Private mCount As Integer
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
@@ -255,7 +243,7 @@ Protected Class CircularLinkedList
 			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="Current"
+			Name="Count"
 			Visible=false
 			Group="Behavior"
 			InitialValue=""

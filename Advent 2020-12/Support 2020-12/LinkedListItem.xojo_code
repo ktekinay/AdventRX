@@ -32,11 +32,7 @@ Protected Class LinkedListItem
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
-		PreviousItem As LinkedListItem
-	#tag EndProperty
-
-	#tag Property, Flags = &h0
-		Value As Variant
+		Value As Integer
 	#tag EndProperty
 
 

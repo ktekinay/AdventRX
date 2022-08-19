@@ -20,7 +20,7 @@ Inherits AdventBase
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return false
+		  return true
 		  
 		End Function
 	#tag EndEvent
@@ -79,7 +79,7 @@ Inherits AdventBase
 		  const kMoves as integer = 100
 		  MakeMoves list, kMoves, items
 		  
-		  while list.Current.Value.IntegerValue <> 1
+		  while list.Current.Value <> 1
 		    list.MoveNext
 		  wend
 		  
@@ -87,9 +87,9 @@ Inherits AdventBase
 		  
 		  var result as integer
 		  do
-		    result = result * 10 + list.Current.Value.IntegerValue
+		    result = result * 10 + list.Current.Value
 		    list.MoveNext
-		  loop until list.Current.Value.IntegerValue = 1
+		  loop until list.Current.Value = 1
 		  
 		  return result
 		  return -1
@@ -99,6 +99,8 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Integer
+		  StopProfiling
+		  
 		  if input = "" then
 		    input = kPuzzleInput
 		  end if
@@ -109,7 +111,7 @@ Inherits AdventBase
 		  var maxValue as integer = -1
 		  
 		  for each item as LinkedListItem in items
-		    var thisValue as integer = item.Value.IntegerValue
+		    var thisValue as integer = item.Value
 		    maxValue = max( maxValue, thisValue )
 		    values.Add thisValue
 		  next
@@ -121,19 +123,28 @@ Inherits AdventBase
 		    items( val ) = item
 		  next
 		  
+		  'Print "Count: " + items.Count.ToString( "#,##0" )
+		  'Print "Last Item: " + items( items.LastIndex ).Value.ToString
+		  
 		  var list as new CircularLinkedList
 		  list.Insert items
 		  
 		  const kMoves as integer = 10000000
+		  'const kMoves as integer = 100
+		  
+		  StartProfiling
+		  
 		  MakeMoves list, kMoves, items
 		  
 		  var cup1 as LinkedListItem = items( 0 )
 		  list.Current = cup1
+		  'Print "cup1.Value: " + cup1.Value.StringValue
 		  
 		  var result as integer = 1
 		  for i as integer = 1 to 2
 		    list.MoveNext
-		    result = result * list.Current.Value.IntegerValue
+		    'Print i.ToString + ": " + list.Current.Value.StringValue
+		    result = result * list.Current.Value
 		  next
 		  
 		  return result
@@ -143,7 +154,9 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Sub MakeMoves(list As CircularLinkedList, moves As Integer, items() As LinkedListItem)
+		  StopProfiling
 		  LinkedListItem.Sort items
+		  StartProfiling
 		  
 		  var removed( 2 ) as LinkedListItem
 		  
@@ -155,10 +168,10 @@ Inherits AdventBase
 		    
 		    var removedValues() as integer
 		    for each item as LinkedListItem in removed
-		      removedValues.Add item.Value.IntegerValue
+		      removedValues.Add item.Value
 		    next
 		    
-		    var dest as integer = current.Value.IntegerValue - 1
+		    var dest as integer = current.Value - 1
 		    do
 		      if dest < list.MininimumValue then
 		        dest = list.MaximumValue
