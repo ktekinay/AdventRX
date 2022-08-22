@@ -102,7 +102,6 @@ Folder=Advent 2022-12;Advent 2022-12;&h000000004DF2AFFF;&h0000000000000000;false
 Class=Advent_2022_12_01;Advent 2022-12/Advent_2022_12_01.xojo_code;&h0000000072A467FF;&h000000004DF2AFFF;false
 Folder=Support 2022-12;Advent 2022-12/Support 2022-12;&h000000003587E7FF;&h000000004DF2AFFF;false
 Class=LinkedListItem;Advent 2020-12/Support 2020-12/LinkedListItem.xojo_code;&h000000004338D7FF;&h00000000761227FF;false
-Class=CircularLinkedList;Advent 2020-12/Support 2020-12/CircularLinkedList.xojo_code;&h00000000442ACFFF;&h00000000761227FF;false
 DefaultWindow=WndAdvent
 AppMenuBar=MainMenuBar
 MajorVersion=1

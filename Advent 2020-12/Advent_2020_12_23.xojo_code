@@ -73,23 +73,16 @@ Inherits AdventBase
 		  
 		  var items() as LinkedListItem = ToItems( input )
 		  
-		  var list as new CircularLinkedList
-		  list.Insert items
-		  
 		  const kMoves as integer = 100
-		  MakeMoves list, kMoves, items
+		  MakeMoves kMoves, items
 		  
-		  while list.Current.Value <> 1
-		    list.MoveNext
-		  wend
-		  
-		  list.MoveNext
+		  var current as LinkedListItem = items( 0 ).NextItem
 		  
 		  var result as integer
 		  do
-		    result = result * 10 + list.Current.Value
-		    list.MoveNext
-		  loop until list.Current.Value = 1
+		    result = result * 10 + current.Value
+		    current = current.NextItem
+		  loop until current.Value = 1
 		  
 		  return result
 		  return -1
@@ -126,70 +119,70 @@ Inherits AdventBase
 		  'Print "Count: " + items.Count.ToString( "#,##0" )
 		  'Print "Last Item: " + items( items.LastIndex ).Value.ToString
 		  
-		  var list as new CircularLinkedList
-		  list.Insert items
-		  
 		  const kMoves as integer = 10000000
 		  'const kMoves as integer = 100
 		  
 		  StartProfiling
 		  
-		  MakeMoves list, kMoves, items
+		  MakeMoves kMoves, items
 		  
-		  var cup1 as LinkedListItem = items( 0 )
-		  list.Current = cup1
-		  'Print "cup1.Value: " + cup1.Value.StringValue
-		  
-		  var result as integer = 1
-		  for i as integer = 1 to 2
-		    list.MoveNext
-		    'Print i.ToString + ": " + list.Current.Value.StringValue
-		    result = result * list.Current.Value
-		  next
+		  var cup1 as LinkedListItem = items( 0 ).NextItem
+		  var cup2 as LinkedListItem = cup1.NextItem
+		  var result as integer = cup1.Value * cup2.Value
 		  
 		  return result
+		  
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub MakeMoves(list As CircularLinkedList, moves As Integer, items() As LinkedListItem)
+		Private Sub MakeMoves(moves As Integer, items() As LinkedListItem)
+		  var current as LinkedListItem = items( 0 )
+		  
+		  for i as integer = 1 to items.LastIndex
+		    items( i - 1).NextItem = items( i )
+		  next
+		  
+		  items( items.LastIndex ).NextItem = items( 0 )
+		  
 		  StopProfiling
 		  LinkedListItem.Sort items
 		  StartProfiling
 		  
-		  var removed( 2 ) as LinkedListItem
+		  var minValue as integer = items( 0 ).Value
+		  var maxValue as integer = items( items.LastIndex ).Value
 		  
 		  for i as integer = 1 to moves
 		    'Print i.ToString( "000" ) + ": " + list.ToString
 		    
-		    var current as LinkedListItem = list.Current
-		    list.RemoveNextTo( removed )
+		    var firstRemoved as linkedListItem = current.NextItem
+		    var lastRemoved as LinkedListItem = firstRemoved.NextItem.NextItem
 		    
-		    var removedValues() as integer
-		    for each item as LinkedListItem in removed
-		      removedValues.Add item.Value
-		    next
+		    current.NextItem = lastRemoved.NextItem
 		    
-		    var dest as integer = current.Value - 1
+		    var destValue as integer = current.Value - 1
 		    do
-		      if dest < list.MininimumValue then
-		        dest = list.MaximumValue
+		      if destValue < minValue then
+		        destValue = maxValue
 		      end if
 		      
-		      if removedValues.IndexOf( dest ) <> -1 then
-		        dest = dest - 1
+		      if _
+		        destValue = firstRemoved.Value or _
+		        destValue = firstRemoved.NextItem.Value or _
+		        destValue = lastRemoved.Value then
+		        destValue = destValue - 1
 		      else
 		        exit
 		      end if
 		    loop
 		    
-		    list.Current = items( dest - 1 )
+		    var insertAfter as LinkedListItem = items( destValue - 1 )
 		    
-		    list.Insert removed
-		    list.Current = current
+		    lastRemoved.NextItem = insertAfter.NextItem
+		    insertAfter.NextItem = firstRemoved
 		    
-		    list.MoveNext
+		    current = current.NextItem
 		  next
 		End Sub
 	#tag EndMethod
