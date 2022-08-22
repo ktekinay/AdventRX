@@ -9,13 +9,7 @@ Protected Class LinkedListItem
 
 	#tag Method, Flags = &h21
 		Private Shared Function ItemSorter(item1 As LinkedListItem, item2 As LinkedListItem) As Integer
-		  if item1.Value < item2.Value then
-		    return -1
-		  elseif item1.Value > item2.Value then
-		    return 1
-		  end if
-		  
-		  return 0
+		  return item1.Value - item2.Value
 		  
 		End Function
 	#tag EndMethod
@@ -74,6 +68,14 @@ Protected Class LinkedListItem
 			Visible=true
 			Group="Position"
 			InitialValue="0"
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Value"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
 			Type="Integer"
 			EditorType=""
 		#tag EndViewProperty
