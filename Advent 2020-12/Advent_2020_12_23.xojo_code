@@ -84,6 +84,8 @@ Inherits AdventBase
 		    current = current.NextItem
 		  loop until current.Value = 1
 		  
+		  current.NextItem = nil
+		  
 		  return result
 		  return -1
 		  
@@ -129,6 +131,8 @@ Inherits AdventBase
 		  var cup1 as LinkedListItem = items( 0 ).NextItem
 		  var cup2 as LinkedListItem = cup1.NextItem
 		  var result as integer = cup1.Value * cup2.Value
+		  
+		  cup1.NextItem = nil
 		  
 		  return result
 		  
@@ -184,6 +188,8 @@ Inherits AdventBase
 		    
 		    current = current.NextItem
 		  next
+		  
+		  
 		End Sub
 	#tag EndMethod
 
