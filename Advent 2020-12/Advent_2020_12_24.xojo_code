@@ -56,6 +56,128 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Integer
+		  return CountBlack( GetGrid( input ) )
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CalculateResultB(input As String) As Integer
+		  var grid as Dictionary = GetGrid( input )
+		  
+		  Print "Move 0: " + CountBlack( grid ).ToString
+		  
+		  const kMoves as integer = 100
+		  
+		  var keysAdded() as variant = grid.Keys
+		  
+		  for move as integer = 1 to kMoves
+		    var keys() as variant
+		    for each key as variant in keysAdded
+		      keys.Add key
+		    next
+		    keysAdded.RemoveAll
+		    
+		    //
+		    // Expand the grid as needed
+		    //
+		    for each key as string in keys
+		      var x as double = key.NthField( ",", 1 ).ToDouble
+		      var y as double = key.NthField( ",", 2 ).ToDouble
+		      
+		      var adjacentKeys() as string = GetAdjacentKeys( x, y )
+		      for each adjacentKey as string in adjacentKeys
+		        if not grid.HasKey( adjacentKey ) then
+		          grid.Value( adjacentKey ) = false
+		          keysAdded.Add adjacentKey
+		        end if
+		      next
+		    next
+		    
+		    var newGrid as new Dictionary
+		    
+		    keys = grid.Keys
+		    var values() as variant = grid.Values
+		    
+		    for i as integer = 0 to keys.LastIndex
+		      var key as string = keys( i )
+		      var isBlack as boolean = values( i )
+		      
+		      var x as double = key.NthField( ",", 1 ).ToDouble
+		      var y as double = key.NthField( ",", 2 ).ToDouble
+		      
+		      var blackCount as integer
+		      
+		      var adjacentKeys() as string
+		      adjacentKeys.Add ToKey( x - 1.0, y )// w
+		      adjacentKeys.Add ToKey( x - 0.5, y + 1.0 ) // nw
+		      adjacentKeys.Add ToKey( x + 0.5, y + 1.0 ) // ne
+		      adjacentKeys.Add ToKey( x + 1.0, y ) // e
+		      adjacentKeys.Add ToKey( x + 0.5, y - 1.0 ) // se
+		      adjacentKeys.Add ToKey( x - 0.5, y - 1.0 ) // sw
+		      
+		      for each adjacentKey as string in adjacentKeys
+		        var adjacentIsBlack as boolean = grid.Lookup( adjacentKey, false )
+		        blackCount = blackCount + if( adjacentIsBlack, 1, 0 )
+		        if blackCount > 2 then
+		          exit
+		        end if
+		      next
+		      
+		      if isBlack and ( blackCount = 0 or blackCount > 2 ) then
+		        isBlack = false
+		        
+		      elseif not isBlack and blackCount = 2 then
+		        isBlack = true
+		        
+		      end if
+		      
+		      newGrid.Value( key ) = isBlack
+		    next
+		    
+		    grid = newGrid
+		    
+		    Print "Move " + move.ToString + ": " + CountBlack( grid ).ToString
+		    
+		  next
+		  
+		  return CountBlack( grid )
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CountBlack(grid As Dictionary) As Integer
+		  var blackCount as integer
+		  var values() as variant = grid.Values
+		  for each isBlack as boolean in values
+		    if isBlack then
+		      blackCount = blackCount + 1
+		    end if
+		  next
+		  
+		  return blackCount
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function GetAdjacentKeys(x As Double, y As Double) As String()
+		  var adjacentKeys() as string
+		  
+		  adjacentKeys.Add ToKey( x - 1.0, y )// w
+		  adjacentKeys.Add ToKey( x - 0.5, y + 1.0 ) // nw
+		  adjacentKeys.Add ToKey( x + 0.5, y + 1.0 ) // ne
+		  adjacentKeys.Add ToKey( x + 1.0, y ) // e
+		  adjacentKeys.Add ToKey( x + 0.5, y - 1.0 ) // se
+		  adjacentKeys.Add ToKey( x - 0.5, y - 1.0 ) // sw
+		  
+		  return adjacentKeys
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function GetGrid(input As String) As Dictionary
 		  var rows() as string = ToStringArray( input )
 		  
 		  var grid as new Dictionary
@@ -85,28 +207,24 @@ Inherits AdventBase
 		      end select
 		    next
 		    
-		    var key as double = x * 10000000.0 + y
+		    var key as string = x.ToString( kFormat ) + "," + y.ToString( kFormat )
 		    grid.Value( key ) = not grid.Lookup( key, false )
 		  next
 		  
-		  var blackCount as integer
-		  var values() as variant = grid.Values
-		  for each isBlack as boolean in values
-		    if isBlack then
-		      blackCount = blackCount + 1
-		    end if
-		  next
+		  return grid
 		  
-		  return blackCount
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function CalculateResultB(input As String) As Integer
-		  
+		Private Function ToKey(x As Double, y As Double) As String
+		  return x.ToString( kFormat ) + "," + y.ToString( kFormat )
 		End Function
 	#tag EndMethod
 
+
+	#tag Constant, Name = kFormat, Type = String, Dynamic = False, Default = \"000000000.0", Scope = Private
+	#tag EndConstant
 
 	#tag Constant, Name = kPuzzleInput, Type = String, Dynamic = False, Default = \"", Scope = Private, Description = 5768656E2070617374696E67207468652064617461206973206E65636573736172792E
 	#tag EndConstant
