@@ -150,8 +150,8 @@ Inherits Thread
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0
-		Sub PrintStringGrid(grid(, ) As String, colDefault As String = "")
+	#tag Method, Flags = &h1
+		Protected Sub PrintStringGrid(grid(, ) As String, colDefault As String = "")
 		  var lastRowIndex as integer = grid.LastIndex( 1 )
 		  var lastColIndex as integer = grid.LastIndex( 2 )
 		  

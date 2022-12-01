@@ -36,13 +36,46 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Integer
+		  var arr() as string = ToStringArray( input )
+		  
+		  var totals() as integer = GetSortedTotals( arr )
+		  return totals.Pop
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Integer
+		  var arr() as string = ToStringArray( input )
 		  
+		  var totals() as integer = GetSortedTotals( arr )
+		  
+		  var grandTotal as integer
+		  for i as integer = 1 to 3
+		    grandTotal = grandTotal + totals.Pop
+		  next
+		  
+		  return grandTotal
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function GetSortedTotals(arr() As String) As Integer()
+		  var totals( 0 ) as integer
+		  var totalIndex as integer
+		  
+		  for each item as string in arr
+		    if item = "" then
+		      totals.Add 0
+		      
+		      continue
+		    end if
+		    
+		    totals( totals.LastIndex ) = totals( totals.LastIndex ) + item.ToInteger
+		  next
+		  
+		  totals.Sort
+		  return totals
 		End Function
 	#tag EndMethod
 
@@ -50,7 +83,7 @@ Inherits AdventBase
 	#tag Constant, Name = kPuzzleInput, Type = String, Dynamic = False, Default = \"", Scope = Private, Description = 5768656E2070617374696E67207468652064617461206973206E65636573736172792E
 	#tag EndConstant
 
-	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"", Scope = Private
+	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"1000\n2000\n3000\n\n4000\n\n5000\n6000\n\n7000\n8000\n9000\n\n10000", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = kTestInputB, Type = String, Dynamic = False, Default = \"", Scope = Private

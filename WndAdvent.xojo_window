@@ -221,7 +221,7 @@ End
 		  AddRow new Advent_2022_12_01
 		  
 		  // Expand
-		  ExpandYear 2020
+		  ExpandYear 2022
 		End Sub
 	#tag EndMethod
 
