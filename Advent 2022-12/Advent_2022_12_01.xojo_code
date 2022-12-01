@@ -2,6 +2,25 @@
 Protected Class Advent_2022_12_01
 Inherits AdventBase
 	#tag Event
+		Function ReturnDescription() As String
+		  return "Sum arrays"
+		  
+		End Function
+	#tag EndEvent
+
+	#tag Event
+		Function ReturnIsComplete() As Boolean
+		  return true
+		End Function
+	#tag EndEvent
+
+	#tag Event
+		Function ReturnName() As String
+		  return "Calorie Counting"
+		End Function
+	#tag EndEvent
+
+	#tag Event
 		Function RunA() As Integer
 		  return CalculateResultA( Normalize( GetPuzzleInput ) )
 		  
