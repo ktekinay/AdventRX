@@ -9,14 +9,14 @@ Inherits AdventBase
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return false
+		  return true
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnName() As String
-		  return ""
+		  return "Rock Paper Scissors"
 		  
 		End Function
 	#tag EndEvent
@@ -56,12 +56,122 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Integer
+		  var turns() as string = ToStringArray( input )
+		  
+		  var myScore as integer
+		  
+		  for each turn as string in turns
+		    var moves() as string = turn.Split( " " )
+		    myScore = myScore + self.MyScore( moves( 0 ), moves( 1 ) )
+		  next turn
+		  
+		  return myScore
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Integer
+		  var turns() as string = ToStringArray( input )
+		  
+		  var myScore as integer
+		  
+		  for each turn as string in turns
+		    var moves() as string = turn.Split( " " )
+		    
+		    select case moves( 1 )
+		    case "X" // Lose
+		      moves( 1 ) = LoserFrom( moves( 0 ) )
+		    case "Y" // Draw
+		      moves( 1 ) = moves( 0 )
+		    case "Z" // Win
+		      moves( 1 ) = WinnerFrom( moves( 0 ) )
+		    end select
+		    
+		    myScore = myScore + self.MyScore( moves( 0 ), moves( 1 ) )
+		  next turn
+		  
+		  return myScore
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function ConvertMove(move As String) As String
+		  static diff as integer = Asc( "X" ) - Asc( "A" )
+		  
+		  if move >= "X" then
+		    var v as integer = move.Asc - diff
+		    move = Chr( v )
+		  end if
+		  
+		  return move
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function LoserFrom(move As String) As String
+		  static ascA as integer = Asc( "A" )
+		  static ascC as integer = Asc( "C" )
+		  
+		  var v as integer = move.Asc - 1
+		  if v < ascA then
+		    v = ascC
+		  end if
+		  
+		  return chr( v )
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function MyScore(theirMove As String, myMove As String) As Integer
+		  theirMove = ConvertMove( theirMove )
+		  myMove = ConvertMove( myMove )
+		  
+		  var myScore as integer = ToPoints( myMove )
+		  
+		  var winner as integer
+		  
+		  select case true
+		  case theirMove = myMove
+		    winner = 3
+		  case theirMove.Asc = ( myMove.Asc - 1 )
+		    winner = 6
+		  case theirMove = "C" and myMove = "A"
+		    winner = 6
+		  end select
+		  
+		  return myScore + winner
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function ToPoints(move As String) As Integer
+		  select case move
+		  case "A", "X"
+		    return 1
+		  case "B", "Y"
+		    return 2
+		  case "C", "Z"
+		    return 3
+		  end select
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function WinnerFrom(move As String) As String
+		  static ascA as integer = Asc( "A" )
+		  static ascC as integer = Asc( "C" )
+		  
+		  var v as integer = move.Asc + 1
+		  if v > ascC then
+		    v = ascA
+		  end if
+		  
+		  return chr( v )
 		  
 		End Function
 	#tag EndMethod
@@ -70,7 +180,7 @@ Inherits AdventBase
 	#tag Constant, Name = kPuzzleInput, Type = String, Dynamic = False, Default = \"", Scope = Private, Description = 5768656E2070617374696E67207468652064617461206973206E65636573736172792E
 	#tag EndConstant
 
-	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"", Scope = Private
+	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"A Y\nB X\nC Z", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = kTestInputB, Type = String, Dynamic = False, Default = \"", Scope = Private
