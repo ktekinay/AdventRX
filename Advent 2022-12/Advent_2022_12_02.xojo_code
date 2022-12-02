@@ -132,18 +132,18 @@ Inherits AdventBase
 		  
 		  var myScore as integer = ToPoints( myMove )
 		  
-		  var winner as integer
+		  var bonus as integer
 		  
 		  select case true
 		  case theirMove = myMove
-		    winner = 3
+		    bonus = 3
 		  case theirMove.Asc = ( myMove.Asc - 1 )
-		    winner = 6
+		    bonus = 6
 		  case theirMove = "C" and myMove = "A"
-		    winner = 6
+		    bonus = 6
 		  end select
 		  
-		  return myScore + winner
+		  return myScore + bonus
 		End Function
 	#tag EndMethod
 
