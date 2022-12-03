@@ -1,9 +1,9 @@
 #tag Class
-Protected Class Advent_2022_12_02
+Protected Class Advent_2022_12_03
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return ""
+		  return "Sacks of common types"
 		End Function
 	#tag EndEvent
 
@@ -16,7 +16,7 @@ Inherits AdventBase
 
 	#tag Event
 		Function ReturnName() As String
-		  return "Rock Paper Scissors"
+		  return "Rucksack Reorganization"
 		  
 		End Function
 	#tag EndEvent
@@ -56,122 +56,93 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Integer
-		  var turns() as string = ToStringArray( input )
+		  var sacks() as string = ToStringArray( input )
 		  
-		  var myScore as integer
+		  var score as integer
 		  
-		  for each turn as string in turns
-		    var moves() as string = turn.Split( " " )
-		    myScore = myScore + self.MyScore( moves( 0 ), moves( 1 ) )
-		  next turn
+		  for each sack as string in sacks
+		    var p as pair = SplitSack( sack )
+		    var com1 as string = p.Left
+		    var com2 as string = p.Right
+		    
+		    var common as Dictionary = GetCommon( com1, com2 )
+		    
+		    for each c as string in common.Keys
+		      var pr as integer = PriorityOf( c )
+		      score = score + pr
+		    next
+		  next sack
 		  
-		  return myScore
+		  return score
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Integer
-		  var turns() as string = ToStringArray( input )
+		  var sacks() as string = ToStringArray( input )
 		  
-		  var myScore as integer
+		  var score as integer
 		  
-		  for each turn as string in turns
-		    var moves() as string = turn.Split( " " )
+		  for groupIndex as integer = 0 to sacks.LastIndex step 3
+		    var common as Dictionary = GetCommon( sacks( groupIndex ), sacks( groupIndex + 1 ) )
+		    var common2 as Dictionary = GetCommon( sacks( groupIndex + 1 ), sacks( groupIndex + 2 ) )
 		    
-		    select case moves( 1 )
-		    case "X" // Lose
-		      moves( 1 ) = LoserFrom( moves( 0 ) )
-		    case "Y" // Draw
-		      moves( 1 ) = moves( 0 )
-		    case "Z" // Win
-		      moves( 1 ) = WinnerFrom( moves( 0 ) )
-		    end select
-		    
-		    myScore = myScore + self.MyScore( moves( 0 ), moves( 1 ) )
-		  next turn
+		    for each key as variant in common.Keys
+		      if common2.HasKey( key ) then
+		        score = score + PriorityOf( key.StringValue )
+		        exit
+		      end if
+		    next
+		  next
 		  
-		  return myScore
+		  return score
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function GetCommon(com1 As String, com2 As String) As Dictionary
+		  var chars1() as string = com1.Split( "" )
+		  var chars2() as string = com2.Split( "" )
+		  
+		  var d1 as Dictionary = ParseJSON( "{}" )
+		  for each c as string in chars1
+		    d1.Value( c ) = nil
+		  next
+		  
+		  var common as Dictionary = ParseJSON( "{}" )
+		  for each c as string in chars2
+		    if d1.HasKey( c ) then
+		      common.Value( c ) = nil
+		    end if
+		  next
+		  
+		  return common
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function ConvertMove(move As String) As String
-		  static diff as integer = Asc( "X" ) - Asc( "A" )
+		Private Function PriorityOf(c As String) As Integer
+		  static ascLittleA as integer = asc( "a" )
+		  static ascCapA as integer = asc( "A" )
 		  
-		  if move >= "X" then
-		    var v as integer = move.Asc - diff
-		    move = Chr( v )
-		  end if
-		  
-		  return move
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Function LoserFrom(move As String) As String
-		  static ascA as integer = Asc( "A" )
-		  static ascC as integer = Asc( "C" )
-		  
-		  var v as integer = move.Asc - 1
-		  if v < ascA then
-		    v = ascC
-		  end if
-		  
-		  return chr( v )
+		  select case c.Asc
+		  case is >= ascLittleA
+		    return c.Asc - ascLittleA + 1
+		  case else
+		    return c.Asc - ascCapA + 27
+		  end
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function MyScore(theirMove As String, myMove As String) As Integer
-		  theirMove = ConvertMove( theirMove )
-		  myMove = ConvertMove( myMove )
+		Private Function SplitSack(sack as String) As Pair
+		  var com1 as string = sack.Left( sack.Length / 2 )
+		  var com2 as string = sack.Right( sack.Length / 2 )
 		  
-		  var myScore as integer = ToPoints( myMove )
-		  
-		  var bonus as integer
-		  
-		  select case true
-		  case theirMove = myMove
-		    bonus = 3
-		  case theirMove.Asc = ( myMove.Asc - 1 )
-		    bonus = 6
-		  case theirMove = "C" and myMove = "A"
-		    bonus = 6
-		  end select
-		  
-		  return myScore + bonus
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Function ToPoints(move As String) As Integer
-		  select case move
-		  case "A", "X"
-		    return 1
-		  case "B", "Y"
-		    return 2
-		  case "C", "Z"
-		    return 3
-		  end select
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Function WinnerFrom(move As String) As String
-		  static ascA as integer = Asc( "A" )
-		  static ascC as integer = Asc( "C" )
-		  
-		  var v as integer = move.Asc + 1
-		  if v > ascC then
-		    v = ascA
-		  end if
-		  
-		  return chr( v )
+		  return com1 : com2
 		  
 		End Function
 	#tag EndMethod
@@ -180,7 +151,7 @@ Inherits AdventBase
 	#tag Constant, Name = kPuzzleInput, Type = String, Dynamic = False, Default = \"", Scope = Private, Description = 5768656E2070617374696E67207468652064617461206973206E65636573736172792E
 	#tag EndConstant
 
-	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"A Y\nB X\nC Z", Scope = Private
+	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"vJrwpWtwJgWrhcsFMMfFFhFp\njqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL\nPmmdzqPrVvPwwTWBwg\nwMqvLMZHhHMvwLHjbvcjnnSBnvTQFn\nttgJtRGJQctTZtZT\nCrZsJsPPZsGzwwsLwLmpwMDw", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = kTestInputB, Type = String, Dynamic = False, Default = \"", Scope = Private
