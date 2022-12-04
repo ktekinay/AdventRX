@@ -221,6 +221,7 @@ End
 		  AddRow new Advent_2022_12_01
 		  AddRow new Advent_2022_12_02
 		  AddRow new Advent_2022_12_03
+		  AddRow new Advent_2022_12_04
 		  
 		  // Expand
 		  ExpandYear 2022
