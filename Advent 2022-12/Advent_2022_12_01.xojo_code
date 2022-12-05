@@ -57,8 +57,8 @@ Inherits AdventBase
 		Private Function CalculateResultA(input As String) As Integer
 		  var arr() as string = ToStringArray( input )
 		  
-		  var totals() as integer = GetSortedTotals( arr )
-		  return totals.Pop
+		  var totals() as integer = SumIntegerGroups( arr )
+		  return totals.Max
 		  
 		End Function
 	#tag EndMethod
@@ -67,7 +67,8 @@ Inherits AdventBase
 		Private Function CalculateResultB(input As String) As Integer
 		  var arr() as string = ToStringArray( input )
 		  
-		  var totals() as integer = GetSortedTotals( arr )
+		  var totals() as integer = SumIntegerGroups( arr )
+		  totals.Sort
 		  
 		  var grandTotal as integer
 		  for i as integer = 1 to 3
@@ -75,26 +76,6 @@ Inherits AdventBase
 		  next
 		  
 		  return grandTotal
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Function GetSortedTotals(arr() As String) As Integer()
-		  var totals( 0 ) as integer
-		  var totalIndex as integer
-		  
-		  for each item as string in arr
-		    if item = "" then
-		      totals.Add 0
-		      
-		      continue
-		    end if
-		    
-		    totals( totals.LastIndex ) = totals( totals.LastIndex ) + item.ToInteger
-		  next
-		  
-		  totals.Sort
-		  return totals
 		End Function
 	#tag EndMethod
 
