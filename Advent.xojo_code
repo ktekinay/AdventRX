@@ -68,6 +68,58 @@ Protected Module Advent
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function Max(Extends arr() As Double) As Double
+		  var result as double = -1.8E308
+		  
+		  for each d as double in arr
+		    result = max( d, result )
+		  next
+		  
+		  return result
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function Max(Extends arr() As Integer) As Integer
+		  var result as integer = 0 - &h7FFFFFFFFFFFFFFF
+		  
+		  for each i as integer in arr
+		    result = max( i, result )
+		  next
+		  
+		  return result
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function Min(Extends arr() As Double) As Double
+		  var result as double = 1.8E308
+		  
+		  for each d as double in arr
+		    result = min( d, result )
+		  next
+		  
+		  return result
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function Min(Extends arr() As Integer) As Integer
+		  var result as integer = &h7FFFFFFFFFFFFFFF
+		  
+		  for each i as integer in arr
+		    result = min( i, result )
+		  next
+		  
+		  return result
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function MultiplyArray(arr() As Integer, includeZeros As Boolean) As Integer
 		  var result as integer = 1
 		  var foundItems as boolean
@@ -98,6 +150,42 @@ Protected Module Advent
 		  next
 		  
 		  return sum
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function SumDoubleGroups(stringArr() As String) As Double()
+		  var doubleArr( 0 ) as double
+		  
+		  for each s as string in stringArr
+		    if s = "" then
+		      doubleArr.Add 0.0
+		      continue
+		    end if
+		    
+		    doubleArr( doubleArr.LastIndex ) = doubleArr( doubleArr.LastIndex ) + s.ToDouble
+		  next
+		  
+		  return doubleArr
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function SumIntegerGroups(stringArr() As String) As Integer()
+		  var intArr( 0 ) as integer
+		  
+		  for each s as string in stringArr
+		    if s = "" then
+		      intArr.Add 0
+		      continue
+		    end if
+		    
+		    intArr( intArr.LastIndex ) = intArr( intArr.LastIndex ) + s.ToInteger
+		  next
+		  
+		  return intArr
 		  
 		End Function
 	#tag EndMethod
