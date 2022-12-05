@@ -101,7 +101,7 @@ Inherits Thread
 
 	#tag Method, Flags = &h1
 		Protected Function Normalize(s As String) As String
-		  return s.Trim.ReplaceLineEndings( EndOfLine )
+		  return s.TrimRight.ReplaceLineEndings( EndOfLine )
 		  
 		End Function
 	#tag EndMethod
