@@ -15,6 +15,22 @@ Protected Module Advent
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function IndexOf(Extends mb As MemoryBlock, b As Byte) As Integer
+		  var p as ptr = mb
+		  var lastByte as integer = mb.Size - 1
+		  
+		  for pos as integer = 0 to lastByte
+		    if p.Byte( pos ) = b then
+		      return pos
+		    end if
+		  next
+		  
+		  return -1
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function IsBelow(Extends pt As Xojo.Point, rect As Advent.GraphRect) As Boolean
 		  return pt.Y < rect.Bottom
 		  
