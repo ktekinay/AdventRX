@@ -1,22 +1,22 @@
 #tag Class
-Protected Class Advent_2015_12_04
+Protected Class Advent_2015_12_10
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "MD5"
+		  return "Unknown"
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return true
+		  return false
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnName() As String
-		  return "The Ideal Stocking Stuffer"
+		  return ""
 		  
 		End Function
 	#tag EndEvent
@@ -56,59 +56,77 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Integer
-		  if not IsTest then
-		    input = kPuzzleInput
-		  else
-		    return 0
+		  if IsTest then
+		    return -1
 		  end if
 		  
-		  var i as integer = 1
-		  do
-		    var key as string = input + i.ToString
-		    var hash as MemoryBlock = Crypto.MD5( key ) 
-		    
-		    var p as ptr = hash
-		    if p.UInt16( 0 ) = 0 and p.Byte( 2 ) < 16 then
-		      'var hex as string = EncodeHex( hash )
-		      return i
-		    end if
-		    
-		    i = i + 1
-		  loop
+		  input = kPuzzleInput
+		  var intArr() as integer = ToIntegerArray( String.FromArray( input.Split( "" ), EndOfLine ) )
+		  
+		  for reps as integer = 1 to 40
+		    input = ExtendIt( input )
+		  next
+		  
+		  Part1 = input
+		  
+		  return input.Length
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Integer
-		  if not IsTest then
-		    input = kPuzzleInput
-		  else
-		    return 0
+		  if IsTest then
+		    return -1
 		  end if
 		  
-		  var i as integer = 1
-		  do
-		    var key as string = input + i.ToString
-		    var hash as MemoryBlock = Crypto.MD5( key ) 
+		  input = Part1
+		  
+		  for reps as integer = 1 to 10
+		    input = ExtendIt( input )
+		  next
+		  
+		  return input.Length
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function ExtendIt(s As String) As String
+		  static rx as RegEx
+		  if rx is nil then
+		    rx = new RegEx
+		    rx.SearchPattern = "(.)\g1*"
+		  end if
+		  
+		  var builder() as string
+		  
+		  var match as RegExMatch = rx.Search( s )
+		  while match isa RegExMatch
+		    var foundString as string = match.SubExpressionString( 0 )
+		    var char as string = match.SubExpressionString( 1 )
 		    
-		    var p as ptr = hash
-		    if p.UInt16( 0 ) = 0 and p.Byte( 2 ) = 0 then
-		      'var hex as string = EncodeHex( hash )
-		      return i
-		    end if
+		    builder.Add foundString.Length.ToString
+		    builder.Add char
 		    
-		    i = i + 1
-		  loop
+		    match = rx.Search
+		  wend
+		  
+		  return String.FromArray( builder, "" )
 		  
 		End Function
 	#tag EndMethod
 
 
-	#tag Constant, Name = kPuzzleInput, Type = String, Dynamic = False, Default = \"bgvyzdsv", Scope = Private, Description = 5768656E2070617374696E67207468652064617461206973206E65636573736172792E
+	#tag Property, Flags = &h21
+		Private Part1 As String
+	#tag EndProperty
+
+
+	#tag Constant, Name = kPuzzleInput, Type = String, Dynamic = False, Default = \"1113122113", Scope = Private, Description = 5768656E2070617374696E67207468652064617461206973206E65636573736172792E
 	#tag EndConstant
 
-	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"pqrstuv", Scope = Private
+	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = kTestInputB, Type = String, Dynamic = False, Default = \"", Scope = Private
