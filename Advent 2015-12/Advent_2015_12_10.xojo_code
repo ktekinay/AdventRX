@@ -3,20 +3,20 @@ Protected Class Advent_2015_12_10
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "Unknown"
+		  return "Game of life"
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return false
+		  return true
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnName() As String
-		  return ""
+		  return "Elves Look, Elves Say"
 		  
 		End Function
 	#tag EndEvent
@@ -64,12 +64,12 @@ Inherits AdventBase
 		  var intArr() as integer = ToIntegerArray( String.FromArray( input.Split( "" ), EndOfLine ) )
 		  
 		  for reps as integer = 1 to 40
-		    input = ExtendIt( input )
+		    intArr = ExtendIt( intArr )
 		  next
 		  
-		  Part1 = input
+		  Part1 = intArr
 		  
-		  return input.Length
+		  return intArr.Count
 		  
 		End Function
 	#tag EndMethod
@@ -80,46 +80,55 @@ Inherits AdventBase
 		    return -1
 		  end if
 		  
-		  input = Part1
+		  var intArr() as integer = Part1
 		  
 		  for reps as integer = 1 to 10
-		    input = ExtendIt( input )
+		    intArr = ExtendIt( intArr )
 		  next
 		  
-		  return input.Length
+		  return intArr.Count
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function ExtendIt(s As String) As String
-		  static rx as RegEx
-		  if rx is nil then
-		    rx = new RegEx
-		    rx.SearchPattern = "(.)\g1*"
-		  end if
+		Private Function ExtendIt(arr() As Integer) As Integer()
+		  var newArr() as integer
+		  newArr.ResizeTo arr.Count * 2
 		  
-		  var builder() as string
+		  var arrIndex as integer
+		  var newArrIndex as integer = -1
 		  
-		  var match as RegExMatch = rx.Search( s )
-		  while match isa RegExMatch
-		    var foundString as string = match.SubExpressionString( 0 )
-		    var char as string = match.SubExpressionString( 1 )
+		  while arrIndex <= arr.LastIndex
+		    var digit as integer = arr( arrIndex )
 		    
-		    builder.Add foundString.Length.ToString
-		    builder.Add char
+		    var count as integer = 1
 		    
-		    match = rx.Search
+		    var start as integer = arrIndex + 1
+		    for i as integer = start to arr.LastIndex
+		      if arr( i ) = digit then
+		        count = count + 1
+		      else
+		        exit for i
+		      end if
+		    next
+		    
+		    newArrIndex = newArrIndex + 1
+		    newArr( newArrIndex ) = count
+		    newArrIndex = newArrIndex + 1
+		    newArr( newArrIndex ) = digit
+		    
+		    arrIndex = arrIndex + count
 		  wend
 		  
-		  return String.FromArray( builder, "" )
-		  
+		  newArr.ResizeTo newArrIndex
+		  return newArr
 		End Function
 	#tag EndMethod
 
 
 	#tag Property, Flags = &h21
-		Private Part1 As String
+		Private Part1() As Integer
 	#tag EndProperty
 
 
