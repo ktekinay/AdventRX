@@ -175,6 +175,7 @@ End
 		  AddRow new Advent_2015_12_09
 		  AddRow new Advent_2015_12_10
 		  AddRow new Advent_2015_12_11
+		  AddRow new Advent_2015_12_12
 		  
 		  // 2020
 		  AddRow new Advent_2020_12_01
