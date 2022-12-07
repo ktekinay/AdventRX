@@ -59,7 +59,7 @@ Inherits AdventBase
 		  var root as MockFolderItem = InputToRoot( input )
 		  
 		  return Walk( root, 100000 )
-		  return -1
+		  
 		End Function
 	#tag EndMethod
 
@@ -73,11 +73,11 @@ Inherits AdventBase
 		  var target as integer = 30000000
 		  var toFree as integer = target - available
 		  
-		  var minimum as integer = toFree * 1000
+		  var minimum as integer = totalDiskSpace
 		  MinOverTarget root, toFree, minimum
 		  
 		  return minimum
-		  return -1
+		  
 		End Function
 	#tag EndMethod
 

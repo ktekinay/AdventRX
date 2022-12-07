@@ -9,12 +9,23 @@ Protected Class MockFolderItem
 
 	#tag Method, Flags = &h0
 		Function Child(name As String) As MockFolderItem
+		  for each f as MockFolderItem in Files
+		    if f.Name = name then
+		      return f
+		    end if
+		  next
+		  
+		  return nil
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub UpdateSize()
+		  if not IsDirectory then
+		    return
+		  end if
+		  
 		  Size = 0
 		  
 		  for each f as MockFolderItem in Files
