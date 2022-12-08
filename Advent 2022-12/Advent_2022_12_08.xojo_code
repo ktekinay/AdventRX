@@ -84,11 +84,7 @@ Inherits AdventBase
 		  var lastRowIndex as integer = grid.LastRowIndex
 		  var lastColIndex as integer = grid.LastColIndex
 		  
-		  var directionals() as ObjectGrid.NextDelegate
-		  directionals.Add AddressOf grid.Above
-		  directionals.Add AddressOf grid.Right
-		  directionals.Add AddressOf grid.Below
-		  directionals.Add AddressOf grid.Left
+		  var directionals() as ObjectGrid.NextDelegate = grid.MainDirectionals
 		  
 		  var count as integer 
 		  
@@ -129,11 +125,7 @@ Inherits AdventBase
 		    return 0
 		  end if
 		  
-		  var directionals() as ObjectGrid.NextDelegate
-		  directionals.Add AddressOf grid.Above
-		  directionals.Add AddressOf grid.Right
-		  directionals.Add AddressOf grid.Below
-		  directionals.Add AddressOf grid.Left
+		  var directionals() as ObjectGrid.NextDelegate = grid.MainDirectionals
 		  
 		  var height as integer = square.RawValue
 		  

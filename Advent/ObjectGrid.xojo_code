@@ -35,6 +35,20 @@ Implements Iterable, Iterator
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function AllDirectionals() As ObjectGrid.NextDelegate()
+		  var directionals() as ObjectGrid.NextDelegate = MainDirectionals
+		  
+		  directionals.Add AddressOf AboveLeft
+		  directionals.Add AddressOf AboveRight
+		  directionals.Add AddressOf BelowLeft
+		  directionals.Add AddressOf BelowRight
+		  
+		  return directionals
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function Below(member As GridMember) As GridMember
 		  if member.Row = LastRowIndex then
 		    return nil
@@ -119,6 +133,19 @@ Implements Iterable, Iterator
 		  else
 		    return Grid( member.Row, member.Column - 1 )
 		  end if
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function MainDirectionals() As ObjectGrid.NextDelegate()
+		  var directionals() as ObjectGrid.NextDelegate
+		  directionals.Add AddressOf Above
+		  directionals.Add AddressOf Right
+		  directionals.Add AddressOf Below
+		  directionals.Add AddressOf Left
+		  
+		  return directionals
 		  
 		End Function
 	#tag EndMethod
