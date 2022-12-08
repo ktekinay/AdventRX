@@ -1,6 +1,13 @@
 #tag Class
 Class GridMember
 	#tag Method, Flags = &h0
+		Sub Constructor(value As Variant = Nil)
+		  self.RawValue = value
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function Neighbors(includeDiagonal As Boolean) As GridMember()
 		  var result() as GridMember
 		  var g as ObjectGrid = Grid
@@ -91,6 +98,10 @@ Class GridMember
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
+		RawValue As Variant
+	#tag EndProperty
+
+	#tag Property, Flags = &h0
 		Row As Integer
 	#tag EndProperty
 
@@ -160,6 +171,14 @@ Class GridMember
 			InitialValue=""
 			Type="Integer"
 			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="ToString"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="String"
+			EditorType="MultiLineEditor"
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class

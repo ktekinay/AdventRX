@@ -1,5 +1,150 @@
 #tag Class
 Class ObjectGrid
+Implements Iterable, Iterator
+	#tag Method, Flags = &h0
+		Function Above(member As GridMember) As GridMember
+		  if member.Row = 0 then
+		    return nil
+		  else
+		    return Grid( member.Row - 1, member.Column )
+		  end if
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function AboveLeft(member As GridMember) As GridMember
+		  if member.Row = 0 or member.Column = 0 then
+		    return nil
+		  else
+		    return Grid( member.Row - 1, member.Column - 1 )
+		  end if
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function AboveRight(member As GridMember) As GridMember
+		  if member.Row = 0 or member.Column = LastColIndex then
+		    return nil
+		  else
+		    return Grid( member.Row - 1, member.Column + 1 )
+		  end if
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function Below(member As GridMember) As GridMember
+		  if member.Row = LastRowIndex then
+		    return nil
+		  else
+		    return Grid( member.Row + 1, member.Column )
+		  end if
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function BelowLeft(member As GridMember) As GridMember
+		  if member.Row = LastRowIndex or member.Column = 0 then
+		    return nil
+		  else
+		    return Grid( member.Row + 1, member.Column - 1 )
+		  end if
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function BelowRight(member As GridMember) As GridMember
+		  if member.Row = LastRowIndex or member.Column = LastColIndex then
+		    return nil
+		  else
+		    return Grid( member.Row + 1, member.Column + 1 )
+		  end if
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Shared Function FromIntegerGrid(igrid(, ) As Integer) As ObjectGrid
+		  var lastRowIndex as integer = igrid.LastIndex( 1 )
+		  var lastColIndex as integer = igrid.LastIndex( 2 )
+		  
+		  var grid as new ObjectGrid
+		  grid.ResizeTo lastRowIndex, lastColIndex
+		  
+		  for row as integer = 0  to lastRowIndex
+		    for col as integer = 0 to lastColIndex
+		      grid( row, col ) = new GridMember( igrid( row, col ) )
+		    next
+		  next
+		  
+		  return grid
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Shared Function FromStringGrid(sgrid(, ) As String) As ObjectGrid
+		  var lastRowIndex as integer = sgrid.LastIndex( 1 )
+		  var lastColIndex as integer = sgrid.LastIndex( 2 )
+		  
+		  var grid as new ObjectGrid
+		  grid.ResizeTo lastRowIndex, lastColIndex
+		  
+		  for row as integer = 0  to lastRowIndex
+		    for col as integer = 0 to lastColIndex
+		      grid( row, col ) = new GridMember( sgrid( row, col ) )
+		    next
+		  next
+		  
+		  return grid
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function Iterator() As Iterator
+		  // Part of the Iterable interface.
+		  return self
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function Left(member As GridMember) As GridMember
+		  if member.Column = 0 then
+		    return nil
+		  else
+		    return Grid( member.Row, member.Column - 1 )
+		  end if
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function MoveNext() As Boolean
+		  IteratorColumn = IteratorColumn + 1
+		  if IteratorColumn > LastColIndex then
+		    IteratorColumn = 0
+		    IteratorRow = IteratorRow + 1
+		    if IteratorRow > LastRowIndex then
+		      IteratorRow = 0
+		      IteratorColumn = -1
+		      return false
+		    end if
+		  end if
+		  
+		  return true
+		  
+		End Function
+	#tag EndMethod
+
+	#tag DelegateDeclaration, Flags = &h0
+		Delegate Function NextDelegate(member As GridMember) As GridMember
+	#tag EndDelegateDeclaration
+
 	#tag Method, Flags = &h0
 		Function Operator_Convert() As String
 		  return ToString
@@ -33,9 +178,36 @@ Class ObjectGrid
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Function Right(member As GridMember) As GridMember
+		  if member.Column = LastColIndex then
+		    return nil
+		  else
+		    return Grid( member.Row, member.Column + 1 )
+		  end if
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function Value() As Variant
+		  // Part of the Iterator interface.
+		  return Grid( IteratorRow, IteratorColumn )
+		  
+		End Function
+	#tag EndMethod
+
 
 	#tag Property, Flags = &h21
 		Private Grid(-1,-1) As GridMember
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private IteratorColumn As Integer = -1
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private IteratorRow As Integer = 0
 	#tag EndProperty
 
 	#tag ComputedProperty, Flags = &h0
@@ -162,6 +334,14 @@ Class ObjectGrid
 			Group="Behavior"
 			InitialValue=""
 			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="ToString"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="String"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior
