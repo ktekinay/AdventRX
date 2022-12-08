@@ -56,90 +56,64 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Integer
-		  var grid( -1, -1 ) as integer = ToIntegerGrid( input )
+		  var grid as ObjectGrid = ToGrid( input )
 		  
-		  return CountVisible( grid )
+		  var count as integer = CountVisible( grid )
+		  return count
+		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Integer
-		  var grid( -1, -1 ) as integer = ToIntegerGrid( input )
+		  var grid as ObjectGrid = ToGrid( input )
 		  
 		  var maxScore as integer
 		  
-		  for row as integer = 0 to grid.LastIndex( 1 )
-		    for col as integer = 0 to grid.LastIndex( 2 )
-		      maxScore = max( maxScore, ScenicScore( grid, row, col ) )
-		    next
+		  for each square as GridMember in grid
+		    maxScore = max( maxScore, ScenicScore( grid, square ) )
 		  next
 		  
+		  maxScore = maxScore
 		  return maxScore
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function CountVisible(grid(, ) As Integer) As Integer
-		  var lastRowIndex as integer = grid.LastIndex( 1 )
-		  var lastColIndex as integer = grid.LastIndex( 2 )
+		Private Function CountVisible(grid As ObjectGrid) As Integer
+		  var lastRowIndex as integer = grid.LastRowIndex
+		  var lastColIndex as integer = grid.LastColIndex
+		  
+		  var directionals() as ObjectGrid.NextDelegate
+		  directionals.Add AddressOf grid.Above
+		  directionals.Add AddressOf grid.Right
+		  directionals.Add AddressOf grid.Below
+		  directionals.Add AddressOf grid.Left
 		  
 		  var count as integer 
 		  
-		  for row as integer = 0 to lastRowIndex 
-		    for col as integer = 0 to lastColIndex 
-		      if row = 0 or col = 0 or row = lastRowIndex or col = lastColIndex then
-		        count = count + 1
-		        continue for col
-		      end if
+		  for each square as GridMember in grid
+		    if square.Row = 0 or square.Column = 0 or square.Row = lastRowIndex or square.Column = lastColIndex then
+		      count = count + 1
+		      continue for square
+		    end if
+		    
+		    var height as integer = square.RawValue
+		    
+		    for each directional as ObjectGrid.NextDelegate in directionals
+		      var thisSquare as GridMember = square
 		      
-		      var height as integer = grid( row, col )
-		      
-		      var foundEdge as boolean = true
-		      
-		      for rowEdge as integer = 0 to row - 1
-		        var testHeight as integer = grid( rowEdge, col )
-		        if testHeight >= height then
-		          foundEdge = false
-		          exit
+		      do
+		        thisSquare = directional.Invoke( thisSquare )
+		        if thisSquare is nil then
+		          count = count + 1
+		          continue for square
 		        end if
-		      next
-		      
-		      if foundEdge = false then
-		        foundEdge = true
-		        for rowEdge as integer = row + 1 to lastRowIndex
-		          var testHeight as integer = grid( rowEdge, col )
-		          if testHeight >= height then
-		            foundEdge = false
-		            exit
-		          end if
-		        next
-		      end if
-		      
-		      if foundEdge = false then
-		        foundEdge = true
-		        for colEdge as integer = 0 to col - 1
-		          var testHeight as integer = grid( row, colEdge )
-		          if testHeight >= height then
-		            foundEdge = false
-		            exit
-		          end if
-		        next
-		      end if
-		      
-		      if foundEdge = false then
-		        foundEdge = true
-		        for colEdge as integer = col + 1 to lastColIndex
-		          var testHeight as integer = grid( row, colEdge )
-		          if testHeight >= height then
-		            foundEdge = false
-		            exit
-		          end if
-		        next
-		      end if
-		      
-		      if foundEdge then
-		        count = count + 1
-		      end if
+		        
+		        if thisSquare.RawValue.IntegerValue >= height then
+		          continue for directional
+		        end if
+		      loop
 		    next
 		  next
 		  
@@ -150,77 +124,51 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function ScenicScore(grid(, ) As Integer, row As Integer, col As Integer) As Integer
-		  var lastRowIndex as integer = grid.LastIndex( 1 )
-		  var lastColIndex as integer = grid.LastIndex( 2 )
-		  
-		  if row = 0 or col = 0 or row = lastRowIndex or col = lastColIndex then
+		Private Function ScenicScore(grid As ObjectGrid, square As GridMember) As Integer
+		  if square.Row = 0 or square.Row = grid.LastRowIndex or square.Column = 0 or square.Column = grid.LastColIndex then
 		    return 0
 		  end if
 		  
-		  if IsTest and row = 3 and col = 2 then
-		    row = row
-		  end if
+		  var directionals() as ObjectGrid.NextDelegate
+		  directionals.Add AddressOf grid.Above
+		  directionals.Add AddressOf grid.Right
+		  directionals.Add AddressOf grid.Below
+		  directionals.Add AddressOf grid.Left
 		  
-		  var height as integer = grid( row, col )
+		  var height as integer = square.RawValue
 		  
-		  var counts() as integer
-		  var count as integer
+		  var score as integer = 1
 		  
-		  count = 0
-		  for testRow as integer = row - 1 downto 0
-		    count = count + 1
+		  for each directional as ObjectGrid.NextDelegate in directionals
+		    var nextSquare as GridMember = square
+		    var thisScore as integer
 		    
-		    var testHeight as integer = grid( testRow, col )
-		    if testHeight >= height then
-		      exit
-		    end if
-		  next
-		  
-		  counts.Add count
-		  
-		  count = 0
-		  for testRow as integer = row + 1 to lastRowIndex
-		    count = count + 1
+		    do
+		      nextSquare = directional.Invoke( nextSquare )
+		      if nextSquare is nil then
+		        exit do
+		      end if
+		      
+		      thisScore = thisScore + 1
+		      
+		      if nextSquare.RawValue >= height then
+		        exit
+		      end if
+		    loop
 		    
-		    var testHeight as integer = grid( testRow, col )
-		    if testHeight >= height then
-		      exit
-		    end if
+		    score = score * thisScore
 		  next
 		  
-		  counts.Add count
+		  score = score
+		  return score
 		  
-		  count = 0
-		  for testCol as integer = col - 1 downto 0
-		    count = count + 1
-		    
-		    var testHeight as integer = grid( row, testCol )
-		    if testHeight >= height then
-		      exit
-		    end if
-		  next
-		  
-		  counts.Add count
-		  
-		  count = 0
-		  for testCol as integer = col + 1 to lastColIndex
-		    count = count + 1
-		    
-		    var testHeight as integer = grid( row, testCol )
-		    if testHeight >= height then
-		      exit
-		    end if
-		  next
-		  
-		  counts.Add count
-		  
-		  var mult as integer = 1
-		  for each count in counts
-		    mult = mult * count
-		  next
-		  
-		  return mult
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function ToGrid(input As String) As ObjectGrid
+		  var igrid( -1, -1 ) as integer = ToIntegerGrid( input )
+		  return ObjectGrid.FromIntegerGrid( igrid )
 		  
 		End Function
 	#tag EndMethod
