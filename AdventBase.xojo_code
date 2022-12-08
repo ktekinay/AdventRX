@@ -210,6 +210,25 @@ Inherits Thread
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
+		Protected Function ToIntegerGrid(input As String) As Integer(,)
+		  var rows() as string = input.ReplaceLineEndings( EndOfLine ).Split( EndOfLine )
+		  
+		  var grid( -1, -1 ) as integer
+		  grid.ResizeTo rows.LastIndex, rows( 0 ).Bytes - 1
+		  
+		  for row as integer = 0 to rows.LastIndex
+		    var cols() as string = rows( row ).Split( "" )
+		    for col as integer = 0 to cols.LastIndex
+		      grid( row, col ) = cols( col ).ToInteger
+		    next
+		  next
+		  
+		  return grid
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
 		Protected Function ToStringArray(s As String) As String()
 		  s = Normalize( s )
 		  
