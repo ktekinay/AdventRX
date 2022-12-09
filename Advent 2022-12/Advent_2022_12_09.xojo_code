@@ -217,7 +217,7 @@ Inherits AdventBase
 	#tag EndMethod
 
 
-	#tag Constant, Name = kCoordZero, Type = Double, Dynamic = False, Default = \"10000000", Scope = Private
+	#tag Constant, Name = kCoordZero, Type = Double, Dynamic = False, Default = \"100", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = kPuzzleInput, Type = String, Dynamic = False, Default = \"", Scope = Private, Description = 5768656E2070617374696E67207468652064617461206973206E65636573736172792E
