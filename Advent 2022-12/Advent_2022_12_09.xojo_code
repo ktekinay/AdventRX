@@ -98,7 +98,7 @@ Inherits AdventBase
 		  tailCoords.X = headCoords.X
 		  tailCoords.Y = headCoords.Y
 		  
-		  visited.Value( ToKey( tailCoords ) ) = nil
+		  visited.Value( tailCoords.ToKey ) = nil
 		  
 		  for each instruction as string in instructions
 		    var parts() as string = instruction.Split( " " )
@@ -108,7 +108,7 @@ Inherits AdventBase
 		    for move as integer = 1 to moves
 		      Move headCoords, direction
 		      Adjust( tailCoords, headCoords )
-		      visited.Value( ToKey( tailCoords ) ) = nil
+		      visited.Value( tailCoords.ToKey ) = nil
 		    next
 		  next
 		  
@@ -139,7 +139,7 @@ Inherits AdventBase
 		  
 		  var tailCoords as Xojo.Point = allCoords( allCoords.LastIndex )
 		  
-		  visited.Value( ToKey( tailCoords ) ) = nil
+		  visited.Value( tailCoords.ToKey ) = nil
 		  
 		  for each instruction as string in instructions
 		    var parts() as string = instruction.Split( " " )
@@ -159,7 +159,7 @@ Inherits AdventBase
 		      'PrintStringGrid allCoords
 		      'end if
 		      
-		      visited.Value( ToKey( tailCoords ) ) = nil
+		      visited.Value( tailCoords.ToKey ) = nil
 		    next
 		  next
 		  
@@ -214,13 +214,6 @@ Inherits AdventBase
 		  super.PrintStringGrid( grid, "." )
 		  Print ""
 		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Function ToKey(pt As Xojo.Point) As Integer
-		  return pt.X * 100000000 + pt.Y
-		  
-		End Function
 	#tag EndMethod
 
 

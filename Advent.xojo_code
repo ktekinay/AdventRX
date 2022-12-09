@@ -246,6 +246,13 @@ Protected Module Advent
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Function ToKey(Extends pt As Xojo.Point, adjuster As Integer = 1000000000) As Variant
+		  return pt.X * adjuster + pt.Y
+		  
+		End Function
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty
