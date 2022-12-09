@@ -86,86 +86,13 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Integer
-		  var instructions() as string = ToStringArray( input )
-		  
-		  var visited as new Dictionary
-		  
-		  var headCoords as new Xojo.Point
-		  headCoords.X = kCoordZero
-		  headCoords.Y = headCoords.X
-		  
-		  var tailCoords as new Xojo.Point
-		  tailCoords.X = headCoords.X
-		  tailCoords.Y = headCoords.Y
-		  
-		  visited.Value( tailCoords.ToKey ) = nil
-		  
-		  for each instruction as string in instructions
-		    var parts() as string = instruction.Split( " " )
-		    var direction as string = parts( 0 )
-		    var moves as integer = parts( 1 ).ToInteger
-		    
-		    for move as integer = 1 to moves
-		      Move headCoords, direction
-		      Adjust( tailCoords, headCoords )
-		      visited.Value( tailCoords.ToKey ) = nil
-		    next
-		  next
-		  
-		  var count as integer = visited.Count
-		  return count
+		  return Solve( input, 2 )
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Integer
-		  var instructions() as string = ToStringArray( input )
-		  
-		  var visited as new Dictionary
-		  
-		  var headCoords as new Xojo.Point
-		  headCoords.X = kCoordZero
-		  headCoords.Y = headCoords.X
-		  
-		  var allCoords() as Xojo.Point
-		  allCoords.Add headCoords
-		  
-		  for i as integer = 1 to 9
-		    var pt as new Xojo.Point
-		    pt.X = headCoords.X
-		    pt.Y = headCoords.Y
-		    allCoords.Add pt
-		  next
-		  
-		  var tailCoords as Xojo.Point = allCoords( allCoords.LastIndex )
-		  
-		  visited.Value( tailCoords.ToKey ) = nil
-		  
-		  for each instruction as string in instructions
-		    var parts() as string = instruction.Split( " " )
-		    var direction as string = parts( 0 )
-		    var moves as integer = parts( 1 ).ToInteger
-		    
-		    for move as integer = 1 to moves
-		      Move headCoords, direction
-		      
-		      for i as integer = 1 to allCoords.LastIndex
-		        var pt as Xojo.Point = allCoords( i )
-		        var prevPt as Xojo.Point = allCoords( i - 1 )
-		        Adjust( pt, prevPt )
-		      next
-		      
-		      'if IsTest then
-		      'PrintStringGrid allCoords
-		      'end if
-		      
-		      visited.Value( tailCoords.ToKey ) = nil
-		    next
-		  next
-		  
-		  var count as integer = visited.Count
-		  return count
-		  
+		  return Solve( input, 10 )
 		End Function
 	#tag EndMethod
 
@@ -175,11 +102,11 @@ Inherits AdventBase
 		  case "R"
 		    pt.X = pt.X + 1
 		  case "D"
-		    pt.Y = pt.Y - 1
+		    pt.Y = pt.Y + 1
 		  case "L"
 		    pt.X = pt.X - 1
 		  case "U"
-		    pt.Y = pt.Y + 1
+		    pt.Y = pt.Y - 1
 		  case else
 		    raise new RuntimeException
 		  end select
@@ -188,32 +115,104 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub PrintStringGrid(coords() As Xojo.Point)
-		  var xAdjust as integer = kCoordZero - 12
-		  var yAdjust as integer = kCoordZero - 8
+		Private Sub PrintStringGrid(coords() As Xojo.Point, visited As Dictionary, isFinal As Boolean)
+		  if isFinal then
+		    print "FINAL"
+		  end if
 		  
-		  var grid( 30, 30 ) as string
+		  const kFloor as integer = -kCoordZero + 18
 		  
-		  for i as integer = coords.LastIndex downto 0
-		    var pt as Xojo.Point = coords( i )
-		    var marker as string
-		    if i = 0 then
-		      marker = "H"
-		    elseif i = coords.LastIndex then
-		      marker= "T"
-		    else
-		      marker = i.ToString
-		    end if
+		  var xAdjust as integer = kFloor
+		  var yAdjust as integer = kFloor
+		  
+		  var grid( 35, 35 ) as string
+		  
+		  for each p as pair in visited.Values
+		    var x as integer = p.Left
+		    var y as integer = p.Right
 		    
-		    var col as integer = pt.X - xAdjust
-		    var row as integer = pt.Y - yAdjust
+		    var col as integer = x + xAdjust
+		    var row as integer = y + yAdjust
 		    
-		    grid( row, col ) = marker
+		    grid( row, col ) = "#"
 		  next
+		  
+		  grid( kCoordZero + yAdjust, kCoordZero + xAdjust ) = "s"
+		  
+		  if not isFinal then
+		    for i as integer = coords.LastIndex downto 0
+		      var pt as Xojo.Point = coords( i )
+		      var marker as string
+		      if i = 0 then
+		        marker = "H"
+		      elseif i = coords.LastIndex then
+		        marker= "T"
+		      else
+		        marker = i.ToString
+		      end if
+		      
+		      var col as integer = pt.X + xAdjust
+		      var row as integer = pt.Y + yAdjust
+		      
+		      grid( row, col ) = marker
+		    next
+		  end if
 		  
 		  super.PrintStringGrid( grid, "." )
 		  Print ""
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function Solve(input As String, knots As Integer) As Integer
+		  var kDebug as boolean = IsTest and FALSE
+		  
+		  var instructions() as string = ToStringArray( input )
+		  
+		  var visited as new Dictionary
+		  
+		  var rope() as Xojo.Point
+		  
+		  for i as integer = 1 to knots
+		    var pt as new Xojo.Point
+		    pt.X = kCoordZero
+		    pt.Y = kCoordZero
+		    rope.Add pt
+		  next
+		  
+		  var headKnot as Xojo.Point = rope( 0 )
+		  var tailKnot as Xojo.Point = rope( rope.LastIndex )
+		  
+		  for each instruction as string in instructions
+		    var parts() as string = instruction.Split( " " )
+		    var direction as string = parts( 0 )
+		    var moves as integer = parts( 1 ).ToInteger
+		    
+		    for move as integer = 1 to moves
+		      Move headKnot, direction
+		      
+		      for i as integer = 1 to rope.LastIndex
+		        var pt as Xojo.Point = rope( i )
+		        var prevPt as Xojo.Point = rope( i - 1 )
+		        Adjust( pt, prevPt )
+		      next
+		      
+		      if kDebug then
+		        PrintStringGrid rope, visited, false
+		      end if
+		      
+		      visited.Value( tailKnot.ToKey ) = tailKnot.X : tailKnot.Y
+		    next
+		  next
+		  
+		  if kDebug then
+		    PrintStringGrid rope, visited, true
+		  end if
+		  
+		  var count as integer = visited.Count
+		  return count
+		  
+		End Function
 	#tag EndMethod
 
 
