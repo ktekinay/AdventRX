@@ -55,75 +55,33 @@ Inherits AdventBase
 
 
 	#tag Method, Flags = &h21
-		Private Function Adjust(pt As Xojo.Point, direction As String, prevPt As Xojo.Point) As String
+		Private Sub Adjust(pt As Xojo.Point, prevPt As Xojo.Point)
 		  var diffX as integer = prevPt.X - pt.X
 		  var diffY as integer = prevPt.Y - pt.Y
 		  
-		  while not AreTouching( prevPt, pt ) 
-		    select case direction
-		    case "R"
-		      pt.X = pt.X + 1
-		      pt.Y = prevPt.Y
-		      
-		      if diffY < 0 then
-		        direction = "D"
-		      elseif diffY > 0 then
-		        direction = "U"
-		      end if
-		      
-		    case "D"
-		      pt.Y = pt.Y - 1
-		      pt.X = prevPt.X
-		      
-		      if diffX < 0 then
-		        direction = "L"
-		      elseif diffX > 0 then
-		        direction = "R"
-		      end if
-		      
-		    case "L"
+		  while abs( diffX ) > 1 or abs( diffY ) > 1
+		    select case diffX 
+		    case is < 0
 		      pt.X = pt.X - 1
-		      pt.Y = prevPt.Y
+		      diffX = diffX + 1
 		      
-		      if diffY < 0 then
-		        direction = "D"
-		      elseif diffY > 0 then
-		        direction = "U"
-		      end if
+		    case is > 0
+		      pt.X = pt.X + 1
+		      diffX = diffX - 1
+		    end select
+		    
+		    select case diffY
+		    case is < 0
+		      pt.Y = pt.Y - 1
+		      diffY = diffY + 1
 		      
-		    case "U"
+		    case is > 0
 		      pt.Y = pt.Y + 1
-		      pt.X = prevPt.X
-		      
-		      if diffX < 0 then
-		        direction = "L"
-		      elseif diffX > 0 then
-		        direction = "R"
-		      end if
-		      
-		    case else
-		      raise new RuntimeException
-		      
+		      diffY = diffY - 1
 		    end select
 		  wend
 		  
-		  return direction
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Function AreTouching(pt1 As Xojo.Point, pt2 As Xojo.Point) As Boolean
-		  select case true
-		  case pt1.X = pt2.X and pt1.Y = pt2.Y
-		    return true
-		  case abs( pt1.X - pt2.X ) <= 1 and abs( pt1.Y - pt2.Y ) <= 1
-		    return true
-		  case else
-		    return false
-		  end select
-		  
-		End Function
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
@@ -149,7 +107,7 @@ Inherits AdventBase
 		    
 		    for move as integer = 1 to moves
 		      Move headCoords, direction
-		      call Adjust( tailCoords, direction, headCoords )
+		      Adjust( tailCoords, headCoords )
 		      visited.Value( ToKey( tailCoords ) ) = nil
 		    next
 		  next
@@ -194,17 +152,12 @@ Inherits AdventBase
 		      for i as integer = 1 to allCoords.LastIndex
 		        var pt as Xojo.Point = allCoords( i )
 		        var prevPt as Xojo.Point = allCoords( i - 1 )
-		        if not AreTouching( pt, prevPt ) then
-		          Move pt, direction
-		          call Adjust( pt, direction, prevPt )
-		        end if
-		        
-		        'direction = Adjust( pt, direction, allCoords( i - 1 ) )
+		        Adjust( pt, prevPt )
 		      next
 		      
-		      if IsTest then
-		        PrintStringGrid allCoords
-		      end if
+		      'if IsTest then
+		      'PrintStringGrid allCoords
+		      'end if
 		      
 		      visited.Value( ToKey( tailCoords ) ) = nil
 		    next
@@ -280,7 +233,7 @@ Inherits AdventBase
 	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"R 4\nU 4\nL 3\nD 1\nR 4\nD 1\nL 5\nR 2", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = kTestInputB, Type = String, Dynamic = False, Default = \"R 4\nU 4\nL 3\nD 1\nR 4\nD 1\nL 5\nR 2", Scope = Private
+	#tag Constant, Name = kTestInputB, Type = String, Dynamic = False, Default = \"R 5\nU 8\nL 8\nD 3\nR 17\nD 10\nL 25\nU 20", Scope = Private
 	#tag EndConstant
 
 
