@@ -1,6 +1,12 @@
 #tag Module
 Protected Module Advent
 	#tag Method, Flags = &h0
+		Function BlackVerticalRectangleString() As String
+		  return &u25AE
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function Clone(Extends arr() As String) As String()
 		  var newArr() as string
 		  newArr.ResizeTo arr.LastIndex
@@ -80,6 +86,12 @@ Protected Module Advent
 	#tag Method, Flags = &h0
 		Function IsWithin(Extends value As Integer, range As Advent.Range) As Boolean
 		  return value >= range.Minimum and value <= range.Maximum
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function LightDotString() As String
+		  return &u22C5
 		End Function
 	#tag EndMethod
 
