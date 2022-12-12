@@ -103,24 +103,11 @@ Inherits AdventBase
 		  var ascA as integer = asc( "a" )
 		  
 		  for each member as Elevation in grid
-		    if member.CompareValue = ascA then
+		    if member.Value = ascA then
 		      if member.BestSteps > 0 and member.BestSteps <= best then
 		        best = member.BestSteps
 		        
 		      else
-		        //
-		        // Reset the existing start
-		        //
-		        startPos.Value = asc( "a" )
-		        startPos.RawValue = "a"
-		        
-		        //
-		        // Make this the start
-		        //
-		        startPos = member
-		        startPos.RawValue = "S"
-		        startPos.Value = asc( "S" )
-		        
 		        //
 		        // Set BestSteps so Traverse will know when to quit
 		        //
@@ -147,20 +134,24 @@ Inherits AdventBase
 		  
 		  for row as integer = 0 to grid.LastRowIndex
 		    for col as integer = 0 to grid.LastColIndex
+		      var member as new Elevation
+		      
 		      var sValue as string = sarr( row, col )
+		      
+		      if sValue.Compare( "S", ComparisonOptions.CaseSensitive ) = 0 then
+		        sValue = "a"
+		        startPos = member
+		      elseif sValue.Compare( "E", ComparisonOptions.CaseSensitive ) = 0 then
+		        sValue = "z"
+		        endPos = member
+		      end if
+		      
 		      var value as integer = sValue.Asc
 		      
-		      var member as new Elevation
 		      member.RawValue = sValue
 		      member.Value = value
 		      member.BestSteps = 0
 		      grid( row, col ) = member
-		      
-		      if member.IsEnd then
-		        endPos = member
-		      elseif member.IsStart then
-		        startPos = member
-		      end if
 		    next
 		  next
 		  
@@ -173,7 +164,7 @@ Inherits AdventBase
 		    return
 		  end if
 		  
-		  if current.IsStart then
+		  if current is StartPos then
 		    return
 		  end if
 		  
@@ -183,11 +174,11 @@ Inherits AdventBase
 		    return
 		  end if
 		  
-		  var lowPoint as integer = current.CompareValue - 1
+		  var lowPoint as integer = current.Value - 1
 		  
 		  trail.Value( current ) = nil
 		  
-		  var neighbors() as Elevation = current.ElevationNeighbors( false )
+		  var neighbors() as Elevation = current.ElevationNeighbors
 		  
 		  for i as integer = neighbors.LastIndex downto 0
 		    var member as Elevation = neighbors( i )
@@ -199,7 +190,7 @@ Inherits AdventBase
 		      continue
 		    end if
 		    
-		    if member.CompareValue < lowPoint then
+		    if member.Value < lowPoint then
 		      //
 		      // Can't get there
 		      //

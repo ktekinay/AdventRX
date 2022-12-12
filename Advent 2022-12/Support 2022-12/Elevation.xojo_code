@@ -10,9 +10,9 @@ Inherits Advent.GridMember
 
 
 	#tag Method, Flags = &h0
-		Function ElevationNeighbors(includeDiagonal As Boolean) As Elevation()
+		Function ElevationNeighbors() As Elevation()
 		  if not GotNeighbors then
-		    var members() as GridMember = super.Neighbors( includeDiagonal )
+		    var members() as GridMember = super.Neighbors( false )
 		    var elevations() as Elevation
 		    for each m as GridMember in members
 		      elevations.Add Elevation( m )
@@ -31,50 +31,9 @@ Inherits Advent.GridMember
 		BestSteps As Integer
 	#tag EndProperty
 
-	#tag ComputedProperty, Flags = &h0
-		#tag Getter
-			Get
-			  static ascA as integer = asc( "a" )
-			  static ascZ as integer = asc( "z" )
-			  
-			  if IsStart then
-			    return ascA
-			  elseif IsEnd then
-			    return ascZ
-			  else
-			    return Value
-			  end if
-			  
-			End Get
-		#tag EndGetter
-		CompareValue As Integer
-	#tag EndComputedProperty
-
 	#tag Property, Flags = &h21
 		Private GotNeighbors As Boolean
 	#tag EndProperty
-
-	#tag ComputedProperty, Flags = &h0
-		#tag Getter
-			Get
-			  static endValue as integer = asc( "E" )
-			  return Value = endValue
-			  
-			End Get
-		#tag EndGetter
-		IsEnd As Boolean
-	#tag EndComputedProperty
-
-	#tag ComputedProperty, Flags = &h0
-		#tag Getter
-			Get
-			  static startValue as integer = asc( "S" )
-			  return Value = startValue
-			  
-			End Get
-		#tag EndGetter
-		IsStart As Boolean
-	#tag EndComputedProperty
 
 	#tag ComputedProperty, Flags = &h0
 		#tag Getter
@@ -178,22 +137,6 @@ Inherits Advent.GridMember
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="IsValid"
-			Visible=false
-			Group="Behavior"
-			InitialValue=""
-			Type="Boolean"
-			EditorType=""
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="IsStart"
-			Visible=false
-			Group="Behavior"
-			InitialValue=""
-			Type="Boolean"
-			EditorType=""
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="IsEnd"
 			Visible=false
 			Group="Behavior"
 			InitialValue=""
