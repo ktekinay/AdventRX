@@ -57,15 +57,11 @@ Inherits AdventBase
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Integer
 		  var grid as new ObjectGrid
-		  var startPos as Elevation
-		  var endPos as Elevation
+		  var startPos as GridMember
+		  var endPos as GridMember
 		  
 		  ParseInput input, grid, startPos, endPos
-		  
-		  var trail as new Dictionary
-		  Traverse grid, endPos, startPos, trail
-		  
-		  var best as integer = startPos.BestSteps
+		  call grid.BestPath( startPos, endPos, AddressOf Compare, false )
 		  
 		  if not IsTest then
 		    self.Grid = grid
@@ -73,15 +69,16 @@ Inherits AdventBase
 		    self.EndPos = endPos
 		  end if
 		  
-		  return best
+		  return startPos.BestSteps
+		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Integer
 		  var grid as ObjectGrid
-		  var startPos as Elevation
-		  var endPos as Elevation
+		  var startPos as GridMember
+		  var endPos as GridMember
 		  
 		  if not IsTest and self.Grid isa object then
 		    //
@@ -94,7 +91,7 @@ Inherits AdventBase
 		  else
 		    grid = new ObjectGrid
 		    ParseInput input, grid, startPos, endPos
-		    Traverse grid, endPos, startPos, new Dictionary
+		    call grid.BestPath startPos, endPos, AddressOf compare, false
 		    
 		  end if
 		  
@@ -102,18 +99,18 @@ Inherits AdventBase
 		  
 		  var ascA as integer = asc( "a" )
 		  
-		  for each member as Elevation in grid
+		  for each member as GridMember in grid
 		    if member.Value = ascA then
 		      if member.BestSteps > 0 and member.BestSteps <= best then
 		        best = member.BestSteps
 		        
 		      else
 		        //
-		        // Set BestSteps so Traverse will know when to quit
+		        // Set BestSteps so BestPath will know when to quit
 		        //
 		        startPos.BestSteps = best
 		        
-		        Traverse grid, endPos, startPos, new Dictionary
+		        call grid.BestPath( member, endPos, AddressOf Compare, false )
 		        
 		        if startPos.BestSteps > 0 and startPos.BestSteps < best then
 		          best = startPos.BestSteps
@@ -127,14 +124,31 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub ParseInput(input As String, grid As ObjectGrid, ByRef startPos As Elevation, ByRef endPos As Elevation)
+		Private Function Compare(fromMember As GridMember, toMember As GridMember) As Integer
+		  if fromMember.Value.IntegerValue >= toMember.Value.IntegerValue then
+		    return 1
+		  end if
+		  
+		  var highPoint as integer = fromMember.Value.IntegerValue + 1
+		  if toMember.Value.IntegerValue > highPoint then
+		    return 0
+		  end if
+		  
+		  return 1
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub ParseInput(input As String, grid As ObjectGrid, ByRef startPos As GridMember, ByRef endPos As GridMember)
 		  var sarr( -1, -1 ) as string = ToStringGrid( input )
 		  
 		  grid.ResizeTo sarr.LastIndex( 1 ), sarr.LastIndex( 2 )
 		  
 		  for row as integer = 0 to grid.LastRowIndex
 		    for col as integer = 0 to grid.LastColIndex
-		      var member as new Elevation
+		      var member as new GridMember
+		      member.PrintType = GridMember.PrintTypes.UseRawValue
 		      
 		      var sValue as string = sarr( row, col )
 		      
@@ -158,58 +172,9 @@ Inherits AdventBase
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub Traverse(grid As ObjectGrid, current As Elevation, startPos As Elevation, trail As Dictionary, depth As Integer = 0)
-		  if trail.HasKey( current ) then
-		    return
-		  end if
-		  
-		  if current is StartPos then
-		    return
-		  end if
-		  
-		  var nextBest as integer = current.BestSteps + 1
-		  
-		  if startPos.BestSteps > 0 and startPos.BestSteps <= nextBest then
-		    return
-		  end if
-		  
-		  var lowPoint as integer = current.Value - 1
-		  
-		  trail.Value( current ) = nil
-		  
-		  var neighbors() as Elevation = current.ElevationNeighbors
-		  
-		  for i as integer = neighbors.LastIndex downto 0
-		    var member as Elevation = neighbors( i )
-		    
-		    if member.BestSteps > 0 and member.BestSteps <= nextBest then
-		      //
-		      // Already found a better path
-		      //
-		      continue
-		    end if
-		    
-		    if member.Value < lowPoint then
-		      //
-		      // Can't get there
-		      //
-		      neighbors.RemoveAt i
-		      continue
-		    end if
-		    
-		    member.BestSteps = nextBest
-		    Traverse grid, member, startPos, trail, depth + 1
-		  next
-		  
-		  trail.Remove current
-		  
-		End Sub
-	#tag EndMethod
-
 
 	#tag Property, Flags = &h21
-		Private EndPos As Elevation
+		Private EndPos As GridMember
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
@@ -217,7 +182,7 @@ Inherits AdventBase
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
-		Private InitialStartPos As Elevation
+		Private InitialStartPos As GridMember
 	#tag EndProperty
 
 

@@ -25,13 +25,13 @@ Class GridMember
 		    directionals = g.AllDirectionals
 		  else
 		    directionals = g.MainDirectionals
-		    end if
-		    
+		  end if
+		  
 		  for each direction as ObjectGrid.NextDelegate in directionals
 		    var neighbor as GridMember = direction.Invoke( self )
 		    if neighbor isa object then
 		      neighbors.Add neighbor
-		  end if
+		    end if
 		  next
 		  
 		  MyNeighbors = neighbors
@@ -54,6 +54,10 @@ Class GridMember
 		Event StringValue() As String
 	#tag EndHook
 
+
+	#tag Property, Flags = &h0, Description = 5768656E2066696E64696E6720746865206265737420706174682C207265636F726473207468652062657374206E756D626572206F6620737465707320746F2074686520656E6420706F736974696F6E2E
+		BestSteps As Integer
+	#tag EndProperty
 
 	#tag Property, Flags = &h0
 		Column As Integer
@@ -96,6 +100,10 @@ Class GridMember
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
+		PrintType As PrintTypes
+	#tag EndProperty
+
+	#tag Property, Flags = &h0, Description = 5468652062617369632076616C7565206F6620746865206D656D6265722C2075736566756C20746F207468652063616C6C6572206F6E6C792E
 		RawValue As Variant
 	#tag EndProperty
 
@@ -106,11 +114,32 @@ Class GridMember
 	#tag ComputedProperty, Flags = &h0
 		#tag Getter
 			Get
-			  return RaiseEvent StringValue
+			  select case PrintType
+			  case PrintTypes.UseRawValue
+			    return RawValue
+			    
+			  case PrintTypes.UseValue
+			    return Value
+			    
+			  end select
+			  
+			  var s as string = RaiseEvent StringValue
+			  return s
 			End Get
 		#tag EndGetter
 		ToString As String
 	#tag EndComputedProperty
+
+	#tag Property, Flags = &h0, Description = 496620746865726520697320612076616C75652073657061726174652066726F6D2C206F7220696E7374656164206F662C2052617756616C75652C2073746F726520697420686572652E20546869732069732075736566756C20746F207468652063616C6C6572206F6E6C792E
+		Value As Variant
+	#tag EndProperty
+
+
+	#tag Enum, Name = PrintTypes, Type = Integer, Flags = &h0
+		UseEvent
+		  UseRawValue
+		UseValue
+	#tag EndEnum
 
 
 	#tag ViewBehavior
@@ -177,6 +206,14 @@ Class GridMember
 			InitialValue=""
 			Type="String"
 			EditorType="MultiLineEditor"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="BestSteps"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class

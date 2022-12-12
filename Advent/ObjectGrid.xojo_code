@@ -81,6 +81,18 @@ Implements Iterable,Iterator
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = 46696E6420746865206265737420706174682066726F6D2073746172744D656D62657220746F20656E644D656D626572207573696E672064697374616E636544656C656761746520746F2064657465726D696E65207468652064697374616E6365206F72206566666F72742E20556E726561636861626C65206E65696768626F72732077696C6C2062652072656D6F7665642066726F6D2065616368206D656D6265722773204E65696768626F72732061727261792E
+		Function BestPath(startMember As GridMember, endMember As GridMember, distanceDelegate As PathDistanceDelegate, includeDiagonals As Boolean) As GridMember()
+		  var currentTrail() as GridMember
+		  var trail() as GridMember
+		  
+		  Traverse endMember, startMember, distanceDelegate, includeDiagonals, new Dictionary, currentTrail, trail, 1
+		  
+		  return trail
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Shared Function FromIntegerGrid(igrid(, ) As Integer) As ObjectGrid
 		  var lastRowIndex as integer = igrid.LastIndex( 1 )
@@ -195,6 +207,10 @@ Implements Iterable,Iterator
 		End Sub
 	#tag EndMethod
 
+	#tag DelegateDeclaration, Flags = &h0, Description = 5768656E2074726176657273696E67206120706174682C2072657475726E73207468652064697374616E6365206F72206566666F7274206E656564656420746F20726561636820746F4D656D6265722066726F6D2066726F6D4D656D6265722C206F7220302069662069742063616E27742072656163682069742E
+		Delegate Function PathDistanceDelegate(fromMember As GridMember, toMember As GridMember) As Integer
+	#tag EndDelegateDeclaration
+
 	#tag Method, Flags = &h0
 		Sub ResizeTo(row As Integer, col As Integer)
 		  mLastRowIndex = row
@@ -214,6 +230,72 @@ Implements Iterable,Iterator
 		  end if
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub Traverse(currentPos As GridMember, startPos As GridMember, distanceDelegate As PathDistanceDelegate, includeDiagonals As Boolean, visited As Dictionary, currentTrail() As GridMember, ultimateTrail() As GridMember, depth As Integer)
+		  if visited.HasKey( currentPos ) or currentPos is startPos then
+		    return
+		  end if
+		  
+		  if startPos.BestSteps > 0 and startPos.BestSteps <= currentPos.BestSteps then
+		    //
+		    // No need to go further down this road
+		    //
+		    return
+		  end if
+		  
+		  visited.Value( currentPos ) = nil
+		  
+		  var neighbors() as GridMember = currentPos.Neighbors( includeDiagonals )
+		  
+		  currentTrail.Add currentPos
+		  
+		  for index as integer = neighbors.LastIndex downto 0
+		    var neighbor as GridMember = neighbors( index )
+		    
+		    var steps as integer = distanceDelegate.Invoke( neighbor, currentPos )
+		    if steps <= 0 then
+		      //
+		      // Can't reach this
+		      //
+		      neighbors.RemoveAt index // No need to test this again
+		      continue
+		    end if
+		    
+		    steps = steps + currentPos.BestSteps
+		    
+		    if neighbor.BestSteps > 0 and neighbor.BestSteps <= steps then
+		      //
+		      // Already found a better path
+		      //
+		      continue
+		    end if
+		    
+		    neighbor.BestSteps = steps
+		    
+		    //
+		    // Have we found the start?
+		    //
+		    if neighbor is startPos then
+		      ultimateTrail.RemoveAll
+		      
+		      ultimateTrail.Add neighbor
+		      for i as integer = currentTrail.LastIndex downto 0
+		        ultimateTrail.Add currentTrail( i )
+		      next
+		      
+		    else
+		      Traverse neighbor, startPos, distanceDelegate, includeDiagonals, visited, currentTrail, ultimateTrail, depth + 1
+		      
+		    end if
+		  next
+		  
+		  call currentTrail.Pop
+		  
+		  visited.Remove currentPos
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21

@@ -136,7 +136,6 @@ Class=Set_MTC;Other Tools/M_Set/Set_MTC.xojo_code;&h00000000532327FF;&h000000001
 Class=SetIterator;Other Tools/M_Set/SetIterator.xojo_code;&h00000000502257FF;&h000000001949CFFF;false
 Module=M_Set;Other Tools/M_Set.xojo_code;&h000000001949CFFF;&h000000007F74CFFF;false
 Class=Monkey;Advent 2022-12/Support 2022-12/Monkey.xojo_code;&h0000000051F157FF;&h000000003587E7FF;false
-Class=Elevation;Advent 2022-12/Support 2022-12/Elevation.xojo_code;&h00000000091E57FF;&h000000003587E7FF;false
 DefaultWindow=WndAdvent
 AppMenuBar=MainMenuBar
 MajorVersion=1
