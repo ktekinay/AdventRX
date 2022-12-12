@@ -243,6 +243,7 @@ End
 		  AddRow new Advent_2022_12_09
 		  AddRow new Advent_2022_12_10
 		  AddRow new Advent_2022_12_11
+		  AddRow new Advent_2022_12_12
 		  
 		  // Expand
 		  ExpandYear 2022

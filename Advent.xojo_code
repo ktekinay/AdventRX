@@ -90,6 +90,40 @@ Protected Module Advent
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function LeastCommonDivisor(val1 As Integer, val2 As Integer) As Integer
+		  if val1 = 0 or val2 = 0 then
+		    raise new InvalidArgumentException
+		  end if
+		  
+		  do
+		    var minValue as integer = min( val1, val2 )
+		    var maxValue as integer = max( val1, val2 )
+		    
+		    if minValue = maxValue then
+		      return minValue
+		    end if
+		    
+		    if minValue = 1 then
+		      return maxValue
+		    end if
+		    if maxValue = 1 then
+		      return minValue
+		    end if
+		    
+		    if ( maxValue mod minValue ) = 0 then
+		      maxValue = maxValue / minValue
+		      val1 = minValue
+		      val2 = maxValue
+		      
+		      continue
+		    end if
+		    
+		    return minValue * maxValue
+		  loop
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function LightDotString() As String
 		  return &u22C5
 		End Function
