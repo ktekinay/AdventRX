@@ -8,46 +8,36 @@ Class GridMember
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function Neighbors(includeDiagonal As Boolean) As GridMember()
-		  var result() as GridMember
+		Function Neighbors(includeDiagonal As Boolean, reset As Boolean = False) As GridMember()
+		  if not reset and GotNeighbors then
+		    return MyNeighbors
+		  end if
+		  
+		  var neighbors() as GridMember
 		  var g as ObjectGrid = Grid
 		  
 		  if g is nil then
-		    return result
+		    return neighbors
 		  end if
 		  
+		  var directionals() as ObjectGrid.NextDelegate
 		  if includeDiagonal then
-		    var firstRow as integer = max( Row - 1, 0 )
-		    var lastRow as integer = min( Row + 1, g.LastRowIndex )
-		    var firstCol as integer = max( Column - 1, 0 )
-		    var lastCol as integer = min( Column + 1, g.LastColIndex )
-		    
-		    for row as integer = firstRow to lastRow
-		      for col as integer = firstCol to lastCol
-		        if row = self.Row and col = Self.Column then
-		          continue
-		        end if
-		        result.Add g( row, col )
-		      next
-		    next
-		    
+		    directionals = g.AllDirectionals
 		  else
-		    if Column > 0 then
-		      result.Add g( Row, Column - 1 )
-		    end if
-		    if Row > 0 then
-		      result.Add g( Row - 1, Column )
-		    end if
-		    if Column < g.LastColIndex then
-		      result.Add g( Row, Column + 1 )
-		    end if
-		    if Row < g.LastRowIndex then
-		      result.Add g( Row + 1, Column )
+		    directionals = g.MainDirectionals
 		    end if
 		    
+		  for each direction as ObjectGrid.NextDelegate in directionals
+		    var neighbor as GridMember = direction.Invoke( self )
+		    if neighbor isa object then
+		      neighbors.Add neighbor
 		  end if
+		  next
 		  
-		  return result
+		  MyNeighbors = neighbors
+		  GotNeighbors = true
+		  
+		  return MyNeighbors
 		  
 		End Function
 	#tag EndMethod
@@ -67,6 +57,10 @@ Class GridMember
 
 	#tag Property, Flags = &h0
 		Column As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h1
+		Protected GotNeighbors As Boolean
 	#tag EndProperty
 
 	#tag ComputedProperty, Flags = &h0
@@ -95,6 +89,10 @@ Class GridMember
 
 	#tag Property, Flags = &h21
 		Private mGrid As WeakRef
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private MyNeighbors() As GridMember
 	#tag EndProperty
 
 	#tag Property, Flags = &h0

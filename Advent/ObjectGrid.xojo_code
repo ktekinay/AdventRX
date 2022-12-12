@@ -1,6 +1,6 @@
 #tag Class
 Class ObjectGrid
-Implements Iterable, Iterator
+Implements Iterable,Iterator
 	#tag Method, Flags = &h0
 		Function Above(member As GridMember) As GridMember
 		  if member.Row = 0 then
@@ -369,7 +369,7 @@ Implements Iterable, Iterator
 			Group="Behavior"
 			InitialValue=""
 			Type="String"
-			EditorType=""
+			EditorType="MultiLineEditor"
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class

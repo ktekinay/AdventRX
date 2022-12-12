@@ -17,23 +17,13 @@ Inherits Advent.GridMember
 		    for each m as GridMember in members
 		      elevations.Add Elevation( m )
 		    next
-		    MyNeighbors = elevations
-		    
-		    GotNeighbors = true
+		    MyElevationNeighbors = elevations
 		  end if
 		  
-		  return MyNeighbors
+		  return MyElevationNeighbors
 		End Function
 	#tag EndMethod
 
-
-	#tag Property, Flags = &h0
-		BestSteps As Integer
-	#tag EndProperty
-
-	#tag Property, Flags = &h21
-		Private GotNeighbors As Boolean
-	#tag EndProperty
 
 	#tag ComputedProperty, Flags = &h0
 		#tag Getter
@@ -46,7 +36,7 @@ Inherits Advent.GridMember
 	#tag EndComputedProperty
 
 	#tag Property, Flags = &h21
-		Private MyNeighbors() As Elevation
+		Private MyElevationNeighbors() As Elevation
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
