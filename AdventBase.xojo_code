@@ -186,6 +186,7 @@ Inherits Thread
 	#tag Method, Flags = &h0
 		Sub Start()
 		  if IsThreaded then
+		    self.StackSize = 1024 * 1024 * 5
 		    super.Start
 		  else
 		    DoRun
