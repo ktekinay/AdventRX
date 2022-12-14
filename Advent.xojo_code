@@ -293,6 +293,31 @@ Protected Module Advent
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function ToHMS(duration As Integer) As String
+		  var builder() as string
+		  
+		  if duration > ( 60 * 60 ) then
+		    var hours as integer = duration / ( 60 * 60 )
+		    duration = duration mod ( 60 * 60 )
+		    
+		    if hours <> 0 then
+		      builder.Add hours.ToString( "00" )
+		    end if
+		  end if
+		  
+		  var mins as integer = duration / 60
+		  duration = duration mod 60
+		  
+		  builder.Add mins.ToString( "00" )
+		  
+		  builder.Add duration.ToString( "00" )
+		  
+		  return String.FromArray( builder, ":" )
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function ToKey(Extends pt As Xojo.Point, adjuster As Double = 10000000.0) As Variant
 		  return pt.X * adjuster + pt.Y
 		  
