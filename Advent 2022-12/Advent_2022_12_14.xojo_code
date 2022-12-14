@@ -56,7 +56,7 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Integer
-		  var grid( 600, 600 ) as string
+		  var grid( 600, 1001 ) as string
 		  
 		  var instructions() as string = input.Split( EndOfLine )
 		  
@@ -87,7 +87,7 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Integer
-		  var grid( 600, 6000 ) as string
+		  var grid( 600, 1001 ) as string
 		  
 		  var instructions() as string = input.Split( EndOfLine )
 		  
