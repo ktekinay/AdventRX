@@ -9,7 +9,6 @@ Inherits DesktopApplication
 		  c = nil
 		  
 		  var gmt as new TimeZone( 0 )
-		  var est as new TimeZone( -5 )
 		  
 		  var data as Dictionary
 		  
