@@ -105,14 +105,15 @@ Private Class Astar
 		        n.Parent = parentNode
 		        n.DistanceFromStart = distanceFromStart
 		        n.DistanceToGoal = n.Milestone.DistanceToGoal( goal )
+		        n.Score = n.DistanceFromStart + n.DistanceToGoal
 		        InsertIntoOpenList n
-		        'OpenList.Add n
 		        n.Status = Statuses.IsOpen
 		        
 		      case Statuses.IsOpen
 		        if n.DistanceFromStart > distanceFromStart then
 		          n.Parent = parentNode
 		          n.DistanceFromStart = distanceFromStart
+		          n.Score = n.DistanceFromStart + n.DistanceToGoal
 		          
 		          var pos as integer = OpenList.IndexOf( n )
 		          OpenList.RemoveAt pos
@@ -124,9 +125,10 @@ Private Class Astar
 		        if n.DistanceFromStart > distanceFromStart then
 		          ClosedList.Remove( n.Key )
 		          InsertIntoOpenList n
-		          'OpenList.Add n
+		          
 		          n.Parent = parentNode
 		          n.DistanceFromStart = distanceFromStart
+		          n.Score = n.DistanceFromStart + n.DistanceToGoal
 		          n.Status = Statuses.IsOpen
 		        end if
 		        

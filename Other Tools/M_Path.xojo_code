@@ -37,13 +37,6 @@ Protected Module M_Path
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Function SortByScoreReverse(node1 As M_Path.Node, node2 As M_Path.Node) As Integer
-		  return node2.Score - node1.Score
-		  
-		End Function
-	#tag EndMethod
-
 
 	#tag Enum, Name = Statuses, Type = Integer, Flags = &h21
 		IsNew

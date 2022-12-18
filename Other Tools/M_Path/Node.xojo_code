@@ -62,15 +62,9 @@ Private Class Node
 		Parent As M_Path.Node
 	#tag EndProperty
 
-	#tag ComputedProperty, Flags = &h0
-		#tag Getter
-			Get
-			  return DistanceFromStart + DistanceToGoal
-			  
-			End Get
-		#tag EndGetter
+	#tag Property, Flags = &h0
 		Score As Double
-	#tag EndComputedProperty
+	#tag EndProperty
 
 	#tag Property, Flags = &h0
 		Status As M_Path.Statuses
@@ -128,7 +122,12 @@ Private Class Node
 			Group="Behavior"
 			InitialValue=""
 			Type="M_Path.Statuses"
-			EditorType=""
+			EditorType="Enum"
+			#tag EnumValues
+				"0 - IsNew"
+				"1 - IsOpen"
+				"2 - IsClosed"
+			#tag EndEnumValues
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="DistanceFromStart"
@@ -140,14 +139,6 @@ Private Class Node
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="DistanceToGoal"
-			Visible=false
-			Group="Behavior"
-			InitialValue=""
-			Type="Double"
-			EditorType=""
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Score"
 			Visible=false
 			Group="Behavior"
 			InitialValue=""
