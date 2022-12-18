@@ -2,8 +2,7 @@
 Private Class Node
 	#tag Method, Flags = &h0
 		Sub ClearSuccessors()
-		  Successors.ResizeTo -1
-		  
+		  Successors.RemoveAll
 		End Sub
 	#tag EndMethod
 

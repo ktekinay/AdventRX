@@ -23,68 +23,128 @@ Private Class Astar
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21
+		Private Sub InsertIntoOpenList(node As M_Path.Node)
+		  var score as double = node.Score
+		  
+		  var openList() as M_Path.Node = self.OpenList
+		  
+		  var startIndex as integer = 0
+		  var endIndex as integer = openList.LastIndex
+		  
+		  while startIndex <= endIndex
+		    var index as integer = ( endIndex - startIndex ) \ 2 + startIndex
+		    
+		    var candidate as M_Path.Node = openList( index )
+		    var candidateScore as double = candidate.Score
+		    
+		    select case score
+		    case is = candidateScore
+		      openList.AddAt index + 1, node
+		      return
+		      
+		    case is < candidateScore
+		      startIndex = index + 1
+		      
+		    case else
+		      endIndex = index - 1
+		      
+		    end select
+		    
+		  wend
+		  
+		  openList.AddAt startIndex, node
+		  
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = 496E64656E746966792074686520626573742070617468206265747765656E20746865207374617274696E6720706F736974696F6E7320616E6420676F616C2E
 		Function Map(startPosition As M_Path.MilestoneInterface, goal As M_Path.MilestoneInterface) As MilestoneInterface()
+		  var goalNode as new M_Path.Node( goal )
+		  nodeMaster.Value( goalNode.Key ) = goalNode
+		  
 		  var startNode as new Node( startPosition )
-		  OpenList.Add startNode
-		  
-		  startNode.Status = Statuses.IsOpen
-		  
 		  NodeMaster.Value( startNode.Key ) = startNode
 		  
-		  var thisNode as M_Path.Node
+		  OpenList.Add startNode
+		  startNode.Status = Statuses.IsOpen
+		  
+		  var parentNode as M_Path.Node
+		  
+		  var foundIt as boolean
 		  
 		  while openList.Count <> 0
-		    thisNode = openList.Pop
-		    thisNode.Status = Statuses.IsClosed
-		    ClosedList.Value( thisNode.Key ) = thisNode
+		    parentNode = OpenList.Pop
 		    
-		    if thisNode is goal then
+		    parentNode.Status = Statuses.IsClosed
+		    ClosedList.Value( parentNode.Key ) = parentNode
+		    
+		    if parentNode is goalNode then
+		      foundIt = true
 		      exit
 		    end if
 		    
-		    var successors() as M_Path.Node = thisNode.GetSuccessors( nodeMaster )
+		    var successors() as M_Path.Node = parentNode.GetSuccessors( nodeMaster )
 		    for each n as M_Path.Node in successors
-		      var g as double = n.Milestone.DistanceFromParent( thisNode.Milestone ) + thisNode.DistanceFromStart
+		      if n is parentNode.Parent then
+		        continue
+		      end if
+		      
+		      if n is GoalNode then
+		        foundIt = true
+		        n.Parent = parentNode
+		        parentNode = n
+		        exit while
+		      end if
+		      
+		      var distanceFromStart as double = n.Milestone.DistanceFromParent( parentNode.Milestone ) + parentNode.DistanceFromStart
 		      
 		      select case n.Status
 		      case Statuses.IsNew
-		        n.Parent = thisNode
-		        n.DistanceFromStart = g
+		        n.Parent = parentNode
+		        n.DistanceFromStart = distanceFromStart
 		        n.DistanceToGoal = n.Milestone.DistanceToGoal( goal )
-		        OpenList.Add n
+		        InsertIntoOpenList n
+		        'OpenList.Add n
 		        n.Status = Statuses.IsOpen
 		        
 		      case Statuses.IsOpen
-		        if n.DistanceFromStart >= g then
-		          n.Parent = thisNode
-		          n.DistanceFromStart = g
+		        if n.DistanceFromStart > distanceFromStart then
+		          n.Parent = parentNode
+		          n.DistanceFromStart = distanceFromStart
+		          
+		          var pos as integer = OpenList.IndexOf( n )
+		          OpenList.RemoveAt pos
+		          
+		          InsertIntoOpenList n
 		        end if
 		        
 		      case else // IsClosed
-		        if n.DistanceFromStart > g then
+		        if n.DistanceFromStart > distanceFromStart then
 		          ClosedList.Remove( n.Key )
-		          OpenList.Add n
-		          n.Parent = thisNode
-		          n.DistanceFromStart = g
+		          InsertIntoOpenList n
+		          'OpenList.Add n
+		          n.Parent = parentNode
+		          n.DistanceFromStart = distanceFromStart
 		          n.Status = Statuses.IsOpen
 		        end if
 		        
 		      end select
 		      
 		    next
-		    
-		    openList.Sort AddressOf SortByScoreReverse
 		  wend
 		  
 		  var trail() as MilestoneInterface
 		  
-		  while not ( thisNode is startNode )
-		    trail.AddAt 0, thisNode.Milestone
-		    thisNode = thisNode.Parent
-		  wend
-		  
-		  trail.AddAt 0, startPosition
+		  if foundIt then
+		    while not ( parentNode is startNode )
+		      trail.AddAt 0, parentNode.Milestone
+		      parentNode = parentNode.Parent
+		    wend
+		    
+		    trail.AddAt 0, startPosition
+		  end if
 		  
 		  return trail
 		End Function
