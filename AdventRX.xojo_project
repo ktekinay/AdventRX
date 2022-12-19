@@ -143,6 +143,7 @@ Class=Monkey;Advent 2022-12/Support 2022-12/Monkey.xojo_code;&h0000000051F157FF;
 Interface=MilestoneInterface;Other Tools/M_Path/MilestoneInterface.xojo_code;&h00000000436F2FFF;&h000000005B2B7FFF;false
 Class=Node;Other Tools/M_Path/Node.xojo_code;&h000000005BF777FF;&h000000005B2B7FFF;false
 Class=Astar;Other Tools/M_Path/Astar.xojo_code;&h000000007EC6B7FF;&h000000005B2B7FFF;false
+Class=TreeGridMember;Advent 2022-12/Support 2022-12/TreeGridMember.xojo_code;&h000000005ABB1FFF;&h000000003587E7FF;false
 Class=Result;Other Tools/M_Path/Result.xojo_code;&h000000003EAA47FF;&h000000005B2B7FFF;false
 DefaultWindow=WndAdvent
 AppMenuBar=MainMenuBar

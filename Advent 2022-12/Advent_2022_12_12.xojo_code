@@ -57,67 +57,63 @@ Inherits AdventBase
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Integer
 		  var grid as new ObjectGrid
-		  var startPos as GridMember
-		  var endPos as GridMember
+		  var startPos as TreeGridMember
+		  var endPos as TreeGridMember
 		  
 		  ParseInput input, grid, startPos, endPos
-		  call grid.BestPath( startPos, endPos, AddressOf Compare, false )
 		  
-		  if not IsTest then
-		    self.Grid = grid
-		    self.InitialStartPos = startPos
-		    self.EndPos = endPos
-		  end if
-		  
-		  return startPos.BestSteps
-		  
+		  var trail() as M_Path.MilestoneInterface = M_Path.Map( TreeGridMember( startPos ), TreeGridMember( endPos ) ).Trail
+		  return trail.LastIndex
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Integer
+		  static ascA as integer = asc( "a" )
+		  
+		  var best as integer = &hFFFFFFFFFFFFFF
+		  
 		  var grid as ObjectGrid
-		  var startPos as GridMember
-		  var endPos as GridMember
+		  var startPos as TreeGridMember
+		  var endPos as TreeGridMember
 		  
-		  if not IsTest and self.Grid isa object then
-		    //
-		    // No need to do this work again
-		    //
-		    startPos = self.InitialStartPos
-		    endPos = self.EndPos
-		    grid = self.Grid
-		    
-		  else
-		    grid = new ObjectGrid
-		    ParseInput input, grid, startPos, endPos
-		    call grid.BestPath startPos, endPos, AddressOf compare, false
-		    
-		  end if
+		  grid = new ObjectGrid
+		  ParseInput input, grid, startPos, endPos
 		  
-		  var best as integer = startPos.BestSteps
+		  var aList as new Set_MTC
 		  
-		  var ascA as integer = asc( "a" )
-		  
-		  for each member as GridMember in grid
+		  for each member as TreeGridMember in grid
 		    if member.Value = ascA then
-		      if member.BestSteps > 0 and member.BestSteps <= best then
-		        best = member.BestSteps
-		        
-		      else
-		        //
-		        // Set BestSteps so BestPath will know when to quit
-		        //
-		        startPos.BestSteps = best
-		        
-		        call grid.BestPath( member, endPos, AddressOf Compare, false )
-		        
-		        if startPos.BestSteps > 0 and startPos.BestSteps < best then
-		          best = startPos.BestSteps
-		        end if
-		      end if
+		      aList.Add member
 		    end if
 		  next
+		  
+		  while aList.Count <> 0
+		    startPos = aList.Pop
+		    
+		    var result as M_Path.Result = M_Path.Map( startPos, endPos )
+		    var trail() as M_Path.MilestoneInterface = result.Trail
+		    
+		    if trail.Count = 0 then
+		      var touched as Set_MTC = Set_MTC.FromDictionary( result.Touched )
+		      aList = aList - touched
+		      
+		    else
+		      best = min( best, trail.LastIndex )
+		      
+		      for i as integer = 1 to trail.LastIndex
+		        var t as TreeGridMember = TreeGridMember( trail( i ) )
+		        
+		        if t.Value = ascA then
+		          best = min( best, trail.LastIndex - i )
+		          if aList.HasMember( t ) then
+		            aList.Remove t
+		          end if
+		        end if
+		      next
+		      
+		    end if
+		  wend
 		  
 		  return best
 		End Function
@@ -140,14 +136,14 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub ParseInput(input As String, grid As ObjectGrid, ByRef startPos As GridMember, ByRef endPos As GridMember)
+		Private Sub ParseInput(input As String, grid As ObjectGrid, ByRef startPos As TreeGridMember, ByRef endPos As TreeGridMember)
 		  var sarr( -1, -1 ) as string = ToStringGrid( input )
 		  
 		  grid.ResizeTo sarr.LastIndex( 1 ), sarr.LastIndex( 2 )
 		  
 		  for row as integer = 0 to grid.LastRowIndex
 		    for col as integer = 0 to grid.LastColIndex
-		      var member as new GridMember
+		      var member as new TreeGridMember
 		      member.PrintType = GridMember.PrintTypes.UseRawValue
 		      
 		      var sValue as string = sarr( row, col )
@@ -172,18 +168,27 @@ Inherits AdventBase
 		End Sub
 	#tag EndMethod
 
-
-	#tag Property, Flags = &h21
-		Private EndPos As GridMember
-	#tag EndProperty
-
-	#tag Property, Flags = &h21
-		Private Grid As ObjectGrid
-	#tag EndProperty
-
-	#tag Property, Flags = &h21
-		Private InitialStartPos As GridMember
-	#tag EndProperty
+	#tag Method, Flags = &h21
+		Private Sub RecordTrail(trail() As M_Path.MilestoneInterface, toDict As Dictionary)
+		  static ascA as integer = asc( "a" )
+		  
+		  for i as integer = 0 to trail.LastIndex
+		    var distance as integer = trail.LastIndex - i
+		    
+		    var m as M_Path.MilestoneInterface = trail( i )
+		    var t as TreeGridMember = TreeGridMember( m )
+		    
+		    if t.Value = ascA then 
+		      var existing as integer = toDict.Lookup( m, distance + 1 )
+		      if existing > distance then
+		        toDict.Value( m ) = distance
+		      else
+		        exit
+		      end if
+		    end if
+		  next
+		End Sub
+	#tag EndMethod
 
 
 	#tag Constant, Name = kPuzzleInput, Type = String, Dynamic = False, Default = \"", Scope = Private, Description = 5768656E2070617374696E67207468652064617461206973206E65636573736172792E
