@@ -60,7 +60,9 @@ Private Class Astar
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 496E64656E746966792074686520626573742070617468206265747765656E20746865207374617274696E6720706F736974696F6E7320616E6420676F616C2E
-		Function Map(startPosition As M_Path.MilestoneInterface, goal As M_Path.MilestoneInterface) As MilestoneInterface()
+		Function Map(startPosition As M_Path.MilestoneInterface, goal As M_Path.MilestoneInterface) As M_Path.Result
+		  var result as new M_Path.Result
+		  
 		  var goalNode as new M_Path.Node( goal )
 		  nodeMaster.Value( goalNode.Key ) = goalNode
 		  
@@ -148,7 +150,15 @@ Private Class Astar
 		    trail.AddAt 0, startPosition
 		  end if
 		  
-		  return trail
+		  result.Trail = trail
+		  result.Touched = new Dictionary
+		  
+		  for each m as M_Path.Node in ClosedList.Values
+		    result.Touched.Value( m.Milestone ) = nil
+		  next
+		  
+		  return result
+		  
 		End Function
 	#tag EndMethod
 
