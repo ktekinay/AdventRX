@@ -116,7 +116,9 @@ Inherits AdventBase
 		      aList = aList - touched
 		      
 		    else
-		      best = min( best, trail.LastIndex )
+		      if trail.LastIndex < best then
+		        best = trail.LastIndex
+		      end if
 		      
 		      for i as integer = 1 to trail.LastIndex
 		        var t as TreeGridMember = TreeGridMember( trail( i ) )
@@ -185,28 +187,6 @@ Inherits AdventBase
 		    next
 		  next
 		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Sub RecordTrail(trail() As M_Path.MilestoneInterface, toDict As Dictionary)
-		  static ascA as integer = asc( "a" )
-		  
-		  for i as integer = 0 to trail.LastIndex
-		    var distance as integer = trail.LastIndex - i
-		    
-		    var m as M_Path.MilestoneInterface = trail( i )
-		    var t as TreeGridMember = TreeGridMember( m )
-		    
-		    if t.Value = ascA then 
-		      var existing as integer = toDict.Lookup( m, distance + 1 )
-		      if existing > distance then
-		        toDict.Value( m ) = distance
-		      else
-		        exit
-		      end if
-		    end if
-		  next
 		End Sub
 	#tag EndMethod
 
