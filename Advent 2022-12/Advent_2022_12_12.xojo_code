@@ -69,6 +69,8 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Integer
+		  StartProfiling
+		  
 		  static ascA as integer = asc( "a" )
 		  
 		  var best as integer = &hFFFFFFFFFFFFFF
@@ -114,6 +116,8 @@ Inherits AdventBase
 		      
 		    end if
 		  wend
+		  
+		  StopProfiling
 		  
 		  return best
 		End Function

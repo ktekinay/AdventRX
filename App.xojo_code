@@ -1,6 +1,14 @@
 #tag Class
 Protected Class App
 Inherits DesktopApplication
+	#tag Event
+		Sub Opening()
+		  StopProfiling
+		  
+		End Sub
+	#tag EndEvent
+
+
 	#tag MenuHandler
 		Function FileParseStats() As Boolean Handles FileParseStats.Action
 		  var c as new Clipboard

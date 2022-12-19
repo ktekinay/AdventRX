@@ -134,6 +134,8 @@ Inherits AdventBase
 		  
 		  cup1.NextItem = nil
 		  
+		  StopProfiling
+		  
 		  return result
 		  
 		  
@@ -142,6 +144,8 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Sub MakeMoves(moves As Integer, items() As LinkedListItem)
+		  StartProfiling
+		  
 		  var current as LinkedListItem = items( 0 )
 		  
 		  for i as integer = 1 to items.LastIndex
@@ -189,6 +193,7 @@ Inherits AdventBase
 		    current = current.NextItem
 		  next
 		  
+		  StopProfiling
 		  
 		End Sub
 	#tag EndMethod
