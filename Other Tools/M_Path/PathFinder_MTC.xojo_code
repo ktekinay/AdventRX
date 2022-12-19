@@ -123,7 +123,7 @@ Class PathFinder_MTC
 		    
 		    if parentNode is goalNode then
 		      foundIt = true
-		      exit
+		      exit while
 		    end if
 		    
 		    var successors() as M_Path.Node = parentNode.GetSuccessors( nodeMaster )
@@ -196,24 +196,12 @@ Class PathFinder_MTC
 		  var trail() as MilestoneInterface
 		  
 		  if foundIt then
-		    var nodes() as M_Path.Node
-		    
 		    while not ( parentNode is startNode )
-		      nodes.AddAt 0, parentNode
+		      trail.AddAt 0, parentNode.Milestone
 		      parentNode = parentNode.Parent
 		    wend
 		    
-		    nodes.AddAt 0, startNode
-		    
-		    //
-		    // Nodes now has the complete trail in order
-		    //
-		    trail.ResizeTo nodes.LastIndex
-		    for i as integer = 0 to nodes.LastIndex
-		      var n as M_Path.Node = nodes( i )
-		      
-		      trail( i ) = n.Milestone
-		    next
+		    trail.AddAt 0, startNode.Milestone
 		  end if
 		  
 		  result.Trail = trail
