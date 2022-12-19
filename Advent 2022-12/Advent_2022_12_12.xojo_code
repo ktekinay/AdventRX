@@ -73,9 +73,14 @@ Inherits AdventBase
 		Private Function CalculateResultB(input As String) As Integer
 		  StartProfiling
 		  
-		  static ascA as integer = asc( "a" )
+		  #if not DebugBuild
+		    #pragma BackgroundTasks false
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
 		  
-		  var best as integer = &hFFFFFFFFFFFFFF
+		  static ascA as integer = asc( "a" )
 		  
 		  var grid as ObjectGrid
 		  var startPos as TreeGridMember
@@ -93,6 +98,12 @@ Inherits AdventBase
 		  next
 		  
 		  var finder as new PathFinder_MTC( endPos )
+		  
+		  //
+		  // Prime the pump
+		  //
+		  var best as integer = finder.Map( startPos ).Trail.LastIndex
+		  aList.Remove startPos
 		  
 		  while aList.Count <> 0
 		    startPos = aList.Pop

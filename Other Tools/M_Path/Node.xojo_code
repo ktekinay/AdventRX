@@ -16,6 +16,13 @@ Private Class Node
 
 	#tag Method, Flags = &h0
 		Function GetSuccessors(fromMaster As Dictionary) As M_Path.Node()
+		  #if not DebugBuild
+		    #pragma BackgroundTasks false
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
 		  if GotSuccessors then
 		    return Successors
 		  end
@@ -127,6 +134,7 @@ Private Class Node
 				"0 - IsNew"
 				"1 - IsOpen"
 				"2 - IsClosed"
+				"3 - IsReset"
 			#tag EndEnumValues
 		#tag EndViewProperty
 		#tag ViewProperty
@@ -139,6 +147,14 @@ Private Class Node
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="DistanceToGoal"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Double"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Score"
 			Visible=false
 			Group="Behavior"
 			InitialValue=""

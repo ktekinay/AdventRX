@@ -26,6 +26,13 @@ Class PathFinder_MTC
 
 	#tag Method, Flags = &h21
 		Private Sub InsertIntoOpenList(node As M_Path.Node, openList() As M_Path.Node)
+		  #if not DebugBuild
+		    #pragma BackgroundTasks false
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
 		  var score as double = node.Score
 		  
 		  var startIndex as integer = 0
@@ -60,6 +67,13 @@ Class PathFinder_MTC
 
 	#tag Method, Flags = &h0, Description = 496E64656E746966792074686520626573742070617468206265747765656E20746865207374617274696E6720706F736974696F6E7320616E6420676F616C2E
 		Function Map(startPosition As M_Path.MilestoneInterface) As M_Path.Result
+		  #if not DebugBuild
+		    #pragma BackgroundTasks false
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
 		  var closedList as new Dictionary
 		  var openList() as M_Path.Node
 		  
