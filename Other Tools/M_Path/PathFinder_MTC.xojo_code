@@ -1,9 +1,11 @@
 #tag Class
-Private Class Astar
+Class PathFinder_MTC
 	#tag Method, Flags = &h0
-		Sub Constructor()
+		Sub Constructor(goal As M_Path.MilestoneInterface)
 		  NodeMaster = new Dictionary
-		  ClosedList = new Dictionary
+		  
+		  GoalNode = new M_Path.Node( goal )
+		  nodeMaster.Value( goalNode.Key ) = GoalNode
 		  
 		End Sub
 	#tag EndMethod
@@ -16,18 +18,15 @@ Private Class Astar
 		    n.Parent = nil
 		  next
 		  
-		  OpenList.RemoveAll
-		  ClosedList = nil
 		  NodeMaster = nil
+		  GoalNode = nil
 		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub InsertIntoOpenList(node As M_Path.Node)
+		Private Sub InsertIntoOpenList(node As M_Path.Node, openList() As M_Path.Node)
 		  var score as double = node.Score
-		  
-		  var openList() as M_Path.Node = self.OpenList
 		  
 		  var startIndex as integer = 0
 		  var endIndex as integer = openList.LastIndex
@@ -60,17 +59,33 @@ Private Class Astar
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 496E64656E746966792074686520626573742070617468206265747765656E20746865207374617274696E6720706F736974696F6E7320616E6420676F616C2E
-		Function Map(startPosition As M_Path.MilestoneInterface, goal As M_Path.MilestoneInterface) As M_Path.Result
+		Function Map(startPosition As M_Path.MilestoneInterface) As M_Path.Result
+		  var closedList as new Dictionary
+		  var openList() as M_Path.Node
+		  
+		  for each node as M_Path.Node in NodeMaster.Values
+		    node.Status = Statuses.IsReset
+		    node.Parent = nil
+		    node.DistanceFromStart = 0
+		    node.Score = 0
+		  next
+		  
+		  GoalNode.Status = Statuses.IsOpen
+		  var goal as M_Path.MilestoneInterface = GoalNode.Milestone
+		  
 		  var result as new M_Path.Result
 		  
-		  var goalNode as new M_Path.Node( goal )
-		  nodeMaster.Value( goalNode.Key ) = goalNode
+		  var startNode as M_Path.Node = NodeMaster.Lookup( startPosition.GetKey, nil )
+		  if startNode is nil then
+		    startNode = new M_Path.Node( startPosition )
+		    NodeMaster.Value( startNode.Key ) = startNode
+		  end if
 		  
-		  var startNode as new Node( startPosition )
-		  NodeMaster.Value( startNode.Key ) = startNode
-		  
-		  OpenList.Add startNode
+		  openList.Add startNode
 		  startNode.Status = Statuses.IsOpen
+		  startNode.Score = 0
+		  startNode.DistanceFromStart = 0
+		  startNode.DistanceToGoal = 0
 		  
 		  var parentNode as M_Path.Node
 		  
@@ -80,7 +95,7 @@ Private Class Astar
 		    parentNode = OpenList.Pop
 		    
 		    parentNode.Status = Statuses.IsClosed
-		    ClosedList.Value( parentNode.Key ) = parentNode
+		    closedList.Value( parentNode.Key ) = parentNode
 		    
 		    if parentNode is goalNode then
 		      foundIt = true
@@ -89,7 +104,7 @@ Private Class Astar
 		    
 		    var successors() as M_Path.Node = parentNode.GetSuccessors( nodeMaster )
 		    for each n as M_Path.Node in successors
-		      if n is parentNode.Parent then
+		      if n is parentNode.Parent or n is startNode then
 		        continue
 		      end if
 		      
@@ -108,7 +123,17 @@ Private Class Astar
 		        n.DistanceFromStart = distanceFromStart
 		        n.DistanceToGoal = n.Milestone.DistanceToGoal( goal )
 		        n.Score = n.DistanceFromStart + n.DistanceToGoal
-		        InsertIntoOpenList n
+		        InsertIntoOpenList n, openList
+		        n.Status = Statuses.IsOpen
+		        
+		      case Statuses.IsReset
+		        n.Parent = parentNode
+		        n.DistanceFromStart = distanceFromStart
+		        if n.DistanceToGoal = 0 then
+		          n.DistanceToGoal = n.Milestone.DistanceToGoal( goal )
+		        end if
+		        n.Score = n.DistanceFromStart + n.DistanceToGoal
+		        InsertIntoOpenList n, openList
 		        n.Status = Statuses.IsOpen
 		        
 		      case Statuses.IsOpen
@@ -120,13 +145,13 @@ Private Class Astar
 		          var pos as integer = OpenList.IndexOf( n )
 		          OpenList.RemoveAt pos
 		          
-		          InsertIntoOpenList n
+		          InsertIntoOpenList n, openList
 		        end if
 		        
 		      case else // IsClosed
 		        if n.DistanceFromStart > distanceFromStart then
 		          ClosedList.Remove( n.Key )
-		          InsertIntoOpenList n
+		          InsertIntoOpenList n, openList
 		          
 		          n.Parent = parentNode
 		          n.DistanceFromStart = distanceFromStart
@@ -164,15 +189,11 @@ Private Class Astar
 
 
 	#tag Property, Flags = &h21
-		Private ClosedList As Dictionary
+		Private GoalNode As M_Path.Node
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
 		Private NodeMaster As Dictionary
-	#tag EndProperty
-
-	#tag Property, Flags = &h21
-		Private OpenList() As M_Path.Node
 	#tag EndProperty
 
 

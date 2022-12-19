@@ -28,20 +28,12 @@ Protected Module M_Path
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h1, Description = 496E64656E746966792074686520626573742070617468206265747765656E20746865207374617274696E6720706F736974696F6E7320616E6420676F616C2E
-		Protected Function Map(startPosition As M_Path.MilestoneInterface, goal As M_Path.MilestoneInterface) As M_Path.Result
-		  var finder as new Astar
-		  var result as M_Path.Result = finder.Map( startPosition, goal )
-		  return result
-		  
-		End Function
-	#tag EndMethod
-
 
 	#tag Enum, Name = Statuses, Type = Integer, Flags = &h21
 		IsNew
 		  IsOpen
-		IsClosed
+		  IsClosed
+		IsReset
 	#tag EndEnum
 
 

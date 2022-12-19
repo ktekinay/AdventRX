@@ -62,7 +62,9 @@ Inherits AdventBase
 		  
 		  ParseInput input, grid, startPos, endPos
 		  
-		  var trail() as M_Path.MilestoneInterface = M_Path.Map( TreeGridMember( startPos ), TreeGridMember( endPos ) ).Trail
+		  var finder as new PathFinder_MTC( endPos )
+		  
+		  var trail() as M_Path.MilestoneInterface = finder.Map( startPos ).Trail
 		  return trail.LastIndex
 		End Function
 	#tag EndMethod
@@ -90,10 +92,12 @@ Inherits AdventBase
 		    end if
 		  next
 		  
+		  var finder as new PathFinder_MTC( endPos )
+		  
 		  while aList.Count <> 0
 		    startPos = aList.Pop
 		    
-		    var result as M_Path.Result = M_Path.Map( startPos, endPos )
+		    var result as M_Path.Result = Finder.Map( startPos )
 		    var trail() as M_Path.MilestoneInterface = result.Trail
 		    
 		    if trail.Count = 0 then
@@ -119,6 +123,7 @@ Inherits AdventBase
 		  
 		  StopProfiling
 		  
+		  best = best
 		  return best
 		End Function
 	#tag EndMethod
