@@ -74,19 +74,6 @@ Class PathFinder_MTC
 		    #pragma StackOverflowChecking false
 		  #endif
 		  
-		  var closedList as new Dictionary
-		  var openList() as M_Path.Node
-		  
-		  for each node as M_Path.Node in NodeMaster.Values
-		    node.Status = Statuses.IsReset
-		    node.Parent = nil
-		    node.DistanceFromStart = 0
-		    node.Score = 0
-		  next
-		  
-		  GoalNode.Status = Statuses.IsOpen
-		  var goal as M_Path.MilestoneInterface = GoalNode.Milestone
-		  
 		  var result as new M_Path.Result
 		  
 		  var startNode as M_Path.Node = NodeMaster.Lookup( startPosition.GetKey, nil )
@@ -94,6 +81,29 @@ Class PathFinder_MTC
 		    startNode = new M_Path.Node( startPosition )
 		    NodeMaster.Value( startNode.Key ) = startNode
 		  end if
+		  
+		  if startNode.Status = Statuses.IsDeadEnd then
+		    result.Touched.Value( startPosition ) = nil
+		    return result
+		  end if
+		  
+		  var closedList as new Dictionary
+		  var openList() as M_Path.Node
+		  
+		  //
+		  // Reset the known nodes
+		  //
+		  for each node as M_Path.Node in NodeMaster.Values
+		    if node.Status <> Statuses.IsDeadEnd then
+		      node.Parent = nil
+		      node.Status = Statuses.IsReset
+		      node.DistanceFromStart = 0
+		      node.Score = 0
+		    end if
+		  next
+		  
+		  GoalNode.Status = Statuses.IsOpen
+		  var goal as M_Path.MilestoneInterface = GoalNode.Milestone
 		  
 		  openList.Add startNode
 		  startNode.Status = Statuses.IsOpen
@@ -162,6 +172,11 @@ Class PathFinder_MTC
 		          InsertIntoOpenList n, openList
 		        end if
 		        
+		      case Statuses.IsDeadEnd
+		        //
+		        // Do nothing
+		        //
+		        
 		      case else // IsClosed
 		        if n.DistanceFromStart > distanceFromStart then
 		          ClosedList.Remove( n.Key )
@@ -181,19 +196,38 @@ Class PathFinder_MTC
 		  var trail() as MilestoneInterface
 		  
 		  if foundIt then
+		    var nodes() as M_Path.Node
+		    
 		    while not ( parentNode is startNode )
-		      trail.AddAt 0, parentNode.Milestone
+		      nodes.AddAt 0, parentNode
 		      parentNode = parentNode.Parent
 		    wend
 		    
-		    trail.AddAt 0, startPosition
+		    nodes.AddAt 0, startNode
+		    
+		    //
+		    // Nodes now has the complete trail in order
+		    //
+		    trail.ResizeTo nodes.LastIndex
+		    for i as integer = 0 to nodes.LastIndex
+		      var n as M_Path.Node = nodes( i )
+		      
+		      trail( i ) = n.Milestone
+		    next
 		  end if
 		  
 		  result.Trail = trail
 		  result.Touched = new Dictionary
 		  
+		  //
+		  // If there was no trail found, every item in the Closed list is a dead end
+		  //
+		  var setStatus as Statuses = if( foundIt, Statuses.IsClosed, Statuses.IsDeadEnd )
 		  for each m as M_Path.Node in ClosedList.Values
 		    result.Touched.Value( m.Milestone ) = nil
+		    if m.Status <> Statuses.IsDeadEnd then
+		      m.Status = setStatus
+		    end if
 		  next
 		  
 		  return result

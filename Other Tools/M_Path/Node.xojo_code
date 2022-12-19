@@ -135,6 +135,7 @@ Private Class Node
 				"1 - IsOpen"
 				"2 - IsClosed"
 				"3 - IsReset"
+				"4 - IsDeadEnd"
 			#tag EndEnumValues
 		#tag EndViewProperty
 		#tag ViewProperty

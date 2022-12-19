@@ -33,7 +33,8 @@ Protected Module M_Path
 		IsNew
 		  IsOpen
 		  IsClosed
-		IsReset
+		  IsReset
+		IsDeadEnd
 	#tag EndEnum
 
 
