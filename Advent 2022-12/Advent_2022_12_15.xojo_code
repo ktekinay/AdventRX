@@ -3,20 +3,20 @@ Protected Class Advent_2022_12_15
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "Unknown"
+		  return "Sensors and beacons"
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return false
+		  return true
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnName() As String
-		  return ""
+		  return "Beacon Exclusion Zone"
 		  
 		End Function
 	#tag EndEvent
