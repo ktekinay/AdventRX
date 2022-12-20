@@ -2,8 +2,20 @@
 Protected Class Advent_2021_12_15
 Inherits AdventBase
 	#tag Event
+		Function ReturnDescription() As String
+		  return "Best path with risk"
+		End Function
+	#tag EndEvent
+
+	#tag Event
 		Function ReturnIsComplete() As Boolean
 		  return true
+		End Function
+	#tag EndEvent
+
+	#tag Event
+		Function ReturnName() As String
+		  return "Chiton"
 		End Function
 	#tag EndEvent
 
@@ -37,80 +49,47 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Integer
-		  var lastRowIndex as integer
-		  var lastColIndex as integer
+		  var grid as new ObjectGrid
+		  ToGrid( input, grid )
 		  
-		  var grid( -1, -1 ) as Chiton
-		  ToGrid( input, grid, lastRowIndex, lastColIndex )
-		  RateChitons( grid, lastRowIndex, lastColIndex )
+		  var lastChiton as Chiton = Chiton( grid( grid.LastRowIndex, grid.LastColIndex ) )
+		  var firstChiton as Chiton = Chiton( grid( 0, 0 ) )
 		  
-		  var firstGrid as Chiton = grid( 0, 0 )
-		  return firstGrid.BestRisk
+		  var finder as new PathFinder_MTC( lastChiton )
+		  var result as M_Path.Result = finder.Map( firstChiton )
 		  
+		  var risk as integer = SumRisk( result )
+		  return risk
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Integer
-		  var lastRowIndex as integer
-		  var lastColIndex as integer
+		  var grid as new ObjectGrid
+		  ToGrid( input, grid )
 		  
-		  var grid( -1, -1 ) as Chiton
-		  ToGrid( input, grid, lastRowIndex, lastColIndex )
-		  var origLastRowIndex as integer = lastRowIndex
-		  var origLastColIndex as integer = lastColIndex
+		  ExpandGrid( grid, 5 )
 		  
-		  ExpandGrid( grid, lastRowIndex, lastColIndex, 5 )
+		  var lastChiton as Chiton = Chiton( grid( grid.LastRowIndex, grid.LastColIndex ) )
+		  var firstChiton as Chiton = Chiton( grid( 0, 0 ) )
 		  
-		  RateChitons( grid, lastRowIndex, lastColIndex )
+		  var finder as new PathFinder_MTC( lastChiton )
+		  var result as M_Path.Result = finder.Map( firstChiton )
 		  
-		  #if FALSE then
-		    //
-		    // Debugging
-		    //
-		    var debugGrid as string
-		    
-		    var rowBuilder() as string
-		    for row as integer = 0 to lastRowIndex
-		      var colBuilder() as string
-		      for col as integer = 0 to lastColIndex
-		        var c as Chiton = grid( row, col )
-		        colBuilder.Add c.Risk.ToString
-		        if ( col + 1 ) mod ( origLastColIndex + 1 ) = 0 then
-		          colBuilder.Add &uFF0E
-		        end if
-		      next
-		      rowBuilder.Add String.FromArray( colBuilder, "" )
-		      if ( row + 1 ) mod ( origLastRowIndex + 1 ) = 0 then
-		        debugGrid = debugGrid + EndOfLine + String.FromArray( rowBuilder, EndOfLine ) + EndOfLine
-		        rowBuilder.RemoveAll
-		      end if
-		    next
-		    
-		    debugGrid = debugGrid.Trim
-		    #pragma unused debugGrid
-		    
-		  #else
-		    #pragma unused origLastRowIndex
-		    #pragma unused origLastColIndex
-		    
-		  #endif
-		  
-		  var firstGrid as Chiton = grid( 0, 0 )
-		  return firstGrid.BestRisk
-		  
+		  var risk as integer = SumRisk( result )
+		  return risk
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub ExpandGrid(grid(, ) As Chiton, ByRef lastRowIndex As Integer, ByRef lastColIndex As Integer, times As Integer)
-		  var origLastRowIndex as integer = lastRowIndex
-		  var origLastColIndex as integer = lastColIndex
+		Private Sub ExpandGrid(grid As ObjectGrid, times As Integer)
+		  var origLastRowIndex as integer = grid.LastRowIndex
+		  var origLastColIndex as integer = grid.LastColIndex
 		  
-		  lastRowIndex = ( lastRowIndex + 1 ) * times - 1
-		  lastColIndex = ( lastColIndex + 1 ) * times - 1
+		  var lastRowIndex as integer = ( grid.LastRowIndex + 1 ) * times - 1
+		  var lastColIndex as integer = ( grid.LastColIndex + 1 ) * times - 1
 		  
 		  grid.ResizeTo lastRowIndex, lastColIndex
 		  
@@ -131,7 +110,7 @@ Inherits AdventBase
 		        copyFromRow = row
 		      end if
 		      
-		      var origChiton as Chiton = grid( copyFromRow, copyFromCol )
+		      var origChiton as Chiton = Chiton( grid( copyFromRow, copyFromCol ) )
 		      var newChiton as new Chiton
 		      newChiton.Risk = origChiton.Risk + 1
 		      if newChiton.Risk > 9 then
@@ -148,233 +127,25 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub RateChitons(grid(, ) As Chiton, lastRowIndex As Integer, lastColIndex As Integer)
-		  var startPoint as Chiton = grid( 0, 0 )
+		Private Function SumRisk(result As M_Path.Result) As Integer
+		  var trail() as M_Path.MilestoneInterface = result.Trail
 		  
-		  for row as integer = lastRowIndex downto 0
-		    for col as integer = lastColIndex downto 0
-		      if row = lastRowIndex and col = lastColIndex then
-		        continue
-		      end if
-		      
-		      var c as Chiton = grid( row, col )
-		      if row < lastRowIndex then
-		        var below as Chiton = grid( row + 1, col )
-		        var risk as integer = below.CombinedRisk
-		        if c.BestRisk = 0 or c.BestRisk > risk then
-		          c.BestRisk = risk
-		        end if
-		      end if
-		      
-		      if col < lastColIndex then
-		        var toRight as Chiton = grid( row, col + 1 )
-		        var risk as integer = toRight.CombinedRisk
-		        if c.BestRisk = 0 or c.BestRisk > risk then
-		          c.BestRisk = risk
-		        end if
-		      end if
-		      
-		      'if startPoint.BestRisk <> 0 then
-		      'if startPoint.BestRisk < c.Risk then
-		      'continue for row
-		      'end if
-		      'end if
-		    next col
-		  next row
+		  var risk as integer
+		  for i as integer = 1 to trail.LastIndex
+		    risk = risk + Chiton( trail( i ) ).Risk
+		  next
 		  
-		  if true then
-		    var doAnotherPass as boolean = true
-		    
-		    while doAnotherPass
-		      doAnotherPass = false
-		      
-		      var c as Chiton
-		      var sorter( 3 ) as Chiton
-		      
-		      for row as integer = 0 to lastRowIndex
-		        for col as integer = 0 to lastColIndex
-		          if row = lastRowIndex and col = lastColIndex then
-		            continue
-		          end if
-		          
-		          c = grid( row, col )
-		          
-		          var chitonDown as Chiton = if( row < lastRowIndex, grid( row + 1, col ), nil )
-		          var chitonRight as Chiton = if( col < lastColIndex, grid( row, col + 1 ) , nil )
-		          var chitonUp as Chiton = if( row > 0, grid( row - 1, col ), nil )
-		          var chitonLeft as Chiton = if( col > 0, grid( row, col - 1 ), nil )
-		          
-		          sorter( 0 ) = chitonDown
-		          sorter( 1 ) = chitonRight
-		          sorter( 2 ) = chitonUp
-		          sorter( 3 ) = chitonLeft
-		          
-		          sorter.Sort AddressOf SortByCombinedRisk
-		          c.BestRisk = sorter( 0 ).CombinedRisk
-		        next col
-		      next row
-		      
-		      
-		      c = startPoint
-		      var trail() as Chiton
-		      var visited as new Dictionary
-		      visited.Value( c ) = nil
-		      
-		      do
-		        var row as integer = c.Row
-		        var col as integer = c.Column
-		        
-		        if row = lastRowIndex and col = lastColIndex then
-		          exit
-		        end if
-		        
-		        var chitonDown as Chiton = if( row < lastRowIndex, grid( row + 1, col ), nil )
-		        var chitonRight as Chiton = if( col < lastColIndex, grid( row, col + 1 ) , nil )
-		        var chitonUp as Chiton = if( row > 0, grid( row - 1, col ), nil )
-		        var chitonLeft as Chiton = if( col > 0, grid( row, col - 1 ), nil )
-		        
-		        sorter( 0 ) = chitonDown
-		        sorter( 1 ) = chitonRight
-		        sorter( 2 ) = chitonUp
-		        sorter( 3 ) = chitonLeft
-		        
-		        sorter.Sort AddressOf SortByCombinedRisk
-		        
-		        for each ordered as Chiton in sorter
-		          if not visited.HasKey( ordered ) then
-		            if c.BestRisk > ordered.CombinedRisk then
-		              c.BestRisk = ordered.CombinedRisk
-		            end if
-		            c = ordered
-		            trail.Add c
-		            visited.Value( c ) = nil
-		            
-		            exit for ordered
-		          end if
-		        next
-		      loop 
-		      
-		      for i as integer = 1 to trail.LastIndex
-		        var before as Chiton = trail( i - 1 )
-		        c = trail( i )
-		        if before.BestRisk <> c.CombinedRisk then
-		          before.BestRisk = c.CombinedRisk
-		          doAnotherPass = true
-		        end if
-		      next
-		      
-		      var bestRisk as integer
-		      for each c in trail
-		        bestRisk = bestRisk + c.Risk
-		      next
-		      
-		      if bestRisk < grid( 0, 0 ).BestRisk then
-		        grid( 0, 0 ).BestRisk = bestRisk
-		        doAnotherPass = true
-		      end if
-		      
-		    wend
-		  end if
-		  
-		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Sub RateChitons_bad(grid(, ) As Chiton, lastRowIndex As Integer, lastColIndex As Integer)
-		  var startPoint as Chiton = grid( 0, 0 )
-		  
-		  var onlyDownAndRight as boolean = true
-		  
-		  for pass as integer = 1 to 2
-		    for row as integer = lastRowIndex downto 0
-		      for col as integer = lastColIndex downto 0
-		        if row = lastRowIndex and col = lastColIndex then
-		          continue
-		        end if
-		        
-		        var c as Chiton = grid( row, col )
-		        c.NextChiton = c.GetNextChiton( grid, lastRowIndex, lastColIndex, onlyDownAndRight )
-		      next col
-		    next row
-		    
-		    onlyDownAndRight = not onlyDownAndRight
-		  next pass
-		  
-		  //
-		  // Now we be selective
-		  //
-		  var doItAgain as boolean
-		  
-		  var row as integer = lastRowIndex
-		  var col as integer = lastColIndex - 1
-		  var adder as integer = -1
-		  
-		  do
-		    doItAgain = false
-		    
-		    while row >= 0 and row <= lastRowIndex
-		      var c as Chiton = grid( row, col )
-		      var best as Chiton = c.GetNextChiton( grid, lastRowIndex, lastColIndex )
-		      
-		      if not ( best is c.NextChiton ) and best.CombinedRisk < c.NextChiton.CombinedRisk then
-		        c.NextChiton = best
-		        doItAgain = true
-		      end if
-		      
-		      col = col + adder
-		      if col < 0 then
-		        col = lastColIndex
-		        row = row - 1
-		      elseif col > lastColIndex then
-		        col = 0
-		        row = row + 1
-		      end if
-		    wend
-		    
-		    if doItAgain then
-		      if row < 0 then
-		        row = 0
-		        col = 0
-		        adder = 1
-		      elseif row > lastRowIndex then
-		        row = lastRowIndex
-		        col = lastColIndex - 1
-		        adder = -1
-		      end if
-		      
-		    else
-		      exit
-		      
-		    end if
-		  loop
-		  
-		  startPoint.BestRisk = startPoint.NextChiton.CombinedRisk
-		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Function SortByCombinedRisk(c1 As Chiton, c2 As Chiton) As Integer
-		  if c1 is nil and c2 is nil then
-		    return 0
-		  elseif c1 is nil then
-		    return 1
-		  elseif c2 is nil then
-		    return -1
-		  else
-		    return c1.CombinedRisk - c2.CombinedRisk
-		  end if
+		  return risk
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub ToGrid(input As String, grid(, ) As Chiton, ByRef lastRowIndex As Integer, ByRef lastColIndex As Integer)
+		Private Sub ToGrid(input As String, grid As ObjectGrid)
 		  var rows() as string = input.Trim.ReplaceLineEndings( EndOfLine ).Split( EndOfLine )
 		  
-		  lastRowIndex = rows.LastIndex
-		  lastColIndex = rows( 0 ).Bytes - 1
+		  var lastRowIndex as integer = rows.LastIndex
+		  var lastColIndex as integer = rows( 0 ).Bytes - 1
 		  
 		  grid.ResizeTo lastRowIndex, lastColIndex
 		  
@@ -390,135 +161,6 @@ Inherits AdventBase
 		    next
 		  next
 		  
-		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Sub TraverseGrid_old(grid(, ) As Chiton, lastRowIndex As Integer, lastColIndex As Integer)
-		  'const kLeft as integer = 1
-		  'const kUp as integer = 2
-		  'const kRight as integer = 3
-		  'const kDown as integer = 4
-		  '
-		  'var stack( 1000 ) as Chiton
-		  'var stackIndex as integer = 0
-		  'var visited as new Dictionary
-		  '
-		  'var startingChiton as Chiton = grid( 0, 0 )
-		  'var endingChiton as Chiton = grid( lastRowIndex, lastColIndex )
-		  '
-		  'var runningRisk as integer = -startingChiton.Risk
-		  'stack( stackIndex ) = startingChiton
-		  '
-		  'do
-		  'var thisChiton as Chiton = stack( stackIndex )
-		  '
-		  'if thisChiton.DirectionTried = 0 then
-		  'runningRisk = runningRisk + thisChiton.Risk
-		  '
-		  '
-		  'if thisChiton is endingChiton then
-		  'if runningRisk < startingChiton.BestRisk then
-		  'startingChiton.BestRisk = runningRisk
-		  'end if
-		  '
-		  'runningRisk = runningRisk - thisChiton.Risk
-		  'stackIndex = stackIndex - 1
-		  'continue
-		  '
-		  'elseif runningRisk > startingChiton.BestRisk then
-		  'runningRisk = runningRisk - thisChiton.Risk
-		  'stackIndex = stackIndex - 1
-		  'continue
-		  '
-		  'end if
-		  '
-		  'visited.Value( thisChiton ) = nil
-		  '
-		  'elseif thisChiton.DirectionTried >= kDown then
-		  '//
-		  '// We've tried all directions
-		  '//
-		  'runningRisk = runningRisk - thisChiton.Risk
-		  'thisChiton.DirectionTried = 0
-		  'stackIndex = stackIndex - 1
-		  'visited.Remove( thisChiton )
-		  'continue
-		  '
-		  'end if
-		  '
-		  'var nextChiton as Chiton
-		  '
-		  'do
-		  'thisChiton.DirectionTried = thisChiton.DirectionTried + 1
-		  '
-		  'select case thisChiton.DirectionTried
-		  'case kLeft
-		  'if thisChiton.Column > 0 then
-		  'nextChiton = grid( thisChiton.Row, thisChiton.Column - 1 )
-		  'if visited.HasKey( nextChiton ) then
-		  'nextChiton = nil
-		  'else
-		  'exit
-		  'end if
-		  'end if
-		  '
-		  'case kUp
-		  'if thisChiton.Row > 0 then
-		  'nextChiton = grid( thisChiton.Row - 1, thisChiton.Column )
-		  'if visited.HasKey( nextChiton ) then
-		  'nextChiton = nil
-		  'else
-		  'exit
-		  'end if
-		  'end if
-		  '
-		  'case kRight
-		  'if thisChiton.Column < lastColIndex then
-		  'nextChiton = grid( thisChiton.Row, thisChiton.Column + 1 )
-		  'if visited.HasKey( nextChiton ) then
-		  'nextChiton = nil
-		  'else
-		  'exit
-		  'end if
-		  'end if
-		  '
-		  'case kDown
-		  'if thisChiton.Row < lastRowIndex then
-		  'nextChiton = grid( thisChiton.Row + 1, thisChiton.Column )
-		  'if visited.HasKey( nextChiton ) then
-		  'nextChiton = nil
-		  'else
-		  'exit
-		  'end if
-		  'end if
-		  '
-		  'case else
-		  '//
-		  '// No more directions to try
-		  '//
-		  'thisChiton.DirectionTried = 0
-		  'runningRisk = runningRisk - thisChiton.Risk
-		  'visited.Remove( thisChiton )
-		  'stackIndex = stackIndex - 1
-		  'exit
-		  '
-		  'end select
-		  '
-		  'loop
-		  '
-		  'if nextChiton isa object then
-		  'stackIndex = stackIndex + 1
-		  'if stackIndex > stack.LastIndex then
-		  'stack.ResizeTo stackIndex + stackIndex
-		  'end if
-		  '
-		  'stack( stackIndex ) = nextChiton
-		  'end if
-		  '
-		  'loop until stackIndex = -1
-		  '
 		  
 		End Sub
 	#tag EndMethod
