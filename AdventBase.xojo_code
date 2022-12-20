@@ -125,6 +125,21 @@ Inherits Thread
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h1
+		Protected Sub Print(msg1 As Variant, msg2 As Variant, ParamArray moreMsgs() As Variant)
+		  #pragma BackgroundTasks true
+		  
+		  var printer() as string = array( msg1.StringValue, msg2.StringValue )
+		  
+		  for each addl as variant in moreMsgs
+		    printer.Add addl.StringValue
+		  next
+		  
+		  Print String.FromArray( printer, " " )
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21
 		Private Sub PrintRowSet(rs As RowSet)
 		  #pragma BackgroundTasks true
