@@ -93,6 +93,15 @@ Implements Iterable,Iterator
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21
+		Private Sub Destructor()
+		  for each m as GridMember in self
+		    m.Teardown
+		  next
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Shared Function FromIntegerGrid(igrid(, ) As Integer) As ObjectGrid
 		  var lastRowIndex as integer = igrid.LastIndex( 1 )

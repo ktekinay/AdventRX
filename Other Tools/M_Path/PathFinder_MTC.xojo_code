@@ -16,6 +16,7 @@ Class PathFinder_MTC
 		    n.ClearSuccessors
 		    n.Milestone = nil
 		    n.Parent = nil
+		    n.Key = nil
 		  next
 		  
 		  NodeMaster = nil

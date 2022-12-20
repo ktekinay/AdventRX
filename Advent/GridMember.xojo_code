@@ -7,6 +7,13 @@ Class GridMember
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h21
+		Private Sub Destructor()
+		  Teardown
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Function Neighbors(includeDiagonal As Boolean, reset As Boolean = False) As GridMember()
 		  if not reset and GotNeighbors then
@@ -47,6 +54,13 @@ Class GridMember
 		  return ToString
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub Teardown()
+		  MyNeighbors.RemoveAll
+		  
+		End Sub
 	#tag EndMethod
 
 
@@ -214,6 +228,19 @@ Class GridMember
 			InitialValue=""
 			Type="Integer"
 			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="PrintType"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="PrintTypes"
+			EditorType="Enum"
+			#tag EnumValues
+				"0 - UseEvent"
+				"1 - UseRawValue"
+				"2 - UseValue"
+			#tag EndEnumValues
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class
