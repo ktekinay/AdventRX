@@ -66,13 +66,117 @@ Inherits AdventBase
 		  var maxXs() as integer
 		  var goodSensors() as Sensor
 		  
-		  for each s as Sensor in sensors
-		    if row < s.MinY or row > s.MaxY then
+		  FilterForRow row, sensors, goodSensors, minXs, maxXs
+		  
+		  var occupied as new Dictionary
+		  
+		  for each s as Sensor in goodSensors
+		    if s.Y = row then
+		      occupied.Value( s.X ) = s
+		    end if
+		    if s.Beacon.Y = row then
+		      occupied.Value( s.Beacon.X ) = s
+		    end if
+		  next
+		  
+		  count = count - occupied.KeyCount
+		  
+		  for i as integer = 0 to minXs.LastIndex
+		    var minX as integer = minXs( i )
+		    var maxX as integer = maxXs( i )
+		    
+		    var scount as integer = maxX - minX + 1
+		    
+		    count = count + scount
+		  next
+		  
+		  return count
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CalculateResultB(input As String) As Integer
+		  const kMult as integer = 4000000
+		  
+		  var maxRow as integer = if( IsTest, 20, kMult )
+		  
+		  var sensors() as Sensor = ParseInput( input )
+		  
+		  var minXs() as integer
+		  var maxXs() as integer
+		  var goodSensors() as Sensor
+		  
+		  var emptyX as integer
+		  var emptyY as integer
+		  
+		  for row as integer = 0 to maxRow
+		    FilterForRow row, sensors, goodSensors, minXs, maxXs
+		    
+		    if minXs.Count = 0 then
+		      break
+		    end if
+		    
+		    var minX as integer = max( 0, minXs( 0 ) )
+		    var maxX as integer = min( maxRow, maxXs( maxXs.LastIndex ) )
+		    
+		    if minXs.Count = 1 and minX = 0 and maxX = maxRow then
 		      continue
 		    end if
 		    
-		    if s.Index = 6 then
-		      s = s
+		    var occupied as new Dictionary
+		    for each s as Sensor in goodSensors
+		      if s.Y = row then
+		        occupied.Value( s.X ) = nil
+		      end if
+		      if s.Beacon.Y = row then
+		        occupied.Value( s.Beacon.X ) = nil
+		      end if
+		    next
+		    
+		    if minXs.Count = 1 then
+		      emptyY = row
+		      
+		      if minX > 0 then
+		        emptyX = 0
+		        
+		      else
+		        emptyX = maxRow
+		      end if
+		      
+		      if occupied.HasKey( emptyX ) then
+		        continue
+		      end if
+		      
+		    else
+		      emptyY = row
+		      
+		      for i as integer = 1 to minXs.LastIndex
+		        emptyX = minXs( i ) - 1
+		        if not occupied.HasKey( emptyX ) then
+		          exit
+		        end if
+		      next
+		      
+		    end if
+		    
+		    exit
+		  next
+		  
+		  var result as integer = emptyX * kMult + emptyY
+		  return result
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub FilterForRow(row As Integer, sensors() As Sensor, goodSensors() As Sensor, minXs() As Integer, maxXs() As Integer)
+		  goodSensors.RemoveAll
+		  minXs.RemoveAll
+		  maxXs.RemoveAll
+		  
+		  for each s as Sensor in sensors
+		    if row < s.MinY or row > s.MaxY then
+		      continue
 		    end if
 		    
 		    var minX as integer = s.MinXForRow( row )
@@ -89,43 +193,86 @@ Inherits AdventBase
 		  
 		  minXs.SortWith maxXs, goodSensors
 		  
-		  for i as integer = 0 to minXs.LastIndex
-		    var s as Sensor = goodSensors( i )
-		    var minX as integer = minXs( i )
-		    var maxX as integer = maxXs( i )
+		  var wasOverlap as boolean = true
+		  while wasOverlap
+		    wasOverlap = false
 		    
-		    if i <> 0 then
-		      var prevMaxX as integer = maxXs( i - 1 )
-		      if prevMaxX >= minX then
-		        minX = prevMaxX + 1
+		    //
+		    // Check for overlap
+		    //
+		    for outer as integer = minXs.LastIndex downto 1
+		      var oMinX as integer = minXs( outer )
+		      var oMaxX as integer = maxXs( outer )
+		      var oLen as integer = oMaxX - oMinX + 1
+		      
+		      for inner as integer = outer - 1 downto 0
+		        var iMinX as integer = minXs( inner )
+		        var iMaxX as integer = maxXs( inner )
+		        var iLen as integer = iMaxX - iMinX + 1
+		        
+		        if iMinX > iMaxX then
+		          continue
+		        end if
+		        
+		        var overlaps as boolean = ( oMinX <= iMinX and oMaxX >= iMinX ) or _
+		        ( iMinX <= oMinX and iMaxX >= oMinX )
+		        
+		        if not overlaps then
+		          continue
+		        end if
+		        
+		        wasOverlap = true
+		        
+		        if oMinX = iMinX and oLen = iLen then
+		          oMaxX = oMinX - 1
+		        elseif oMinX <= iMinX and oMaxX >= iMaxX then
+		          iMaxX = iMinX - 1
+		        elseif iMinX <= oMinX and iMaxX >= oMaxX then
+		          oMaxX = oMinX - 1
+		        elseif oMinX <= iMinX then
+		          oMaxX = iMinX - 1
+		        elseif iMinX <= oMinX then
+		          iMaxX = oMinX - 1
+		        else
+		          break
+		        end if
+		        
+		        minXs( inner ) = iMinX
+		        maxXs( inner ) = iMaxX
+		        
+		        if iMinX > iMaxX then
+		          exit for inner
+		        end if
+		      next
+		      
+		      minXs( outer ) = oMinX
+		      maxXs( outer ) = oMaxX
+		    next
+		    
+		    minXs.SortWith maxXs
+		    
+		    for i as integer = minXs.LastIndex downto 0
+		      var minX as integer = minXs( i )
+		      var maxX as integer = maxXs( i )
+		      
+		      if maxX < minX then
+		        minXs.RemoveAt i
+		        maxXs.RemoveAt i
 		      end if
-		    end if
+		    next
 		    
-		    if minX >= maxX then
-		      continue
-		    end if
-		    
-		    var scount as integer = maxX - minX + 1
-		    if s.Y = row then
-		      scount = scount - 1
-		    end if
-		    
-		    if s.Beacon.Y = row then
-		      scount = scount - 1
-		    end if
-		    
-		    count = count + scount
-		  next
-		  
-		  return count
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Function CalculateResultB(input As String) As Integer
-		  
-		End Function
+		    for i as integer = minXs.LastIndex downto 1
+		      var minX as integer = minXs( i )
+		      var pmaxX as integer = maxXs( i - 1 )
+		      
+		      if minX = ( pMaxX + 1 ) then
+		        maxXs( i - 1 ) = maxXs( i )
+		        minXs.RemoveAt i
+		        maxXs.RemoveAt i
+		      end if
+		    next
+		  wend
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
