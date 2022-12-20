@@ -7,6 +7,20 @@ Protected Module Advent
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function Clone(Extends arr() As Integer) As Integer()
+		  var newArr() as integer
+		  newArr.ResizeTo arr.LastIndex
+		  
+		  for i as integer = 0 to arr.LastIndex
+		    newArr( i ) = arr( i )
+		  next
+		  
+		  return newArr
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function Clone(Extends arr() As String) As String()
 		  var newArr() as string
 		  newArr.ResizeTo arr.LastIndex
