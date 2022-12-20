@@ -53,7 +53,7 @@ Begin DesktopWindow WndAdvent
       Italic          =   False
       Left            =   20
       LockBottom      =   True
-      LockedInPosition=   False
+      LockedInPosition=   True
       LockLeft        =   True
       LockRight       =   True
       LockTop         =   True
@@ -136,8 +136,7 @@ End
 		        //
 		        // We're done
 		        //
-		        RemoveHandler advent.ResultReturned, WeakAddressOf Advent_ResultReturned
-		        LbAdvent.CellTextAt( row, integer( Columns.Status ) ) = kLabelFinished
+		        EndThread row, advent
 		        
 		      case else
 		        raise new RuntimeException
@@ -149,6 +148,21 @@ End
 		      exit
 		    end if
 		  next
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub EndThread(row As Integer, advent As AdventBase)
+		  if advent.ThreadState <> Thread.ThreadStates.NotRunning then
+		    advent.Stop
+		    while advent.ThreadState <> Thread.ThreadStates.NotRunning
+		      Thread.YieldToNext
+		    wend
+		  end if
+		  
+		  RemoveHandler advent.ResultReturned, WeakAddressOf Advent_ResultReturned
+		  LbAdvent.CellTextAt( row, integer( Columns.Status ) ) = kLabelFinished
 		  
 		End Sub
 	#tag EndMethod
@@ -248,6 +262,7 @@ End
 		  AddRow new Advent_2022_12_13
 		  AddRow new Advent_2022_12_14
 		  AddRow new Advent_2022_12_15
+		  AddRow new Advent_2022_12_20
 		  
 		  // Expand
 		  ExpandYear 2022
@@ -308,6 +323,9 @@ End
 	#tag EndConstant
 
 	#tag Constant, Name = kMenuCopy, Type = String, Dynamic = False, Default = \"Copy", Scope = Private
+	#tag EndConstant
+
+	#tag Constant, Name = kMenuKill, Type = String, Dynamic = False, Default = \"Kill", Scope = Private
 	#tag EndConstant
 
 
@@ -372,6 +390,13 @@ End
 		  end if
 		  
 		  var col as integer = me.ColumnFromXY( x, y )
+		  if col = integer( Columns.Name ) then
+		    var killMenu as new DesktopMenuItem( kMenuKill, row )
+		    killMenu.Name = kMenuKill
+		    base.AddMenu killMenu
+		    return true
+		  end if
+		  
 		  if col < integer( Columns.ResultTestA ) or col > integer( columns.ResultB ) then
 		    return false
 		  end if
@@ -405,6 +430,12 @@ End
 		    c.Close
 		    
 		    return true
+		    
+		  case kMenuKill
+		    var row as integer = selectedItem.Tag
+		    var advent as AdventBase = me.RowTagAt( row )
+		    
+		    EndThread row, advent
 		    
 		  end select
 		  
