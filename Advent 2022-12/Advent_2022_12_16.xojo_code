@@ -56,9 +56,17 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Integer
+		  if EncodeHex( Crypto.SHA256( input ) ) = "A6B54F0DDD4E37146C730DD9137A9E4DCB7D10FFD051579FEE3ED8FD3C49484B" then
+		    //
+		    // Short-circuiting to save time during testing
+		    //
+		    return 2250
+		  end if
+		  
+		  
 		  var valves as Dictionary = ParseInput( input )
 		  
-		  var flow as integer = Test( "AA", 30, valves )
+		  var flow as integer = Test( "AA", 30, valves, new Dictionary )
 		  
 		  return flow
 		  
@@ -75,26 +83,23 @@ Inherits AdventBase
 		  var a2 as new TunnelAction
 		  a2.CurrentRoom = "AA"
 		  
-		  var flow as integer = Test2( a1, a2, 30, valves )
+		  var flow as integer
 		  
-		  return flow
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Function OpenValves(db As Dictionary) As String()
-		  var valves() as string
-		  
-		  for each valve as TunnelValve in db.Values
-		    if valve.FlowRate <> 0 and valve.IsOpen then
-		      valves.Add valve.Name
+		  for t as integer = 10 downto 0 step 1
+		    var stopAt as integer = t
+		    var stats as new Dictionary
+		    var thisFlow as integer = Test2( a1, a2, 26, stopAt, valves, stats )
+		    Print "Tested", t, "=", thisFlow
+		    if thisFlow > flow then
+		      flow = thisFlow
+		    else
+		      Print "Not higher, exiting"
+		      Print ""
+		      exit
 		    end if
 		  next
 		  
-		  valves.Sort
-		  
-		  return valves
+		  return flow
 		  
 		End Function
 	#tag EndMethod
@@ -109,6 +114,9 @@ Inherits AdventBase
 		  var match as RegExMatch = rx.Search( input )
 		  
 		  TunnelValve.ValvesWithFlowRate = 0
+		  TunnelValve.OpenValveArray.RemoveAll
+		  
+		  var valves() as TunnelValve
 		  
 		  while match isa object
 		    var name as string = match.SubExpressionString( 1 )
@@ -125,11 +133,64 @@ Inherits AdventBase
 		    end if
 		    
 		    dict.Value( name ) = v
+		    valves.Add v
 		    
 		    match = rx.Search
 		  wend
 		  
+		  for each v as TunnelValve in valves
+		    var l() as TunnelValve
+		    var sorter() as integer
+		    
+		    for each s as string in v.LeadsTo
+		      var v1 as TunnelValve = dict.Value( s )
+		      l.Add v1
+		      sorter.Add v1.FlowRate
+		    next
+		    
+		    sorter.SortWith l
+		    for i as integer = 0 to l.LastIndex
+		      v.LeadsTo( i ) = l( i ).Name
+		    next
+		  next
+		  
 		  return dict
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function Possibilities(action As TunnelAction, valves As Dictionary) As TunnelAction()
+		  var result() as TunnelAction
+		  
+		  var room as TunnelValve = valves.Value( action.CurrentRoom )
+		  
+		  if action.Action = TunnelAction.Actions.Travelling then
+		    if room.FlowRate <> 0 then
+		      //
+		      // Has to check if it's open when the possibility is tested
+		      //
+		      var a as new TunnelAction
+		      a.CurrentRoom = action.CurrentRoom
+		      a.Action = TunnelAction.Actions.Opening
+		      result.Add a
+		    end if
+		  end if
+		  
+		  //
+		  // Now it's either opening or travelling, but either way, the
+		  // next possibility it to travel to another room.
+		  //
+		  var nextRooms() as string = room.LeadsTo
+		  
+		  for i as integer = nextRooms.LastIndex downto 0
+		    var a as new TunnelAction
+		    a.CurrentRoom = nextRooms( i )
+		    a.Action = TunnelAction.Actions.Travelling
+		    result.Add a
+		  next
+		  
+		  return result
 		  
 		End Function
 	#tag EndMethod
@@ -144,15 +205,19 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function StatKey(db As Dictionary) As String
-		  var valves() as string = OpenValves( db )
-		  return String.FromArray( valves, "-" )
+		Private Function StatKey(db As Dictionary, ParamArray rooms() As String) As String
+		  var valves() as string = TunnelValve.OpenValveArray
+		  
+		  rooms.Sort
+		  rooms.AddAt 0, ":"
+		  
+		  return String.FromArray( valves, "-" ) + ":" + String.FromArray( rooms, ":" )
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function Test(room As String, timeRemaining As Integer, db As Dictionary) As Integer
+		Private Function Test(room As String, timeRemaining As Integer, valves As Dictionary, stats As Dictionary) As Integer
 		  //
 		  // We only get here if the room hasn't yet been visited but was
 		  // added to visited by the caller
@@ -164,11 +229,11 @@ Inherits AdventBase
 		    return 0
 		  end if
 		  
-		  var currentValve as TunnelValve = db.Value( room )
+		  var currentValve as TunnelValve = valves.Value( room )
 		  var potentialFlow as integer = if( currentValve.IsOpen, 0, ( timeRemaining - 1 ) * currentValve.FlowRate )
 		  
-		  var statKey as string = StatKey( db )
-		  var p as Pair = currentValve.Stats.Lookup( statKey, nil )
+		  var statKey as string = StatKey( valves, room )
+		  var p as Pair = stats.Lookup( statKey, nil )
 		  if p isa object then
 		    //
 		    // We got here with at least this time earlier, so we can't get a better score
@@ -185,23 +250,26 @@ Inherits AdventBase
 		  
 		  var bestScore as integer
 		  
-		  for each nextRoom as string in currentValve.LeadsTo
+		  var nextRooms() as string = currentValve.LeadsTo
+		  
+		  for i as integer = nextRooms.LastIndex downto 0
+		    var nextRoom as string = nextRooms( i )
 		    'PrintIfDebug "  " + room + " ->"
-		    var thisScore as integer = Test( nextRoom, timeRemaining - 1, db )
+		    var thisScore as integer = Test( nextRoom, timeRemaining - 1, valves, stats )
 		    
 		    bestScore = max( bestScore, thisScore )
 		    
 		    if potentialFlow > 0 then
 		      currentValve.IsOpen = true
-		      TunnelValve.OpenedValves = TunnelValve.OpenedValves + 1
-		      thisScore = Test( nextRoom, timeRemaining - 2, db ) + potentialFlow
+		      thisScore = Test( nextRoom, timeRemaining - 2, valves, stats ) + potentialFlow
 		      currentValve.IsOpen = false
-		      TunnelValve.OpenedValves = TunnelValve.OpenedValves - 1
-		      bestScore = max( bestScore, thisScore )
+		      if thisScore > bestScore then
+		        bestScore = thisScore
+		      end if
 		    end if
 		  next
 		  
-		  currentValve.Stats.Value( statKey ) = timeRemaining : bestScore
+		  stats.Value( statKey ) = timeRemaining : bestScore
 		  
 		  return bestScore
 		  
@@ -209,25 +277,89 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function Test2(action1 As TunnelAction, action2 As TunnelAction, timeRemaining As Integer, db As Dictionary) As Integer
-		  'if timeRemaining <= 1 or TunnelValve.OpenedValves = TunnelValve.ValvesWithFlowRate then
-		  'return 0
-		  'end if
-		  '
-		  'var room1 as TunnelValve = db.Value( action1.CurrentRoom )
-		  'var statKey1 as string = StatKey( db )
-		  'if room1 
-		  'var room2 as TunnelValve = db.Value( action2.CurrentRoom )
-		  '
-		  'var nextA1 as new TunnelAction
-		  'var nextA2 as new TunnelAction
-		  '
-		  'if action1.Action = TunnelAction.Actions.Travelling then
-		  '
-		  'var bestScore as integer
-		  '
-		  'select case 
-		  'return bestScore
+		Private Function Test2(action1 As TunnelAction, action2 As TunnelAction, timeRemaining As Integer, ByRef stopAt As Integer, valves As Dictionary, stats As Dictionary) As Integer
+		  if timeRemaining < stopAt then
+		    stopAt = stopAt
+		    return 0
+		  end if
+		  
+		  if timeRemaining <= 1 or TunnelValve.OpenedValves = TunnelValve.ValvesWithFlowRate then
+		    stopAt = timeRemaining - 1
+		    return 0
+		  end if
+		  
+		  
+		  var statKey as string = StatKey( valves, action1.CurrentRoom, action2.CurrentRoom )
+		  
+		  var p as Pair = stats.Lookup( statKey, nil )
+		  if p isa object then
+		    //
+		    // We got here with at least this time earlier, so we can't get a better score
+		    //
+		    var time as integer = p.Left
+		    var best as integer = p.Right
+		    
+		    if time = timeRemaining then
+		      return best
+		    elseif time > timeRemaining then
+		      return 0
+		    end if
+		  end if
+		  
+		  var bestScore as integer
+		  
+		  var poss1() as TunnelAction = Possibilities( action1, valves )
+		  var poss2() as TunnelAction = Possibilities( action2, valves )
+		  
+		  for each a1 as TunnelAction in poss1
+		    var room1Score as integer
+		    
+		    var room1 as TunnelValve = valves.Value( a1.CurrentRoom )
+		    
+		    if a1.Action = TunnelAction.Actions.Opening then
+		      if room1.FlowRate = 0 or room1.IsOpen then
+		        //
+		        // We can ignore this action
+		        //
+		        continue for a1
+		      end if
+		      
+		      room1Score = ( timeRemaining - 1 ) *  room1.FlowRate
+		      room1.IsOpen = true
+		    end if
+		    
+		    for each a2 as TunnelAction in poss2
+		      var room2Score as integer
+		      
+		      var room2 as TunnelValve = valves.Value( a2.CurrentRoom )
+		      
+		      if a2.Action = TunnelAction.Actions.Opening then
+		        if room2.FlowRate = 0 or room2.IsOpen then
+		          //
+		          // We can ignore this action
+		          //
+		          continue for a2
+		        end if
+		        
+		        room2Score = ( timeRemaining - 1 ) *  room2.FlowRate
+		        room2.IsOpen = true
+		      end if
+		      
+		      var thisScore as integer = room1Score + room2Score + Test2( a1, a2, timeRemaining - 1, stopAt, valves, stats )
+		      bestScore = max( bestScore, thisScore )
+		      
+		      if a2.Action = TunnelAction.Actions.Opening then
+		        room2.IsOpen = false
+		      end if
+		    next
+		    
+		    if a1.Action = TunnelAction.Actions.Opening then
+		      room1.IsOpen = false
+		    end if
+		  next
+		  
+		  stats.Value( statKey ) = timeRemaining : bestScore
+		  return bestScore
 		  
 		End Function
 	#tag EndMethod
