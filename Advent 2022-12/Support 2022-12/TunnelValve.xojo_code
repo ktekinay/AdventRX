@@ -7,6 +7,17 @@ Protected Class TunnelValve
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Shared Function Sorter_ByFlowReverse(v1 As TunnelValve, v2 As TunnelValve) As Integer
+		  return v2.FlowRate - v1.FlowRate
+		  
+		End Function
+	#tag EndMethod
+
+
+	#tag Property, Flags = &h0
+		Shared AllValvesWithFlowArray() As TunnelValve
+	#tag EndProperty
 
 	#tag ComputedProperty, Flags = &h0
 		#tag Getter
