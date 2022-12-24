@@ -58,10 +58,6 @@ Inherits AdventBase
 		Private Function CalculateResultA(input As String) As Integer
 		  const kLastColIndex as integer = 6
 		  
-		  if not IsTest then
-		    return -1
-		  end if
-		  
 		  var grid as new TetrisGrid
 		  grid.ResizeTo 15, kLastColIndex
 		  
@@ -80,45 +76,44 @@ Inherits AdventBase
 		  var rockIndex as integer
 		  var jetIndex as integer
 		  
-		  var exampleHeights() as integer = ToIntegerArray( kExampleHeights )
+		  var exampleHeights() as integer
+		  if IsTest then
+		    exampleHeights = ToIntegerArray( kExampleHeights )
+		  end if
 		  
-		  const kDebugCount as integer = 24
+		  const kDebugCount as integer = -1
 		  
 		  for count as integer = 1 to 2022
 		    var rock as TetrisRock = NextRock( rocks, rockIndex )
 		    PlaceRock grid, rock
 		    
-		    if IsTest and count = kDebugCount then
-		      Print grid.HighPoint
-		      Print "Placing"
-		      PrintRockAndGrid rock, grid, "@"
-		      Print ""
-		    end if
+		    'if IsTest and count = kDebugCount then
+		    'Print grid.HighPoint
+		    'Print "Placing"
+		    'PrintRockAndGrid rock, grid, "@"
+		    'Print ""
+		    'end if
 		    
 		    do
 		      var jet as string = NextJet( jetPatterns, jetIndex )
 		      PushRock rock, jet, grid
-		      if IsTest and count = kDebugCount then
-		        Print jet
-		        PrintRockAndGrid rock, grid, "@"
-		      end if
+		      'if IsTest and count = kDebugCount then
+		      'Print jet
+		      'PrintRockAndGrid rock, grid, "@"
+		      'end if
 		    loop until not LowerRock( rock, grid )
 		    
 		    DrawRock rock, Grid
-		    if count >= 24 and count <= 27 then
-		      Print grid
-		      Print ""
-		    end if
 		    
 		    if IsTest then
-		      if count = kDebugCount then
-		        Print grid
-		        Print ""
-		      end if
+		      'if count = kDebugCount then
+		      'Print grid
+		      'Print ""
+		      'end if
 		      
 		      if grid.HighPoint <> exampleHeights( count - 1 ) then
 		        Print "mismatch at", count, "got", grid.HighPoint, "expected", exampleHeights( count - 1 )
-		        exit
+		        'exit
 		      end if
 		    end if
 		  next
@@ -200,11 +195,19 @@ Inherits AdventBase
 		  end if
 		  
 		  for rockCol as integer = 0 to rock.LastColIndex
-		    if rock( 0, rockCol ) = "#" then
-		      var testGridCol as integer = rock.GridColumn + rockCol
-		      if grid( targetGridRow, testGridCol ) <> nil then
-		        return false
-		      end if
+		    var rockRow as integer
+		    while rockRow <= rock.LastRowIndex and rock( rockRow, rockCol ) <> "#"
+		      rockRow = rockRow + 1
+		    wend
+		    if rockRow > rock.LastRowIndex then
+		      continue
+		    end if
+		    
+		    var testGridCol as integer = rock.GridColumn + rockCol
+		    var testGridRow as integer = targetGridRow + rockRow
+		    
+		    if grid( testGridRow, testGridCol ) <> nil then
+		      return false
 		    end if
 		  next
 		  
@@ -272,6 +275,7 @@ Inherits AdventBase
 		  var targetGridCol as integer
 		  var targetRockCol as integer
 		  var rockEdgeCol as integer
+		  var stepper as integer
 		  
 		  if direction = "<" then
 		    targetGridCol = rock.GridColumn - 1
@@ -281,6 +285,7 @@ Inherits AdventBase
 		    end if
 		    targetRockCol = targetGridCol
 		    rockEdgeCol = 0
+		    stepper = 1
 		    
 		  else
 		    targetGridCol = rock.GridColumn + rock.LastColIndex + 1
@@ -289,14 +294,24 @@ Inherits AdventBase
 		    end
 		    targetRockCol = rock.GridColumn + 1
 		    rockEdgeCol = rock.LastColIndex
+		    stepper = -1
 		  end if
 		  
 		  for rockRow as integer = 0 to rock.LastRowIndex
-		    if rock( rockRow, rockEdgeCol ) = "#" then
-		      var testGridRow as integer = rock.GridRow + rockRow
-		      if grid( testGridRow, targetGridCol ) <> nil then
-		        return
-		      end if
+		    var testRockCol as integer = rockEdgeCol
+		    var testGridCol as integer = targetGridCol
+		    while rock( rockRow, testRockCol ) <> "#" and testRockCol >= 0 and testRockCol <= rock.LastColIndex
+		      testRockCol = testRockCol + stepper
+		      testGridCol = testGridCol + stepper
+		    wend
+		    
+		    if testRockCol < 0 or testRockCol > rock.LastColIndex then
+		      continue
+		    end if
+		    
+		    var testGridRow as integer = rock.GridRow + rockRow
+		    if grid( testGridRow, testGridCol ) <> nil then
+		      return
 		    end if
 		  next
 		  
