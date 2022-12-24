@@ -3,6 +3,7 @@ Class GridMember
 	#tag Method, Flags = &h0
 		Sub Constructor(value As Variant = Nil)
 		  self.RawValue = value
+		  self.Value = value
 		  
 		End Sub
 	#tag EndMethod

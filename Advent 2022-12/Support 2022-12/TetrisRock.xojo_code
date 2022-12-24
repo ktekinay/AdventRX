@@ -1,58 +1,36 @@
 #tag Class
-Class StringGrid
+Protected Class TetrisRock
+Inherits StringGrid
 	#tag Method, Flags = &h0
-		Function Operator_Subscript(row As Integer, col As Integer) As String
-		  return Grid( row, col )
+		Function Operator_Convert() As String
+		  var rows() as string
+		  
+		  for rowIndex as integer = 0 to LastRowIndex
+		    var row() as string
+		    for colIndex as integer = 0 to LastColIndex
+		      var char as string = Grid( rowIndex, colIndex )
+		      if char = "" then
+		        char = LightDotString
+		      end if
+		      
+		      row.Add Grid( rowIndex, colIndex )
+		    next
+		    
+		    rows.Add String.FromArray( row, "" )
+		  next
+		  
+		  return String.FromArray( rows, EndOfLine )
 		  
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0
-		Sub Operator_Subscript(row As Integer, col As Integer, Assigns s As String)
-		  Grid( row, col ) = s
-		  
-		End Sub
-	#tag EndMethod
 
-	#tag Method, Flags = &h0
-		Sub ResizeTo(row As Integer, col As Integer)
-		  mLastRowIndex = row
-		  mLastColIndex = col
-		  
-		  Grid.ResizeTo row, col
-		  
-		End Sub
-	#tag EndMethod
-
-
-	#tag Property, Flags = &h1
-		Protected Grid(-1,-1) As String
+	#tag Property, Flags = &h0
+		GridColumn As Integer
 	#tag EndProperty
 
-	#tag ComputedProperty, Flags = &h0
-		#tag Getter
-			Get
-			  Return mLastColIndex
-			End Get
-		#tag EndGetter
-		LastColIndex As Integer
-	#tag EndComputedProperty
-
-	#tag ComputedProperty, Flags = &h0
-		#tag Getter
-			Get
-			  Return mLastRowIndex
-			End Get
-		#tag EndGetter
-		LastRowIndex As Integer
-	#tag EndComputedProperty
-
-	#tag Property, Flags = &h21
-		Private mLastColIndex As Integer
-	#tag EndProperty
-
-	#tag Property, Flags = &h21
-		Private mLastRowIndex As Integer
+	#tag Property, Flags = &h0
+		GridRow As Integer
 	#tag EndProperty
 
 

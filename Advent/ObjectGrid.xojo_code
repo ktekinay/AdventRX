@@ -96,7 +96,9 @@ Implements Iterable,Iterator
 	#tag Method, Flags = &h21
 		Private Sub Destructor()
 		  for each m as GridMember in self
-		    m.Teardown
+		    if m isa object then
+		      m.Teardown
+		    end if
 		  next
 		  
 		End Sub
@@ -195,7 +197,23 @@ Implements Iterable,Iterator
 
 	#tag Method, Flags = &h0
 		Function Operator_Convert() As String
-		  return ToString
+		  var rowBuilder() as string
+		  for row as integer = 0 to mLastRowIndex
+		    var colBuilder() as string
+		    for col as integer = 0 to mLastColIndex
+		      var m as GridMember = Grid( row, col )
+		      if m is nil then
+		        'colBuilder.Add &uFF0E
+		        colBuilder.Add "."
+		      else
+		        colBuilder.Add Grid( row, col ).ToString
+		      end if
+		    next
+		    rowBuilder.Add String.FromArray( colBuilder, "" )
+		  next
+		  
+		  return String.FromArray( rowBuilder, EndOfLine )
+		  
 		End Function
 	#tag EndMethod
 
@@ -316,8 +334,8 @@ Implements Iterable,Iterator
 	#tag EndMethod
 
 
-	#tag Property, Flags = &h21
-		Private Grid(-1,-1) As GridMember
+	#tag Property, Flags = &h1
+		Protected Grid(-1,-1) As GridMember
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
@@ -361,21 +379,7 @@ Implements Iterable,Iterator
 	#tag ComputedProperty, Flags = &h0
 		#tag Getter
 			Get
-			  var rowBuilder() as string
-			  for row as integer = 0 to mLastRowIndex
-			    var colBuilder() as string
-			    for col as integer = 0 to mLastColIndex
-			      var m as GridMember = Grid( row, col )
-			      if m is nil then
-			        colBuilder.Add &uFF0E
-			      else
-			        colBuilder.Add Grid( row, col ).ToString
-			      end if
-			    next
-			    rowBuilder.Add String.FromArray( colBuilder, "" )
-			  next
-			  
-			  return String.FromArray( rowBuilder, EndOfLine )
+			  return self
 			  
 			End Get
 		#tag EndGetter
