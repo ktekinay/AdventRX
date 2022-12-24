@@ -61,65 +61,10 @@ Inherits AdventBase
 		  var grid as new TetrisGrid
 		  grid.ResizeTo 15, kLastColIndex
 		  
-		  for col as integer = 0 to kLastColIndex
-		    grid( 0, col ) = new TetrisSquare( "#" )
-		  next
-		  
-		  grid.UpdateHighPoint
-		  
-		  'Print grid
-		  'Print ""
-		  
 		  var rocks() as TetrisRock = GetRocks
 		  var jetPatterns() as string = input.Split( "" )
 		  
-		  var rockIndex as integer
-		  var jetIndex as integer
-		  
-		  var exampleHeights() as integer
-		  if IsTest then
-		    exampleHeights = ToIntegerArray( kExampleHeights )
-		  end if
-		  
-		  const kDebugCount as integer = -1
-		  
-		  for count as integer = 1 to 2022
-		    var rock as TetrisRock = NextRock( rocks, rockIndex )
-		    PlaceRock grid, rock
-		    
-		    'if IsTest and count = kDebugCount then
-		    'Print grid.HighPoint
-		    'Print "Placing"
-		    'PrintRockAndGrid rock, grid, "@"
-		    'Print ""
-		    'end if
-		    
-		    do
-		      var jet as string = NextJet( jetPatterns, jetIndex )
-		      PushRock rock, jet, grid
-		      'if IsTest and count = kDebugCount then
-		      'Print jet
-		      'PrintRockAndGrid rock, grid, "@"
-		      'end if
-		    loop until not LowerRock( rock, grid )
-		    
-		    DrawRock rock, Grid
-		    
-		    if IsTest then
-		      'if count = kDebugCount then
-		      'Print grid
-		      'Print ""
-		      'end if
-		      
-		      if grid.HighPoint <> exampleHeights( count - 1 ) then
-		        Print "mismatch at", count, "got", grid.HighPoint, "expected", exampleHeights( count - 1 )
-		        'exit
-		      end if
-		    end if
-		  next
-		  
-		  'Print grid
-		  'Print ""
+		  Process grid, rocks, jetPatterns, 2022
 		  
 		  return grid.HighPoint
 		  
@@ -267,6 +212,67 @@ Inherits AdventBase
 		  DrawRock rock, debugGrid, symbol
 		  Print debugGrid
 		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub Process(grid As TetrisGrid, rocks() As TetrisRock, jetPatterns() As String, reps As Integer)
+		  for col as integer = 0 to grid.LastColIndex
+		    grid( 0, col ) = new TetrisSquare( "#" )
+		  next
+		  
+		  grid.UpdateHighPoint
+		  
+		  'Print grid
+		  'Print ""
+		  
+		  var rockIndex as integer
+		  var jetIndex as integer
+		  
+		  var exampleHeights() as integer
+		  if IsTest then
+		    exampleHeights = ToIntegerArray( kExampleHeights )
+		  end if
+		  
+		  const kDebugCount as integer = -1
+		  
+		  for count as integer = 1 to reps
+		    var rock as TetrisRock = NextRock( rocks, rockIndex )
+		    PlaceRock grid, rock
+		    
+		    'if IsTest and count = kDebugCount then
+		    'Print grid.HighPoint
+		    'Print "Placing"
+		    'PrintRockAndGrid rock, grid, "@"
+		    'Print ""
+		    'end if
+		    
+		    do
+		      var jet as string = NextJet( jetPatterns, jetIndex )
+		      PushRock rock, jet, grid
+		      'if IsTest and count = kDebugCount then
+		      'Print jet
+		      'PrintRockAndGrid rock, grid, "@"
+		      'end if
+		    loop until not LowerRock( rock, grid )
+		    
+		    DrawRock rock, Grid
+		    
+		    if IsTest then
+		      'if count = kDebugCount then
+		      'Print grid
+		      'Print ""
+		      'end if
+		      
+		      if grid.HighPoint <> exampleHeights( count - 1 ) then
+		        Print "mismatch at", count, "got", grid.HighPoint, "expected", exampleHeights( count - 1 )
+		        'exit
+		      end if
+		    end if
+		  next
+		  
+		  'Print grid
+		  'Print ""
 		End Sub
 	#tag EndMethod
 
