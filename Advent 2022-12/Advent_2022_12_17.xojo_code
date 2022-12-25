@@ -3,20 +3,20 @@ Protected Class Advent_2022_12_17
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "Unknown"
+		  return "Tetris"
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return false
+		  return true
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnName() As String
-		  return ""
+		  return "Pyroclastic Flow"
 		  
 		End Function
 	#tag EndEvent
@@ -74,6 +74,18 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Integer
+		  const kLastColIndex as integer = 6
+		  
+		  var grid as new TetrisGrid
+		  grid.ResizeTo 15, kLastColIndex
+		  
+		  var rocks() as TetrisRock = GetRocks
+		  var jetPatterns() as string = input.Split( "" )
+		  
+		  Process grid, rocks, jetPatterns, 1000000000000
+		  
+		  return grid.HighPoint
+		  
 		  
 		End Function
 	#tag EndMethod
@@ -234,6 +246,14 @@ Inherits AdventBase
 		    exampleHeights = ToIntegerArray( kExampleHeights )
 		  end if
 		  
+		  var visited as new Dictionary
+		  var foundRepeat as boolean
+		  var lastRepeatedRep as integer
+		  var lastRepeatedHighPoint as integer
+		  var lastRepeatedDiff as integer
+		  var lastHighPointDiff as integer
+		  var highPointAdder as integer
+		  
 		  const kDebugCount as integer = -1
 		  
 		  for count as integer = 1 to reps
@@ -256,21 +276,62 @@ Inherits AdventBase
 		      'end if
 		    loop until not LowerRock( rock, grid )
 		    
-		    DrawRock rock, Grid
+		    DrawRock rock, grid
 		    
-		    if IsTest then
-		      'if count = kDebugCount then
-		      'Print grid
-		      'Print ""
-		      'end if
-		      
-		      if grid.HighPoint <> exampleHeights( count - 1 ) then
-		        Print "mismatch at", count, "got", grid.HighPoint, "expected", exampleHeights( count - 1 )
-		        'exit
+		    var topBuilder() as string = array( grid.TopographyKey.ToString, jetIndex.ToString, rockIndex.ToString )
+		    var topKey as string = String.FromArray( topBuilder, "-" )
+		    
+		    if visited.HasKey( topKey ) then
+		      if foundRepeat then
+		        var diff as integer = count - lastRepeatedRep
+		        var highPointDiff as integer = grid.HighPoint - lastRepeatedHighPoint
+		        
+		        if diff <> lastRepeatedDiff or highPointDiff <> lastHighPointDiff then
+		          lastRepeatedRep = count
+		          lastRepeatedDiff = diff
+		          lastRepeatedHighPoint = grid.HighPoint
+		          lastHighPointDiff = highPointDiff
+		          
+		        else
+		          // We found the pattern
+		          var remainingReps as integer = reps - count
+		          'Print "Diff=", diff, "lastRepeatedHighPoint=", lastRepeatedHighPoint, "highPointDiff=", highPointDiff
+		          var mult as integer = remainingReps \ diff
+		          var nextRep as integer = mult * diff + count
+		          highPointAdder = mult * highPointDiff
+		          
+		          count = nextRep
+		        end if
+		        
+		      else // not foundRepeat
+		        foundRepeat = true
+		        visited.RemoveAll
+		        visited.Value( topKey ) = nil
+		        lastRepeatedRep = count
+		        lastRepeatedDiff = count
 		      end if
+		      
+		      'Print "Repeated at", count, "rockindex =", rockIndex, "jetIndex =", jetIndex, "key =", topKey
+		      
+		    elseif not foundRepeat then
+		      visited.Value( topKey ) = nil
+		      
 		    end if
+		    
+		    'if IsTest then
+		    'if count = kDebugCount then
+		    'Print grid
+		    'Print ""
+		    'end if
+		    
+		    'if grid.HighPoint <> exampleHeights( count - 1 ) then
+		    'Print "mismatch at", count, "got", grid.HighPoint, "expected", exampleHeights( count - 1 )
+		    'exit
+		    'end if
+		    'end if
 		  next
 		  
+		  grid.HighPoint = grid.HighPoint + highPointAdder
 		  'Print grid
 		  'Print ""
 		End Sub

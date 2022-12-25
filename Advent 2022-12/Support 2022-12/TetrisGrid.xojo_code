@@ -42,12 +42,34 @@ Inherits ObjectGrid
 		    ResizeTo( LastRowIndex + 20, LastColIndex )
 		  end if
 		  
+		  Topography.ResizeTo LastColIndex
+		  TopographyKey = 0
+		  
+		  for col as integer = 0 to LastColIndex
+		    for row as integer = HighPoint downto 0
+		      if Grid( row, col ) isa object then
+		        var delta as integer = HighPoint - row
+		        Topography( col ) = delta
+		        TopographyKey = TopographyKey + ( delta * 15^col )
+		        exit for row
+		      end if
+		    next row
+		  next col
+		  
 		End Sub
 	#tag EndMethod
 
 
 	#tag Property, Flags = &h0
 		HighPoint As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h0
+		Topography() As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h0
+		TopographyKey As Integer
 	#tag EndProperty
 
 
@@ -115,6 +137,14 @@ Inherits ObjectGrid
 			InitialValue=""
 			Type="String"
 			EditorType="MultiLineEditor"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="HighPoint"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class
