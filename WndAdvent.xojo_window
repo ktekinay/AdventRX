@@ -264,6 +264,7 @@ End
 		  AddRow new Advent_2022_12_15
 		  AddRow new Advent_2022_12_16
 		  AddRow new Advent_2022_12_17
+		  AddRow new Advent_2022_12_18
 		  AddRow new Advent_2022_12_20
 		  AddRow new Advent_2022_12_21
 		  AddRow new Advent_2022_12_22
