@@ -62,12 +62,14 @@ Inherits AdventBase
 		  
 		  for each snafu as string in snafus
 		    var d as integer = ToDecimal( snafu )
-		    var s as string = ToSnafu( d )
+		    
+		    'var s as string = ToSnafu( d )
 		    'if s <> snafu then
 		    'Print "Expected", snafu, "got", s, "for", d
 		    'else
 		    'Print "BINGO", snafu, "for", d
 		    'end if
+		    
 		    sum = sum + d
 		  next
 		  
