@@ -3,20 +3,20 @@ Protected Class Advent_2022_12_18
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "Unknown"
+		  return "Count exposed cube sides"
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return false
+		  return true
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnName() As String
-		  return ""
+		  return "Boiling Boulders"
 		  
 		End Function
 	#tag EndEvent
@@ -53,6 +53,18 @@ Inherits AdventBase
 		End Function
 	#tag EndEvent
 
+
+	#tag Method, Flags = &h21
+		Private Sub AddVoidNeighbors(grid As Advent.SpacialGrid, square As Advent3DObject, toArray() As Advent3DObject)
+		  MaybeAddVoid grid, square.X - 1, square.Y, square.Z, toArray
+		  MaybeAddVoid grid, square.X + 1, square.Y, square.Z, toArray
+		  MaybeAddVoid grid, square.X, square.Y - 1, square.Z, toArray
+		  MaybeAddVoid grid, square.X, square.Y + 1, square.Z, toArray
+		  MaybeAddVoid grid, square.X, square.Y, square.Z - 1, toArray
+		  MaybeAddVoid grid, square.X, square.Y, square.Z + 1, toArray
+		  
+		End Sub
+	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Integer
@@ -164,21 +176,91 @@ Inherits AdventBase
 		    next
 		  next
 		  
+		  //
+		  // Adjust the mins and maxs so we go around the entire perimeter
+		  //
+		  minX = minX - 1
+		  minY = minY - 1
+		  minZ = minZ - 1
+		  maxX = maxX + 1
+		  maxY = maxY + 1
+		  maxZ = maxZ + 1
+		  
+		  var open() as Advent3dObject
+		  
+		  for x as integer = minX to maxX
+		    for y as integer = minY to maxY
+		      for z as integer = minZ to maxZ
+		        if grid( x, y, z ) is nil then
+		          open.Add NewVoid( grid, x, y, z )
+		          exit for x
+		        end if
+		      next
+		    next
+		  next
+		  
+		  while open.Count <> 0
+		    var square as Advent3DObject = open.Pop
+		    if square.X < minX or square.X > maxX or _
+		      square.Y < minY or square.Y > maxY or _
+		      square.Z < minZ  or square.Z > maxZ then
+		      continue
+		    end if
+		    
+		    AddVoidNeighbors grid, square, open
+		  wend
+		  
+		  for each cube as Advent3DObject in cubes
+		    var x as integer = cube.X
+		    var y as integer = cube.Y
+		    var z as integer = cube.Z
+		    
+		    cube.Value = cube.Value - CountVoid( grid, x - 1, y, z )
+		    cube.Value = cube.Value - CountVoid( grid, x + 1, y, z )
+		    cube.Value = cube.Value - CountVoid( grid, x, y - 1, z )
+		    cube.Value = cube.Value - CountVoid( grid, x, y + 1, z )
+		    cube.Value = cube.Value - CountVoid( grid, x, y, z - 1 )
+		    cube.Value = cube.Value - CountVoid( grid, x, y, z + 1 )
+		  next
+		  
 		  var count as integer
 		  for each cube as Advent3DObject in cubes
 		    count = count + cube.Value
 		  next
 		  
-		  for x as integer = minX to maxX
-		    for y as integer = minY to maxY
-		      for z as integer = minZ to maxZ
-		        
-		      next
-		    next
-		  next
 		  
 		  return count
 		  return -1
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CountVoid(grid As Advent.SpacialGrid, x As Integer, y As Integer, z As Integer) As Integer
+		  if grid( x, y, z ) is nil then
+		    return 1
+		  end if
+		  
+		  return 0
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub MaybeAddVoid(grid As Advent.SpacialGrid, x As Integer, y As Integer, z As Integer, toArray() As Advent3DObject)
+		  if grid( x, y, z ) is nil then
+		    var o as Advent3DObject = NewVoid( grid, x, y, z )
+		    toArray.Add o
+		  end if
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function NewVoid(grid As Advent.SpacialGrid, x As Integer, y As Integer, z As Integer) As Advent3DObject
+		  var o as new Advent3dObject
+		  o.Value = kVoidValue
+		  grid( x, y, z ) = o
+		  return o
 		  
 		End Function
 	#tag EndMethod
@@ -197,6 +279,9 @@ Inherits AdventBase
 	#tag EndConstant
 
 	#tag Constant, Name = kTestInputB, Type = String, Dynamic = False, Default = \"", Scope = Private
+	#tag EndConstant
+
+	#tag Constant, Name = kVoidValue, Type = Double, Dynamic = False, Default = \"-1", Scope = Private
 	#tag EndConstant
 
 
