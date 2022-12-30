@@ -139,6 +139,15 @@ Class GridMember
 			  end select
 			  
 			  var s as string = RaiseEvent StringValue
+			  
+			  if s = "" then
+			    s = Value
+			  end if
+			  
+			  if s = "" then
+			    s = RawValue
+			  end if
+			  
 			  return s
 			End Get
 		#tag EndGetter
