@@ -113,6 +113,36 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
+		Private Function AreSame(grid1 As ObjectGrid, grid2 As ObjectGrid) As Boolean
+		  if grid1.LastRowIndex <> grid2.LastRowIndex or grid1.LastColIndex <> grid2.LastColIndex then
+		    return false
+		  end if
+		  
+		  for row as integer = 1 to grid1.LastRowIndex - 1
+		    for col as integer = 1 to grid2.LastColIndex - 1
+		      var g1 as BlizzardTracker = BlizzardTracker( grid1( row, col ) )
+		      var g2 as BlizzardTracker = BlizzardTracker( grid2( row, col ) )
+		      if g1.UpCount <> g2.UpCount then
+		        return false
+		      end if
+		      if g1.DownCount <> g2.DownCount then
+		        return false
+		      end if
+		      if g1.LeftCount <> g2.LeftCount then
+		        return false
+		      end if
+		      if g1.RightCount <> g2.RightCount then
+		        return false
+		      end if
+		    next
+		  next
+		  
+		  return true
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Function BestMoves(move As Integer, rowPos As Integer, colPos As Integer, destRow As Integer, destCol As Integer, grids() As ObjectGrid, ByRef bestMoves As Integer) As Integer
 		  const kMaxMoves as integer = &hFFFFFFFFFFFF
 		  
@@ -197,8 +227,16 @@ Inherits AdventBase
 		  'Print ""
 		  'end if
 		  
-		  var bestMoves as integer = ( grid.LastRowIndex + 1 ) * ( grid.LastColIndex + 1 ) * 10
-		  call BestMoves 0, 0, 1, grid.LastRowIndex, grid.LastColIndex - 1, grids, bestMoves
+		  var startingBestMoves as integer = M_Path.ManhattanDistance( 1, 0, grid.LastColIndex - 1, grid.LastRowIndex )
+		  
+		  var bestMoves as integer
+		  var thisBestMoves as integer
+		  
+		  do
+		    startingBestMoves = startingBestMoves * 2
+		    bestMoves = startingBestMoves
+		    thisBestMoves = BestMoves( 0, 0, 1, grid.LastRowIndex, grid.LastColIndex - 1, grids, bestMoves )
+		  loop until thisBestMoves < startingBestMoves
 		  
 		  return bestMoves
 		  
@@ -219,12 +257,19 @@ Inherits AdventBase
 		  var destRow as integer = grid.LastRowIndex
 		  var destCol as integer = grid.LastColIndex - 1
 		  
-		  var bestMoves as integer = ( grid.LastRowIndex + 1 ) * ( grid.LastColIndex + 1 )
+		  var bestMoves as integer = M_Path.ManhattanDistance( 1, 0, grid.LastColIndex - 1, grid.LastRowIndex )
 		  
 		  for i as integer = 1 to 3
-		    bestMoves = bestMoves * 10
+		    var startingBestMoves as integer = bestMoves
+		    var thisBestMoves as integer
 		    
-		    call BestMoves( 0, startRow, startCol, destRow, destCol, grids, bestMoves )
+		    do
+		      startingBestMoves = startingBestMoves * 2
+		      bestMoves = startingBestMoves
+		      
+		      thisBestMoves = BestMoves( 0, startRow, startCol, destRow, destCol, grids, bestMoves )
+		    loop until thisBestMoves < startingBestMoves
+		    
 		    accumulated.Add bestMoves
 		    Print i, bestMoves
 		    
@@ -238,6 +283,10 @@ Inherits AdventBase
 		    while grids.LastIndex < bestMoves 
 		      AdvanceBlizzards grids
 		    wend
+		    
+		    if i = 3 then
+		      exit
+		    end if
 		    
 		    grid = grids( bestMoves )
 		    Reset grid
