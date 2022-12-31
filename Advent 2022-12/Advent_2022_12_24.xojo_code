@@ -157,8 +157,13 @@ Inherits AdventBase
 		    return move
 		  end if
 		  
-		  if bestMoves > 0 and move >= bestMoves then
-		    return kMaxMoves
+		  
+		  if bestMoves > 0 then
+		     var mdist as integer = M_Path.ManhattanDistance( colPos, rowPos, destCol, destRow )
+		    
+		    if( move + mdist ) >= bestMoves then
+		      return kMaxMoves
+		    end if
 		  end if
 		  
 		  if move >= grids.LastIndex then
@@ -236,7 +241,15 @@ Inherits AdventBase
 		    startingBestMoves = startingBestMoves * 2
 		    bestMoves = startingBestMoves
 		    thisBestMoves = BestMoves( 0, 0, 1, grid.LastRowIndex, grid.LastColIndex - 1, grids, bestMoves )
-		  loop until thisBestMoves < startingBestMoves
+		    
+		    if thisBestMoves < startingBestMoves then
+		      exit
+		    end if
+		    
+		    grids.RemoveAll
+		    Reset grid
+		    grids.Add grid
+		  loop 
 		  
 		  return bestMoves
 		  
@@ -268,7 +281,15 @@ Inherits AdventBase
 		      bestMoves = startingBestMoves
 		      
 		      thisBestMoves = BestMoves( 0, startRow, startCol, destRow, destCol, grids, bestMoves )
-		    loop until thisBestMoves < startingBestMoves
+		      
+		      if thisBestMoves < startingBestMoves then
+		        exit
+		      end if
+		      
+		      grids.RemoveAll
+		      Reset grid
+		      grids.Add grid
+		    loop
 		    
 		    accumulated.Add bestMoves
 		    Print i, bestMoves
