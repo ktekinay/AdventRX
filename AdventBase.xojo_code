@@ -119,6 +119,12 @@ Inherits Thread
 		    msg = GenerateJSON( msg )
 		  end if
 		  
+		  if msg isa Pair then
+		    var p as Pair = msg
+		    Print p.Left, "=", p.Right
+		    return
+		  end if
+		  
 		  WndConsole.Print msg
 		  'System.DebugLog "console: " + msg.StringValue
 		  Thread.YieldToNext
