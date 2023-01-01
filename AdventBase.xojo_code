@@ -28,6 +28,21 @@ Inherits Thread
 
 
 	#tag Method, Flags = &h21
+		Private Function ConvertToString(msg As Variant) As String
+		  if msg.IsArray or msg isa Dictionary then
+		    msg = GenerateJSON( msg )
+		    
+		  elseif msg isa Pair then
+		    var p as Pair = msg
+		    msg = p.Left + " = " + p.Right
+		  end if
+		  
+		  return msg
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Sub DoRun()
 		  var startµs as double
 		  var duration as double
@@ -115,15 +130,7 @@ Inherits Thread
 		    return
 		  end if
 		  
-		  if msg.IsArray or msg isa Dictionary then
-		    msg = GenerateJSON( msg )
-		  end if
-		  
-		  if msg isa Pair then
-		    var p as Pair = msg
-		    Print p.Left, "=", p.Right
-		    return
-		  end if
+		  msg = ConvertToString( msg )
 		  
 		  WndConsole.Print msg
 		  'System.DebugLog "console: " + msg.StringValue
@@ -135,10 +142,10 @@ Inherits Thread
 		Protected Sub Print(msg1 As Variant, msg2 As Variant, ParamArray moreMsgs() As Variant)
 		  #pragma BackgroundTasks true
 		  
-		  var printer() as string = array( msg1.StringValue, msg2.StringValue )
+		  var printer() as string = array( ConvertToString( msg1 ), ConvertToString( msg2 ) )
 		  
 		  for each addl as variant in moreMsgs
-		    printer.Add addl.StringValue
+		    printer.Add ConvertToString( addl )
 		  next
 		  
 		  Print String.FromArray( printer, " " )

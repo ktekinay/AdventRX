@@ -3,20 +3,20 @@ Protected Class Advent_2022_12_20
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "Unknown"
+		  return "Rotate an array"
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return false
+		  return true
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnName() As String
-		  return ""
+		  return "Grove Positioning System"
 		  
 		End Function
 	#tag EndEvent
@@ -57,17 +57,137 @@ Inherits AdventBase
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Integer
 		  var values() as integer = ToIntegerArray( input )
-		  var originalValues() as integer = values.Clone
+		  
+		  var indexes() as integer
+		  indexes.ResizeTo values.LastIndex
+		  
+		  for i as integer = 0 to indexes.LastIndex
+		    indexes( i ) = i
+		  next
 		  
 		  if kDebug and IsTest then
 		    Print ""
 		    Print values
 		  end if
 		  
-		  for each value as integer in originalValues
-		    Move value, values
+		  for index as integer = 0 to values.LastIndex
+		    Move index, indexes, values
+		    
+		    if kDebug and IsTest then
+		      Print values
+		    end if
 		  next
 		  
+		  var sum as integer = PartASum( values )
+		  
+		  return sum
+		  return sum
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CalculateResultB(input As String) As Integer
+		  const kDecryptionKey as integer = 811589153
+		  
+		  var values() as integer = ToIntegerArray( input )
+		  
+		  for i as integer = 0 to values.LastIndex
+		    values( i ) = values( i ) * kDecryptionKey
+		  next
+		  
+		  var indexes() as integer
+		  indexes.ResizeTo values.LastIndex
+		  
+		  for i as integer = 0 to indexes.LastIndex
+		    indexes( i ) = i
+		  next
+		  
+		  if kDebug and IsTest then
+		    Print ""
+		    Print values
+		  end if
+		  
+		  for rep as integer = 1 to 10
+		    for index as integer = 0 to values.LastIndex
+		      Move index, indexes, values
+		    next
+		    
+		    if kDebug and IsTest then
+		      Print "Rep" : rep, values
+		    end if
+		  next
+		  
+		  var sum as integer = PartASum( values )
+		  
+		  return sum
+		  return sum
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub Move(index As Integer, indexes() As Integer, values() As Integer)
+		  var pos as integer = indexes.IndexOf( index )
+		  var value as integer = values( pos )
+		  
+		  if value = 0 then
+		    return
+		  end if
+		  
+		  values.RemoveAt pos
+		  indexes.RemoveAt pos
+		  
+		  var newPos as integer = pos + value
+		  newPos = newPos mod values.Count
+		  
+		  while newPos < 0 
+		    newPos = values.Count + newPos
+		  wend
+		  
+		  values.AddAt newPos, value
+		  indexes.AddAt newPos, index
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub MoveSlow(index As Integer, indexes() As Integer, values() As Integer)
+		  var pos as integer = indexes.IndexOf( index )
+		  var value as integer = values( pos )
+		  
+		  if value = 0 then
+		    return
+		  end if
+		  
+		  var originalValue as integer = value
+		  
+		  values.RemoveAt pos
+		  indexes.RemoveAt pos
+		  
+		  value = value mod values.Count
+		  
+		  while value > 0
+		    values.Add values( 0 )
+		    values.RemoveAt 0
+		    indexes.Add indexes( 0 )
+		    indexes.RemoveAt 0
+		    
+		    value = value - 1
+		  wend
+		  
+		  while value < 0
+		    values.AddAt 0, values.Pop
+		    indexes.AddAt 0, indexes.Pop
+		    
+		    value = value + 1
+		  wend
+		  
+		  values.AddAt pos, originalValue
+		  indexes.AddAt pos, index
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function PartASum(values() As Integer) As Integer
 		  var pos as integer = values.IndexOf( 0 )
 		  
 		  var sum as integer
@@ -82,54 +202,8 @@ Inherits AdventBase
 		  next
 		  
 		  return sum
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Function CalculateResultB(input As String) As Integer
 		  
 		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Sub Move(value As Integer, values() As Integer)
-		  if value = -2 and kDebug then
-		    value = value
-		  end if
-		  
-		  var pos as integer = values.IndexOf( value )
-		  
-		  var rawNewPos as integer = pos + value
-		  var newPos as integer = rawNewPos mod values.Count
-		  if newPos < 0 then
-		    newPos = values.LastIndex + newPos
-		  end if
-		  
-		  if abs( rawNewPos ) > values.LastIndex then
-		    newPos = newPos + 1
-		  end if
-		  
-		  if pos <> newPos then
-		    values.RemoveAt pos
-		    
-		    if pos < newPos then
-		      values.AddAt newPos, value
-		    else
-		      var usePos as integer = newPos - 1
-		      if usePos < 0 then
-		        usePos = values.Count + usePos
-		      end if
-		      
-		      values.AddAt usePos, value
-		    end if
-		  end if
-		  
-		  if kDebug then
-		    Print "Value:", value, "Pos:", pos, "NewPos:", newPos
-		    'Print values
-		  end if
-		    
-		End Sub
 	#tag EndMethod
 
 
