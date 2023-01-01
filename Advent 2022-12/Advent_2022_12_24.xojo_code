@@ -159,7 +159,7 @@ Inherits AdventBase
 		  
 		  
 		  if bestMoves > 0 then
-		     var mdist as integer = M_Path.ManhattanDistance( colPos, rowPos, destCol, destRow )
+		    var mdist as integer = M_Path.ManhattanDistance( colPos, rowPos, destCol, destRow )
 		    
 		    if( move + mdist ) >= bestMoves then
 		      return kMaxMoves
