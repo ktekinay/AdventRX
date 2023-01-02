@@ -140,6 +140,12 @@ Inherits Thread
 
 	#tag Method, Flags = &h1
 		Protected Sub Print(msg1 As Variant, msg2 As Variant, ParamArray moreMsgs() As Variant)
+		  Print msg1, msg2, moreMsgs
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
+		Protected Sub Print(msg1 As Variant, msg2 As Variant, moreMsgs() As Variant)
 		  #pragma BackgroundTasks true
 		  
 		  var printer() as string = array( ConvertToString( msg1 ), ConvertToString( msg2 ) )
