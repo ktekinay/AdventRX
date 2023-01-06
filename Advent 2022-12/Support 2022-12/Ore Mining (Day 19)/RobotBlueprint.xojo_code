@@ -51,7 +51,7 @@ Protected Class RobotBlueprint
 			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="Designs()"
+			Name="ID"
 			Visible=false
 			Group="Behavior"
 			InitialValue=""

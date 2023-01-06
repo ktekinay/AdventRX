@@ -55,6 +55,73 @@ Inherits AdventBase
 
 
 	#tag Method, Flags = &h21
+		Private Function Advance(remainingMinutes as Integer, scenario as MiningScenario, history as Dictionary, ByRef highCount as Integer) As Integer
+		  if remainingMinutes = 0 then
+		    if scenario.Inventory.Geode > highCount then
+		      Print "", "New High" : scenario.Inventory.Geode
+		      highCount = scenario.Inventory.Geode
+		    end if
+		    
+		    return scenario.Inventory.Geode
+		  end if
+		  
+		  var key as variant = Key( remainingMinutes, scenario )
+		  if history.HasKey( key ) then
+		    return history.Value( key ).IntegerValue + scenario.Inventory.Geode
+		  end if
+		  
+		  var startingGeodes as integer = scenario.Inventory.Geode
+		  
+		  var mined as integer
+		  
+		  //
+		  // Try building each design
+		  //
+		  var wasCalled as boolean
+		  
+		  var newScenario as MiningScenario
+		  
+		  for i as integer = 0 to scenario.Blueprint.Designs.LastIndex
+		    if remainingMinutes <= 5 and i = 3 then
+		      continue
+		    end if
+		    
+		    var design as RobotDesign = scenario.Blueprint.Designs( i )
+		    
+		    if newScenario is nil then
+		      newScenario = scenario.Clone
+		    end if
+		    
+		    var newRobot as Robot = Produce( design, newScenario.Inventory )
+		    if newRobot isa object then
+		      Mine( newScenario )
+		      
+		      newScenario.ExistingRobots.Add newRobot
+		      newScenario.HaveCounts( i ) = newScenario.HaveCounts( i ) + 1
+		      
+		      var nowMined as integer = Advance( remainingMinutes - 1, newScenario, history, highCount )
+		      
+		      mined = max( mined, nowMined )
+		      wasCalled = true
+		      
+		      newScenario = nil
+		    end if
+		  next
+		  
+		  if not wasCalled or scenario.HaveCounts( 0 ) <> 0 or scenario.HaveCounts( 1 ) <> 0 or scenario.HaveCounts( 2 ) <> 0 then
+		    Mine( scenario )
+		    var nowMined as integer = Advance( remainingMinutes - 1, scenario, history, highCount )
+		    mined = max( mined, nowMined )
+		  end if
+		  
+		  history.Value( key ) = mined - startingGeodes
+		  
+		  return mined
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Integer
 		  var blueprints() as RobotBlueprint = ParseInput( input )
 		  
@@ -63,33 +130,15 @@ Inherits AdventBase
 		  for each bp as RobotBlueprint in blueprints
 		    Print "Blueprint id" : bp.ID
 		    
-		    var inventory as new OreInventory
+		    var scenario as MiningScenario = MiningScenario.NewScenario
+		    scenario.Blueprint = bp
 		    
-		    var existingRobots() as Robot
-		    existingRobots.Add new OreRobot
+		    var highCount as integer
+		    call Advance( 24, scenario, new Dictionary, highCount )
 		    
-		    for minute as integer = 1 to 24
-		      Print "=== Minute ", minute, "==="
-		      
-		      if IsTest and minute = 10 then
-		        minute = minute
-		      end if
-		      
-		      var newRobots() as Robot = Produce( bp, inventory )
-		      
-		      for each robot as Robot in existingRobots
-		        Print "robot", Introspection.GetType( robot ).Name
-		        robot.Mine inventory
-		      next
-		      
-		      Print "Ore" : inventory.Ore, "Clay" : inventory.Clay, "Obsidian" : inventory.Obsidian, "Geode" : inventory.Geode
-		      
-		      for each newRobot as Robot in newRobots
-		        existingRobots.Add newRobot
-		      next
-		      
-		      quality = quality + ( bp.ID * inventory.Geode )
-		    next
+		    Print "", "Count" : highCount
+		    
+		    quality = quality + ( bp.ID * highCount )
 		  next
 		  
 		  return quality
@@ -100,6 +149,51 @@ Inherits AdventBase
 		Private Function CalculateResultB(input As String) As Integer
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function Key(remainingMinutes As Integer, scenario As MiningScenario) As Variant
+		  var key as integer
+		  
+		  var inventory as OreInventory = scenario.Inventory
+		  var haveCounts() as integer = scenario.HaveCounts
+		  
+		  for each cnt as integer in haveCounts
+		    key = key * 100 + cnt
+		  next
+		  
+		  key = key * 100 + inventory.Ore
+		  key = key * 100 + inventory.Clay
+		  key = key * 100 + inventory.Obsidian
+		  
+		  return key
+		  
+		  
+		  
+		  
+		  'var builder() as string = array( _
+		  'remainingMinutes.ToString, _
+		  'inventory.Ore.ToString, _
+		  'inventory.Clay.ToString, _
+		  'inventory.Obsidian.ToString _
+		  ')
+		  '
+		  'for each cnt as integer in haveCounts
+		  'builder.Add cnt.ToString
+		  'next
+		  '
+		  'return String.FromArray( builder, ":" )
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub Mine(scenario As MiningScenario)
+		  for each robot as Robot  in scenario.ExistingRobots
+		    robot.Mine( scenario.Inventory )
+		  next
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
@@ -133,7 +227,6 @@ Inherits AdventBase
 		      select case design.Name
 		      case "ore"
 		        design.RobotType = GetTypeInfo( OreRobot )
-		        design.Have = 1
 		      case "clay"
 		        design.RobotType = GetTypeInfo( ClayRobot )
 		      case "obsidian"
@@ -175,7 +268,7 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Sub Print(msg As Variant)
-		  if IsTest and kDebug then
+		  if kDebug then
 		    super.Print(msg)
 		  end if
 		  
@@ -184,7 +277,7 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Sub Print(msg1 As Variant, msg2 As Variant, ParamArray moreMsgs() As Variant)
-		  if IsTest and kDebug then
+		  if kDebug then
 		    // Calling the overridden superclass method.
 		    super.Print(msg1, msg2, moreMsgs)
 		  end if
@@ -193,30 +286,24 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function Produce(blueprint As RobotBlueprint, inventory As OreInventory) As Robot()
-		  var robots() as Robot
+		Private Function Produce(design As RobotDesign, inventory As OreInventory) As Robot
+		  if inventory.Clay >= design.RequiredClay and _
+		    inventory.Ore >= design.RequiredOre and _
+		    inventory.Obsidian >= design.RequiredObsidian _
+		    then
+		    var r as Robot
+		    var type as Introspection.TypeInfo = design.RobotType
+		    var constructors() as Introspection.ConstructorInfo = type.GetConstructors
+		    r = Robot( constructors( 0 ).Invoke )
+		    
+		    inventory.Clay = inventory.Clay - design.RequiredClay
+		    inventory.Ore = inventory.Ore - design.RequiredOre
+		    inventory.Obsidian = inventory.Obsidian - design.RequiredObsidian
+		    
+		    return r
+		  end if
 		  
-		  for each design as RobotDesign in blueprint.Designs
-		    if inventory.Clay >= design.RequiredClay and _
-		      inventory.Ore >= design.RequiredOre and _
-		      inventory.Obsidian >= design.RequiredObsidian _
-		      and ( design.Want = 0 or design.Have < design.Want ) then
-		      var r as Robot
-		      var type as Introspection.TypeInfo = design.RobotType
-		      var constructors() as Introspection.ConstructorInfo = type.GetConstructors
-		      r = Robot( constructors( 0 ).Invoke )
-		      
-		      robots.Add r
-		      
-		      inventory.Clay = inventory.Clay - design.RequiredClay
-		      inventory.Ore = inventory.Ore - design.RequiredOre
-		      inventory.Obsidian = inventory.Obsidian - design.RequiredObsidian
-		      
-		      design.Have = design.Have + 1
-		    end if
-		  next
-		  
-		  return robots
+		  return nil
 		  
 		End Function
 	#tag EndMethod
