@@ -58,13 +58,7 @@ Inherits AdventBase
 		Private Function CalculateResultA(input As String) As Integer
 		  var chars() as string = input.Split( "" )
 		  
-		  for i as integer = 0 to chars.LastIndex
-		    if not HasWithin( chars, i, 4 ) _
-		      and not HasWithin( chars, i+1, 3 ) _
-		      and not HasWithin( chars, i+2, 2 ) then
-		      return i + 4
-		    end if
-		  next
+		  return FindUnique( chars, 4 )
 		  
 		End Function
 	#tag EndMethod
@@ -73,33 +67,30 @@ Inherits AdventBase
 		Private Function CalculateResultB(input As String) As Integer
 		  var chars() as string = input.Split( "" )
 		  
-		  for i as integer = 0 to chars.LastIndex
-		    for l as integer = 0 to 13
-		      if HasWithin( chars, i+l, 14-l ) then
-		        continue for i
-		      end if
-		    next
-		    
-		    return i + 14
-		  next
+		  return FindUnique( chars, 14 )
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function HasWithin(chars() As String, pos As Integer, length As Integer) As Boolean
-		  var char as string = chars( pos )
+		Private Function FindUnique(chars() As String, count As Integer) As Integer
+		  var set as new Set_MTC
 		  
-		  for i as integer = pos + 1 to pos + length - 1
-		    if i > chars.LastIndex then
-		      return false
-		    end if
-		    if chars( i ) = char then
-		      return true
-		    end if
+		  for i as integer = 0 to chars.LastIndex - count + 1
+		    set.RemoveAll
+		    
+		    for charIndex as integer = i to i + count - 1
+		      var char as string = chars( charIndex )
+		      
+		      if set.HasMember( char ) then
+		        continue for i
+		      end if
+		      
+		      set.Add char
+		    next
+		    
+		    return i + count
 		  next
-		  
-		  return false
 		  
 		End Function
 	#tag EndMethod
