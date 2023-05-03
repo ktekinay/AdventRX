@@ -56,41 +56,43 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Integer
-		  var chars() as string = input.Split( "" )
-		  
-		  return FindUnique( chars, 4 )
+		  return FindUnique( input, 4 )
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Integer
-		  var chars() as string = input.Split( "" )
-		  
-		  return FindUnique( chars, 14 )
+		  return FindUnique( input, 14 )
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function FindUnique(chars() As String, count As Integer) As Integer
-		  var set as new Set_MTC
+		Private Function FindUnique(charsMB As MemoryBlock, count As Integer) As Integer
+		  var lastStartIndex as integer = charsMB.Size - count
 		  
-		  for i as integer = 0 to chars.LastIndex - count + 1
-		    set.RemoveAll
+		  var p as ptr = charsMB
+		  
+		  for startIndex as integer = 0 to lastStartIndex
+		    var checker as UInt32
 		    
-		    for charIndex as integer = i to i + count - 1
-		      var char as string = chars( charIndex )
+		    var rangeEndIndex as integer = startIndex + count - 1
+		    for byteIndex as integer = rangeEndIndex downto startIndex
+		      var char as UInt32 = 2 ^ ( p.Byte( byteIndex ) mod 32 )
 		      
-		      if set.HasMember( char ) then
-		        continue for i
+		      if ( checker or char ) = checker then
+		        startIndex = byteIndex
+		        continue for startIndex
 		      end if
 		      
-		      set.Add char
+		      checker = checker xor char
 		    next
 		    
-		    return i + count
+		    return startIndex + count
 		  next
+		  
+		  return -1
 		  
 		End Function
 	#tag EndMethod
