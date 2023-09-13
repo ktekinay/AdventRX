@@ -1,6 +1,7 @@
 #tag Class
 Protected Class Advent_2022_12_08
 Inherits AdventBase
+	#tag CompatibilityFlags = (TargetConsole and (Target32Bit or Target64Bit)) or  (TargetWeb and (Target32Bit or Target64Bit)) or  (TargetDesktop and (Target32Bit or Target64Bit)) or  (TargetIOS and (Target64Bit)) or  (TargetAndroid and (Target64Bit))
 	#tag Event
 		Function ReturnDescription() As String
 		  return "Scan a forest"
@@ -66,6 +67,13 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Integer
+		  #if not DebugBuild
+		    #pragma BackgroundTasks false
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
 		  var grid as ObjectGrid = ToGrid( input )
 		  
 		  var maxScore as integer
@@ -81,6 +89,13 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CountVisible(grid As ObjectGrid) As Integer
+		  #if not DebugBuild
+		    #pragma BackgroundTasks false
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
 		  var lastRowIndex as integer = grid.LastRowIndex
 		  var lastColIndex as integer = grid.LastColIndex
 		  
@@ -121,6 +136,13 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function ScenicScore(grid As ObjectGrid, square As GridMember) As Integer
+		  #if not DebugBuild
+		    #pragma BackgroundTasks false
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
 		  if square.Row = 0 or square.Row = grid.LastRowIndex or square.Column = 0 or square.Column = grid.LastColIndex then
 		    return 0
 		  end if

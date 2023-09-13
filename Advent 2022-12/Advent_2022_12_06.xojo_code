@@ -70,16 +70,31 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function FindUnique(charsMB As MemoryBlock, count As Integer) As Integer
+		  #if not DebugBuild
+		    #pragma BackgroundTasks false
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
+		  var lookupMB as new MemoryBlock( 4 * 32 )
+		  var lookupPtr as ptr = lookupMB
+		  
+		  for i as integer = 0 to 31
+		    lookupPtr.UInt32( i * 4 ) = 2 ^ i
+		  next
+		  
 		  var lastStartIndex as integer = charsMB.Size - count
 		  
-		  var p as ptr = charsMB
+		  var charsPtr as ptr = charsMB
 		  
 		  for startIndex as integer = 0 to lastStartIndex
 		    var checker as UInt32
 		    
 		    var rangeEndIndex as integer = startIndex + count - 1
 		    for byteIndex as integer = rangeEndIndex downto startIndex
-		      var char as UInt32 = 2 ^ ( p.Byte( byteIndex ) mod 32 )
+		      var lookupIndex as integer = charsPtr.Byte( byteIndex ) - 97
+		      var char as UInt32 = lookupPtr.UInt32( lookupIndex * 4 )
 		      
 		      if ( checker or char ) = checker then
 		        startIndex = byteIndex

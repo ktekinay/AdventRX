@@ -1,6 +1,7 @@
 #tag Class
 Protected Class Advent_2022_12_11
 Inherits AdventBase
+	#tag CompatibilityFlags = (TargetConsole and (Target32Bit or Target64Bit)) or  (TargetWeb and (Target32Bit or Target64Bit)) or  (TargetDesktop and (Target32Bit or Target64Bit)) or  (TargetIOS and (Target64Bit)) or  (TargetAndroid and (Target64Bit))
 	#tag Event
 		Function ReturnDescription() As String
 		  return "Monkeys play keep-away"
@@ -93,7 +94,7 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Sub MaybePrint(round As Integer, monkeys() As Monkey)
-		  if not IsTest then
+		  if not IsTest or not kDebug then
 		    return
 		  end if
 		  
@@ -174,6 +175,9 @@ Inherits AdventBase
 		End Function
 	#tag EndMethod
 
+
+	#tag Constant, Name = kDebug, Type = Boolean, Dynamic = False, Default = \"False", Scope = Private
+	#tag EndConstant
 
 	#tag Constant, Name = kPuzzleInput, Type = String, Dynamic = False, Default = \"", Scope = Private, Description = 5768656E2070617374696E67207468652064617461206973206E65636573736172792E
 	#tag EndConstant
