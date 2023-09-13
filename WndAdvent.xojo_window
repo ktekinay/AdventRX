@@ -161,7 +161,12 @@ End
 		    wend
 		  end if
 		  
-		  RemoveHandler advent.ResultReturned, WeakAddressOf Advent_ResultReturned
+		  try
+		    RemoveHandler advent.ResultReturned, WeakAddressOf Advent_ResultReturned
+		  catch err as RuntimeException
+		    // Do nothing
+		  end try
+		  
 		  LbAdvent.CellTextAt( row, integer( Columns.Status ) ) = kLabelFinished
 		  
 		End Sub
