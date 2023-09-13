@@ -407,6 +407,10 @@ End
 		  if col = integer( Columns.Name ) then
 		    var killMenu as new DesktopMenuItem( kMenuKill, row )
 		    killMenu.Name = kMenuKill
+		    
+		    var advent as AdventBase = me.RowTagAt( row )
+		    killMenu.Enabled = advent.ThreadState <> Thread.ThreadStates.NotRunning
+		    
 		    base.AddMenu killMenu
 		    return true
 		  end if
