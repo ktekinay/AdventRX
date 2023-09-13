@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>SD4Version</key>
-	<string>8.0.4</string>
+	<string>8.0.6</string>
 	<key>SD5ConversionOffered</key>
 	<false/>
 	<key>SDAddUsedFrameworksOnExport</key>
@@ -50,7 +50,7 @@ XWJtdHV3fIeQn6OrAAAAAAAAAQEAAAAAAAAAGAAAAAAAAAAAAAAAAAAAALQ=</string>
 		<real>0.80000001192092896</real>
 		<key>viewControllers</key>
 		<dict>
-			<key>F741FFCA-F190-4542-8DA7-20A2C65175E6-46328-00001CD6F4DA6DE5</key>
+			<key>C57853C3-706A-4012-9995-74C8549D38B2-5913-0000D24B32DA878D</key>
 			<dict>
 				<key>debuggerViewState</key>
 				<dict>
@@ -277,7 +277,7 @@ XWJtdHV3fIeQn6OrAAAAAAAAAQEAAAAAAAAAGAAAAAAAAAAAAAAAAAAAALQ=</string>
 								<key>length</key>
 								<integer>0</integer>
 								<key>location</key>
-								<integer>668</integer>
+								<integer>202</integer>
 							</dict>
 						</array>
 						<key>LNSTextViewShowInvisibles</key>
@@ -316,9 +316,9 @@ XWJtdHV3fIeQn6OrAAAAAAAAAQEAAAAAAAAAGAAAAAAAAAAAAAAAAAAAALQ=</string>
 				<key>tabsHidden</key>
 				<false/>
 				<key>windowControllerID</key>
-				<string>F741FFCA-F190-4542-8DA7-20A2C65175E6-46328-00001CD6F4DA6DE5</string>
+				<string>C57853C3-706A-4012-9995-74C8549D38B2-5913-0000D24B32DA878D</string>
 				<key>windowFrame</key>
-				<string>44 435 1189 965 0 0 2560 1415 </string>
+				<string>717 389 1189 965 0 0 2560 1415 </string>
 			</dict>
 		</dict>
 		<key>windowControllers</key>
@@ -327,7 +327,7 @@ XWJtdHV3fIeQn6OrAAAAAAAAAQEAAAAAAAAAGAAAAAAAAAAAAAAAAAAAALQ=</string>
 				<key>controllerClass</key>
 				<string>SD8ScriptWindowController</string>
 				<key>controllerID</key>
-				<string>F741FFCA-F190-4542-8DA7-20A2C65175E6-46328-00001CD6F4DA6DE5</string>
+				<string>C57853C3-706A-4012-9995-74C8549D38B2-5913-0000D24B32DA878D</string>
 				<key>controllerState</key>
 				<dict>
 					<key>miniaturized</key>
@@ -335,7 +335,7 @@ XWJtdHV3fIeQn6OrAAAAAAAAAQEAAAAAAAAAGAAAAAAAAAAAAAAAAAAAALQ=</string>
 					<key>timerShowsDetail</key>
 					<false/>
 					<key>windowFrame</key>
-					<string>44 435 1189 965 0 0 2560 1415 </string>
+					<string>717 389 1189 965 0 0 2560 1415 </string>
 				</dict>
 			</dict>
 		</array>
