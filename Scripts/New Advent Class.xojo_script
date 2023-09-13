@@ -1,10 +1,5 @@
 const kTemplateCopyName as string = "AdventTemplate1"
 
-if not DoesProjectItemExist( kTemplateCopyName ) then
-print "First duplicate the template into " + kTemplateCopyName
-return
-end if
-
 var label as string = Input( "Enter year_month_day, or year_day (12 is assumed):" ).Trim
 
 if label = "" then
@@ -52,13 +47,30 @@ parts( 2 ) = "0" + parts( 2 )
 end if
 
 var year as string = parts( 0 )
+var month as string = parts( 1 )
+var day as string = parts( 2 )
+
+//
+// Try to fetch the data
+//
+var dataFetched as boolean = MaybeGetData( year, day, month )
+if not dataFetched then
+print "Could not fetch data."
+end if
+
+if not DoesProjectItemExist( kTemplateCopyName ) then
+print "Could not find " + kTemplateCopyName + _
+if( dataFetched, ", but the data was fetched.", "." )
+
+return
+end if
 
 label = String.FromArray( parts, "_" )
 
 var className as string = "Advent_" + label
 
 if not SelectProjectItem( kTemplateCopyName ) then
-print "Could not select " + kTemplateCopyName
+print "Could not select " + kTemplateCopyName + "."
 return
 end if
 
@@ -122,3 +134,46 @@ next
 return false
 
 End Function
+
+Function GetAOCCookie() As String
+const kAOCSessionCookie as string = "AOC_SESSION_COOKIE"
+
+var data() as string = LoadText( "~/.zshrc" ).Split( EndOfLine )
+for each line as string in data
+if line.Contains( kAOCSessionCookie ) then
+return line.NthField( "=", 2 ).ReplaceAll( "'", "" ).Trim
+end if
+next
+
+return ""
+End Function
+
+Function MaybeGetData(year As String, day As String, month As String = "12") As Boolean
+var cookie as string = GetAOCCookie
+if cookie = "" then
+return false
+end if
+
+var destPath as string = ProjectFolderShellPath + "/Puzzle\ Data/Advent_" + year + "_" + month + "_" + day + ".txt"
+
+var url as string = "https://adventofcode.com/" + year + "/day/" + day.ToInteger.ToString + "/input"
+
+var curl as string = _
+"curl " + _
+"--silent " + _
+"--cookie-jar ""~/curlcookies"" --cookie 'session=" + cookie + "' " + _
+"'" + url + "'"
+
+var shellResult as integer
+call DoShellCommand( curl + " > " + destPath, 3000, shellResult )
+
+return shellResult = 0
+End Function
+
+Function ProjectFolderShellPath() As String
+var path as string = ProjectShellPath
+var parts() As string = path.Split( "/" )
+parts.RemoveAt parts.LastIndex
+return String.FromArray( parts, "/" )
+End Function
+
