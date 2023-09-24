@@ -82,7 +82,7 @@ Implements Iterable,Iterator
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 46696E6420746865206265737420706174682066726F6D2073746172744D656D62657220746F20656E644D656D626572207573696E672064697374616E636544656C656761746520746F2064657465726D696E65207468652064697374616E6365206F72206566666F72742E20556E726561636861626C65206E65696768626F72732077696C6C2062652072656D6F7665642066726F6D2065616368206D656D6265722773204E65696768626F72732061727261792E
-		Function BestPath(startMember As GridMember, endMember As GridMember, distanceDelegate As PathDistanceDelegate, includeDiagonals As Boolean) As GridMember()
+		Attributes( Deprecated = "PathFinder_MTC" )  Function BestPath(startMember As GridMember, endMember As GridMember, distanceDelegate As PathDistanceDelegate, includeDiagonals As Boolean) As GridMember()
 		  var currentTrail() as GridMember
 		  var trail() as GridMember
 		  
