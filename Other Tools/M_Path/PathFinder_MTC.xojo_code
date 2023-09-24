@@ -25,47 +25,6 @@ Class PathFinder_MTC
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Sub InsertIntoOpenList(node As M_Path.Node, openList() As M_Path.Node)
-		  #if not DebugBuild
-		    #pragma BackgroundTasks false
-		    #pragma BoundsChecking false
-		    #pragma NilObjectChecking false
-		    #pragma StackOverflowChecking false
-		  #endif
-		  
-		  var score as double = node.Score
-		  
-		  var startIndex as integer = 0
-		  var endIndex as integer = openList.LastIndex
-		  
-		  while startIndex <= endIndex
-		    var index as integer = ( endIndex - startIndex ) \ 2 + startIndex
-		    
-		    var candidate as M_Path.Node = openList( index )
-		    var candidateScore as double = candidate.Score
-		    
-		    select case score
-		    case is = candidateScore
-		      openList.AddAt index + 1, node
-		      return
-		      
-		    case is < candidateScore
-		      startIndex = index + 1
-		      
-		    case else
-		      endIndex = index - 1
-		      
-		    end select
-		    
-		  wend
-		  
-		  openList.AddAt startIndex, node
-		  
-		  
-		End Sub
-	#tag EndMethod
-
 	#tag Method, Flags = &h0, Description = 496E64656E746966792074686520626573742070617468206265747765656E20746865207374617274696E6720706F736974696F6E7320616E6420676F616C2E
 		Function Map(startPosition As M_Path.MilestoneInterface) As M_Path.Result
 		  #if not DebugBuild
@@ -89,7 +48,7 @@ Class PathFinder_MTC
 		  end if
 		  
 		  var closedList as new Dictionary
-		  var openList() as M_Path.Node
+		  var openList as new PriorityQueue_MTC
 		  
 		  //
 		  // Reset the known nodes
@@ -106,11 +65,11 @@ Class PathFinder_MTC
 		  GoalNode.Status = Statuses.IsOpen
 		  var goal as M_Path.MilestoneInterface = GoalNode.Milestone
 		  
-		  openList.Add startNode
 		  startNode.Status = Statuses.IsOpen
-		  startNode.Score = 0
 		  startNode.DistanceFromStart = 0
-		  startNode.DistanceToGoal = 0
+		  startNode.DistanceToGoal = startPosition.DistanceToGoal( goal )
+		  startNode.Score = startNode.DistanceToGoal
+		  openList.Add startNode.Score, startNode
 		  
 		  var parentNode as M_Path.Node
 		  
@@ -140,6 +99,13 @@ Class PathFinder_MTC
 		        exit while
 		      end if
 		      
+		      if n.DistanceFromStart <> 0 and n.DistanceFromStart <= parentNode.DistanceFromStart then
+		        //
+		        // Do nothing
+		        //
+		        continue
+		      end if
+		      
 		      var distanceFromStart as double = n.Milestone.DistanceFromParent( parentNode.Milestone ) + parentNode.DistanceFromStart
 		      
 		      select case n.Status
@@ -148,7 +114,7 @@ Class PathFinder_MTC
 		        n.DistanceFromStart = distanceFromStart
 		        n.DistanceToGoal = n.Milestone.DistanceToGoal( goal )
 		        n.Score = n.DistanceFromStart + n.DistanceToGoal
-		        InsertIntoOpenList n, openList
+		        openList.Add n.Score, n
 		        n.Status = Statuses.IsOpen
 		        
 		      case Statuses.IsReset
@@ -158,7 +124,7 @@ Class PathFinder_MTC
 		          n.DistanceToGoal = n.Milestone.DistanceToGoal( goal )
 		        end if
 		        n.Score = n.DistanceFromStart + n.DistanceToGoal
-		        InsertIntoOpenList n, openList
+		        openList.Add n.Score, n
 		        n.Status = Statuses.IsOpen
 		        
 		      case Statuses.IsOpen
@@ -167,10 +133,7 @@ Class PathFinder_MTC
 		          n.DistanceFromStart = distanceFromStart
 		          n.Score = n.DistanceFromStart + n.DistanceToGoal
 		          
-		          var pos as integer = OpenList.IndexOf( n )
-		          OpenList.RemoveAt pos
-		          
-		          InsertIntoOpenList n, openList
+		          openList.Add n.Score, n
 		        end if
 		        
 		      case Statuses.IsDeadEnd
@@ -181,7 +144,7 @@ Class PathFinder_MTC
 		      case else // IsClosed
 		        if n.DistanceFromStart > distanceFromStart then
 		          ClosedList.Remove( n.Key )
-		          InsertIntoOpenList n, openList
+		          openList.Add n.Score, n
 		          
 		          n.Parent = parentNode
 		          n.DistanceFromStart = distanceFromStart

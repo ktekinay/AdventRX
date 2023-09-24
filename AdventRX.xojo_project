@@ -176,6 +176,7 @@ Class=Robot;Advent 2022-12/Support 2022-12/Ore Mining (Day 19)/Robots/Robot.xojo
 Class=MiningScenario;Advent 2022-12/Support 2022-12/Ore Mining (Day 19)/MiningScenario.xojo_code;&h000000004D5187FF;&h0000000051C8D7FF;false
 Class=Set_MTC;Other Tools/M_Set/Set_MTC.xojo_code;&h00000000532327FF;&h000000001949CFFF;false
 Class=SetIterator;Other Tools/M_Set/SetIterator.xojo_code;&h00000000502257FF;&h000000001949CFFF;false
+Class=PriorityQueue_MTC;Other Tools/PriorityQueue_MTC.xojo_code;&h000000007E5887FF;&h000000007F74CFFF;false
 DefaultWindow=WndAdvent
 AppMenuBar=MainMenuBar
 MajorVersion=1
