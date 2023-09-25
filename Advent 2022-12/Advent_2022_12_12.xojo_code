@@ -62,9 +62,9 @@ Inherits AdventBase
 		  
 		  ParseInput input, grid, startPos, endPos
 		  
-		  var finder as new PathFinder_MTC( endPos )
-		  
-		  var trail() as M_Path.MilestoneInterface = finder.Map( startPos ).Trail
+		  StartProfiling
+		  var trail() as M_Path.MilestoneInterface = M_Path.FindPath( endPos, startPos ).Trail
+		  StopProfiling
 		  return trail.LastIndex
 		End Function
 	#tag EndMethod
@@ -108,12 +108,13 @@ Inherits AdventBase
 		  while aList.Count <> 0
 		    startPos = aList.Pop
 		    
-		    var result as M_Path.Result = Finder.Map( startPos )
+		    var result as M_Path.Result = finder.Map( startPos )
 		    var trail() as M_Path.MilestoneInterface = result.Trail
 		    
 		    if trail.Count = 0 then
-		      var touched as Set_MTC = Set_MTC.FromDictionary( result.Touched )
-		      aList = aList - touched
+		      for each v as variant in result.Touched.Keys
+		        if aList.HasMember( v ) then aList.Remove( v )
+		      next
 		      
 		    else
 		      if trail.LastIndex < best then
@@ -138,22 +139,6 @@ Inherits AdventBase
 		  
 		  best = best
 		  return best
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Function Compare(fromMember As GridMember, toMember As GridMember) As Integer
-		  if fromMember.Value.IntegerValue >= toMember.Value.IntegerValue then
-		    return 1
-		  end if
-		  
-		  var highPoint as integer = fromMember.Value.IntegerValue + 1
-		  if toMember.Value.IntegerValue > highPoint then
-		    return 0
-		  end if
-		  
-		  return 1
-		  
 		End Function
 	#tag EndMethod
 
