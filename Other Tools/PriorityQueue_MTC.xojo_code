@@ -1,6 +1,6 @@
 #tag Class
 Protected Class PriorityQueue_MTC
-	#tag Method, Flags = &h0, Description = 41646420612076616C756520746F2074686520717565756520776974682074686520676976656E205072696F726974792E
+	#tag Method, Flags = &h0, Description = 41646420612076616C756520746F2074686520517565756520776974682074686520676976656E207072696F726974792E
 		Sub Add(priority As Double, value As Variant)
 		  #if not DebugBuild
 		    #pragma BackgroundTasks false
@@ -15,8 +15,7 @@ Protected Class PriorityQueue_MTC
 		    // Expand arrays
 		    //
 		    var expandTo as integer = min( Priorities.Count * 2, Priorities.Count + 2048 )
-		    Priorities.ResizeTo expandTo - 1
-		    Values.ResizeTo Priorities.LastIndex
+		    ResizeTo expandTo - 1
 		  end if
 		  
 		  Priorities( LastIndex ) = priority
@@ -57,17 +56,15 @@ Protected Class PriorityQueue_MTC
 
 	#tag Method, Flags = &h0, Description = 526573657473207468652051756575652E
 		Sub Clear()
-		  Priorities.ResizeTo 127
-		  
 		  Values.RemoveAll
-		  Values.ResizeTo Priorities.LastIndex
+		  ResizeTo kInitialLastIndex
 		  
 		  LastIndex = -1
 		  
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 5768656E206D696E546F4D61782020697320547275652C2077696C6C2072657475726E2061205072696F726974792076616C7565206F662031206265666F726520612076616C7565206F66203130302E205768656E2046616C73652C2076616C7565203130302077696C6C2062652072657475726E6564206265666F72652076616C756520312E
+	#tag Method, Flags = &h0, Description = 5768656E206D696E546F4D61782020697320547275652C20612076616C756520776974682061207072696F72697479206F6620312E302077696C6C2062652072657475726E6564206265666F7265206F6E6520776974682061207072696F72697479206F662031302E302E205768656E2046616C73652C207072696F726974792031302E302077696C6C2062652072657475726E6564206265666F7265207072696F7269747920312E302E
 		Sub Constructor(minToMax As Boolean = True)
 		  IsMinToMax = minToMax
 		  IsMaxToMin = not minToMax
@@ -77,7 +74,7 @@ Protected Class PriorityQueue_MTC
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = 52656D6F766520616E642072657475726E207468652056616C75652061742074686520746F70206F66207468652051756575652E
+	#tag Method, Flags = &h0, Description = 52656D6F766520616E642072657475726E207468652076616C75652061742074686520746F70206F66207468652051756575652E
 		Function Pop() As Variant
 		  #if not DebugBuild
 		    #pragma BackgroundTasks false
@@ -86,22 +83,26 @@ Protected Class PriorityQueue_MTC
 		    #pragma StackOverflowChecking false
 		  #endif
 		  
-		  if LastIndex = -1 then
-		    raise new OutOfBoundsException
-		  end if
-		  
 		  var returnValue as variant = Values( 0 )
 		  
 		  if LastIndex = 0 then
 		    Values( 0 ) = nil
 		    LastIndex = -1
+		    
+		    //
+		    // Save some memory
+		    //
+		    if Priorities.LastIndex > kInitialLastIndex then
+		      ResizeTo kInitialLastIndex
+		    end if
+		    
 		    return returnValue
 		  end if
 		  
 		  //
 		  // Shuffle the tree
 		  //
-		  var priority as double = Priorities( LastIndex )
+		  var priority as double = Priorities( LastIndex ) // If the queue was empty, this will raise an OutOfBoundsException
 		  var value as variant = Values( LastIndex )
 		  Values( LastIndex ) = nil // Remove any references
 		  LastIndex = LastIndex - 1
@@ -150,6 +151,14 @@ Protected Class PriorityQueue_MTC
 		  return returnValue
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub ResizeTo(index As Integer)
+		  Priorities.ResizeTo index
+		  Values.ResizeTo index
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
@@ -214,11 +223,12 @@ Protected Class PriorityQueue_MTC
 		Private LastIndex As Integer = -1
 	#tag EndProperty
 
-	#tag ComputedProperty, Flags = &h0, Description = 546865205072696F72697479206F662056616C75652061742074686520746F70206F66207468652071756575652E
+	#tag ComputedProperty, Flags = &h0, Description = 546865205072696F72697479206F662076616C75652061742074686520746F70206F66207468652051756575652C206F72204E614E2069662074686520517565756520697320656D7074792E
 		#tag Getter
 			Get
 			  if LastIndex = -1 then
-			    return -1
+			    static nan as double = val( "NaN" )
+			    return nan
 			  end if
 			  
 			  var priority as double = Priorities( 0 )
@@ -230,7 +240,7 @@ Protected Class PriorityQueue_MTC
 		PeekPriority As Double
 	#tag EndComputedProperty
 
-	#tag ComputedProperty, Flags = &h0, Description = 5468652056616C75652061742074686520746F70206F66207468652051756575652E
+	#tag ComputedProperty, Flags = &h0, Description = 5468652076616C75652061742074686520746F70206F66207468652051756575652C206F72204E696C2069662074686520517565756520697320656D7074792E
 		#tag Getter
 			Get
 			  return if( LastIndex = -1, nil, Values( 0 ) )
@@ -248,6 +258,9 @@ Protected Class PriorityQueue_MTC
 		Private Values() As Variant
 	#tag EndProperty
 
+
+	#tag Constant, Name = kInitialLastIndex, Type = Double, Dynamic = False, Default = \"127", Scope = Private
+	#tag EndConstant
 
 	#tag Constant, Name = kVersion, Type = String, Dynamic = False, Default = \"1.0", Scope = Public
 	#tag EndConstant
