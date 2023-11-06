@@ -1,6 +1,7 @@
 #tag Class
 Protected Class Advent_2022_12_15
 Inherits AdventBase
+	#tag CompatibilityFlags = (TargetConsole and (Target32Bit or Target64Bit)) or  (TargetWeb and (Target32Bit or Target64Bit)) or  (TargetDesktop and (Target32Bit or Target64Bit)) or  (TargetIOS and (Target64Bit)) or  (TargetAndroid and (Target64Bit))
 	#tag Event
 		Function ReturnDescription() As String
 		  return "Sensors and beacons"
@@ -97,78 +98,85 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Integer
+		  #if not DebugBuild
+		    #pragma BackgroundTasks false
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
 		  const kMult as integer = 4000000
 		  
 		  var maxRow as integer = if( IsTest, 20, kMult )
+		  var maxCol as integer = maxRow
 		  
 		  var sensors() as Sensor = ParseInput( input )
+		  sensors.Sort AddressOf SensorSorter
 		  
-		  var minXs() as integer
-		  var maxXs() as integer
-		  var goodSensors() as Sensor
+		  var curX as integer
+		  var row as integer
 		  
-		  var emptyX as integer
-		  var emptyY as integer
-		  
-		  for row as integer = 0 to maxRow
-		    FilterForRow row, sensors, goodSensors, minXs, maxXs
+		  for row = 0 to maxRow
+		    var nextRow as integer = kMult + 1
 		    
-		    if minXs.Count = 0 then
-		      break
-		    end if
+		    curX = 0
+		    var retries as integer
+		    var tried as UInt64
 		    
-		    var minX as integer = max( 0, minXs( 0 ) )
-		    var maxX as integer = min( maxRow, maxXs( maxXs.LastIndex ) )
-		    
-		    if minXs.Count = 1 and minX = 0 and maxX = maxRow then
-		      continue
-		    end if
-		    
-		    var occupied as new Dictionary
-		    for each s as Sensor in goodSensors
-		      if s.Y = row then
-		        occupied.Value( s.X ) = nil
-		      end if
-		      if s.Beacon.Y = row then
-		        occupied.Value( s.Beacon.X ) = nil
-		      end if
-		    next
-		    
-		    if minXs.Count = 1 then
-		      emptyY = row
-		      
-		      if minX > 0 then
-		        emptyX = 0
+		    do
+		      for sIndex as integer = 0 to sensors.LastIndex
+		        var mask as UInt64 = 2 ^ sIndex
 		        
-		      else
-		        emptyX = maxRow
-		      end if
-		      
-		      if occupied.HasKey( emptyX ) then
-		        continue
-		      end if
-		      
-		    else
-		      emptyY = row
-		      
-		      for i as integer = 1 to minXs.LastIndex
-		        emptyX = minXs( i ) - 1
-		        if not occupied.HasKey( emptyX ) then
-		          exit
+		        if ( tried and mask ) <> 0 then
+		          continue for sIndex
 		        end if
+		        
+		        var s as Sensor = sensors( sIndex )
+		        
+		        if row < s.MinY or row > s.MaxY then
+		          tried = tried or mask
+		          continue for sIndex
+		        end if
+		        
+		        if curX < s.MinXForRow( row ) then
+		          continue for sIndex
+		        end if
+		        
+		        tried = tried or mask
+		        if s.Y < nextRow then
+		          nextRow = s.Y
+		        end if
+		        
+		        var nextX as integer = s.NextXForRow( row, curX )
+		        if nextX = curX then
+		          continue for sIndex
+		        end if
+		        
+		        if nextX > maxCol then
+		          if nextRow > row then
+		            row = nextRow
+		          end if
+		          
+		          continue for row
+		        end if
+		        
+		        curX = nextX
+		        retries = 0
 		      next
 		      
-		    end if
+		      retries = retries + 1
+		    loop until retries = 2
 		    
-		    exit
+		    var result as integer = curX * kMult + row
+		    return result
 		  next
 		  
-		  var result as integer = emptyX * kMult + emptyY
-		  return result
+		  return -1
+		  
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
+	#tag Method, Flags = &h21, CompatibilityFlags = (TargetConsole and (Target32Bit or Target64Bit)) or  (TargetWeb and (Target32Bit or Target64Bit)) or  (TargetDesktop and (Target32Bit or Target64Bit)) or  (TargetIOS and (Target64Bit)) or  (TargetAndroid and (Target64Bit))
 		Private Sub FilterForRow(row As Integer, sensors() As Sensor, goodSensors() As Sensor, minXs() As Integer, maxXs() As Integer)
 		  goodSensors.RemoveAll
 		  minXs.RemoveAll
@@ -300,8 +308,20 @@ Inherits AdventBase
 		  wend
 		  
 		  return result
-		   
 		  
+		  
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function SensorSorter(s1 As Sensor, s2 As Sensor) As Integer
+		  var result as integer = s1.MinX - s2.MinX
+		  if result = 0 then
+		    result = s1.MinY - s2.MinY
+		  end if
+		  
+		  return result
 		  
 		End Function
 	#tag EndMethod

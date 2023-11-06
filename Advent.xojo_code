@@ -110,8 +110,8 @@ Protected Module Advent
 		  end if
 		  
 		  do
-		    var minValue as integer = min( val1, val2 )
-		    var maxValue as integer = max( val1, val2 )
+		    var minValue as integer = if( val1 < val2, val1, val2 )
+		    var maxValue as integer = if( val1 > val2, val1, val2 )
 		    
 		    if minValue = maxValue then
 		      return minValue
@@ -148,7 +148,7 @@ Protected Module Advent
 		  var result as double = -1.8E308
 		  
 		  for each d as double in arr
-		    result = max( d, result )
+		    result = if( result > d, result, d )
 		  next
 		  
 		  return result
@@ -161,7 +161,7 @@ Protected Module Advent
 		  var result as integer = 0 - &h7FFFFFFFFFFFFFFF
 		  
 		  for each i as integer in arr
-		    result = max( i, result )
+		    result = if( result > i, result, i )
 		  next
 		  
 		  return result
@@ -174,7 +174,7 @@ Protected Module Advent
 		  var result as double = 1.8E308
 		  
 		  for each d as double in arr
-		    result = min( d, result )
+		    result = if( result < d, result, d )
 		  next
 		  
 		  return result
@@ -187,7 +187,7 @@ Protected Module Advent
 		  var result as integer = &h7FFFFFFFFFFFFFFF
 		  
 		  for each i as integer in arr
-		    result = min( i, result )
+		    result = if( result < i, result, i )
 		  next
 		  
 		  return result

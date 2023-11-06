@@ -9,7 +9,7 @@ Protected Module M_Path
 		  var dy as double = abs( y1 - y2 )
 		  
 		  return _
-		  kLengthOfNode * ( dx + dy ) + ( diagDistanceBetweenNodes - 2 * diagDistanceBetweenNodes ) * min( dx, dy )
+		  kLengthOfNode * ( dx + dy ) + ( diagDistanceBetweenNodes - 2 * diagDistanceBetweenNodes ) * if( dx < dy, dx, dy )
 		  
 		  
 		End Function

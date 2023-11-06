@@ -122,17 +122,21 @@ Inherits AdventBase
 		        best = trail.LastIndex
 		      end if
 		      
+		      var lastAIndex as integer
+		      
 		      for i as integer = 1 to trail.LastIndex
 		        var t as TreeGridMember = TreeGridMember( trail( i ) )
 		        
 		        if t.Value = ascA then
-		          best = min( best, trail.LastIndex - i )
+		          lastAIndex = i
+		          
 		          if aList.HasMember( t ) then
 		            aList.Remove t
 		          end if
 		        end if
 		      next
 		      
+		      best = if( best < ( trail.LastIndex - lastAIndex ), best,  trail.LastIndex - lastAIndex )
 		    end if
 		  wend
 		  

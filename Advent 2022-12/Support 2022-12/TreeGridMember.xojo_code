@@ -5,6 +5,8 @@ Implements M_Path.MilestoneInterface
 	#tag CompatibilityFlags = (TargetConsole and (Target32Bit or Target64Bit)) or  (TargetWeb and (Target32Bit or Target64Bit)) or  (TargetDesktop and (Target32Bit or Target64Bit)) or  (TargetIOS and (Target64Bit)) or  (TargetAndroid and (Target64Bit))
 	#tag Method, Flags = &h0
 		Function DistanceFromParent(parent As M_Path.MilestoneInterface) As Double
+		  #pragma unused parent
+		  
 		  return 1.0
 		  
 		End Function
