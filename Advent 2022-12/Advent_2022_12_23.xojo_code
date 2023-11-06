@@ -56,6 +56,10 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Sub ApplyInstructions(elf As ElfGridMember, instructions() As ElfInstruction)
+		  #if not DebugBuild
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
 		  elf.ProposedMove = nil
 		  
 		  var hasNeighbor as boolean
@@ -88,6 +92,10 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Integer
+		  #if not DebugBuild
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
 		  const kRounds as integer = 10
 		  
 		  var grid as ObjectGrid = ParseInput( input, kRounds )
@@ -184,6 +192,10 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Integer
+		  #if not DebugBuild
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
 		  const kRounds as integer = 1000
 		  
 		  var grid as ObjectGrid = ParseInput( input, kRounds )
@@ -263,6 +275,10 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function GetInstructions(grid As Advent.ObjectGrid) As ElfInstruction()
+		  #if not DebugBuild
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
 		  var result() as ElfInstruction
 		  
 		  var ins as ElfInstruction
@@ -318,6 +334,10 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function ParseInput(input As String, rounds As Integer) As ObjectGrid
+		  #if not DebugBuild
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
 		  var sgrid( -1, -1 ) as string = ToStringGrid( input )
 		  
 		  var lastRowIndex as integer = sgrid.LastIndex( 1 ) + rounds + rounds

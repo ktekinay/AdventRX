@@ -349,6 +349,12 @@ Implements Iterable,Iterator
 	#tag ComputedProperty, Flags = &h0
 		#tag Getter
 			Get
+			  #if not DebugBuild
+			    #pragma BoundsChecking false
+			    #pragma NilObjectChecking false
+			    #pragma StackOverflowChecking false
+			  #endif
+			  
 			  Return mLastColIndex
 			End Get
 		#tag EndGetter
@@ -358,6 +364,12 @@ Implements Iterable,Iterator
 	#tag ComputedProperty, Flags = &h0
 		#tag Getter
 			Get
+			  #if not DebugBuild
+			    #pragma BoundsChecking false
+			    #pragma NilObjectChecking false
+			    #pragma StackOverflowChecking false
+			  #endif
+			  
 			  Return mLastRowIndex
 			End Get
 		#tag EndGetter

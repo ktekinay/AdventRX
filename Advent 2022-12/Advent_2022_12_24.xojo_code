@@ -1,6 +1,7 @@
 #tag Class
 Protected Class Advent_2022_12_24
 Inherits AdventBase
+	#tag CompatibilityFlags = (TargetConsole and (Target32Bit or Target64Bit)) or  (TargetWeb and (Target32Bit or Target64Bit)) or  (TargetDesktop and (Target32Bit or Target64Bit)) or  (TargetIOS and (Target64Bit)) or  (TargetAndroid and (Target64Bit))
 	#tag Event
 		Function ReturnDescription() As String
 		  return "Navigate blizzards"
@@ -56,13 +57,22 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Sub AdvanceBlizzards(grids() As ObjectGrid)
+		  #if not DebugBuild
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
 		  var source as ObjectGrid = grids( grids.LastIndex )
 		  
 		  var grid as new ObjectGrid
 		  grid.ResizeTo source.LastRowIndex, source.LastColIndex
 		  
-		  for row as integer = 0 to grid.LastRowIndex
-		    for col as integer = 0 to grid.LastColIndex
+		  var lastRowIndex as integer = grid.LastRowIndex
+		  var lastColIndex as integer = grid.LastColIndex
+		  
+		  for row as integer = 0 to lastRowIndex
+		    for col as integer = 0 to lastColIndex
 		      var square as GridMember = source( row, col )
 		      
 		      if not ( square isa BlizzardTracker ) then // Wall
@@ -75,24 +85,24 @@ Inherits AdventBase
 		      
 		      var bt as new BlizzardTracker 
 		      
-		      if row > 0 and row < grid.LastRowIndex then
+		      if row > 0 and row < lastRowIndex then
 		        var prevRow as integer = row - 1
 		        if prevRow <= 0 then
-		          prevRow = grid.LastRowIndex - 1
+		          prevRow = lastRowIndex - 1
 		        end if
 		        
 		        var nextRow as integer = row + 1
-		        if nextRow >= grid.LastRowIndex then
+		        if nextRow >= lastRowIndex then
 		          nextRow = 1
 		        end if
 		        
 		        var prevCol as integer = col - 1
 		        if prevCol <= 0 then
-		          prevCol = grid.LastColIndex - 1
+		          prevCol = lastColIndex - 1
 		        end if
 		        
 		        var nextCol as integer = col + 1
-		        if nextCol >= grid.LastColIndex then
+		        if nextCol >= lastColIndex then
 		          nextCol = 1
 		        end if
 		        
@@ -114,12 +124,21 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function AreSame(grid1 As ObjectGrid, grid2 As ObjectGrid) As Boolean
+		  #if not DebugBuild
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
 		  if grid1.LastRowIndex <> grid2.LastRowIndex or grid1.LastColIndex <> grid2.LastColIndex then
 		    return false
 		  end if
 		  
-		  for row as integer = 1 to grid1.LastRowIndex - 1
-		    for col as integer = 1 to grid2.LastColIndex - 1
+		  var lastRow as integer = grid1.LastRowIndex - 1
+		  var lastCol as integer = grid1.LastColIndex - 1
+		  
+		  for row as integer = 1 to lastRow
+		    for col as integer = 1 to lastCol
 		      var g1 as BlizzardTracker = BlizzardTracker( grid1( row, col ) )
 		      var g2 as BlizzardTracker = BlizzardTracker( grid2( row, col ) )
 		      if g1.UpCount <> g2.UpCount then
@@ -144,6 +163,12 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function BestMoves(move As Integer, rowPos As Integer, colPos As Integer, destRow As Integer, destCol As Integer, grids() As ObjectGrid, ByRef bestMoves As Integer) As Integer
+		  #if not DebugBuild
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
 		  const kMaxMoves as integer = &hFFFFFFFFFFFF
 		  
 		  if rowPos = destRow and colPos = destCol then
@@ -218,6 +243,12 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Integer
+		  #if not DebugBuild
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
 		  var grid as ObjectGrid = ParseInput( input )
 		  'if IsTest then
 		  'Print grid
@@ -258,6 +289,12 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Integer
+		  #if not DebugBuild
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
 		  var grid as ObjectGrid = ParseInput( input )
 		  
 		  var grids() as ObjectGrid
@@ -365,6 +402,13 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Sub Reset(grid As ObjectGrid)
+		  #if not DebugBuild
+		    #pragma BackgroundTasks false
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
 		  for each member as GridMember in grid
 		    if member isa object then
 		      member.BestSteps = 0

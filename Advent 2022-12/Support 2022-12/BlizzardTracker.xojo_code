@@ -1,6 +1,7 @@
 #tag Class
 Protected Class BlizzardTracker
 Inherits GridMember
+	#tag CompatibilityFlags = (TargetConsole and (Target32Bit or Target64Bit)) or  (TargetWeb and (Target32Bit or Target64Bit)) or  (TargetDesktop and (Target32Bit or Target64Bit)) or  (TargetIOS and (Target64Bit)) or  (TargetAndroid and (Target64Bit))
 	#tag Event
 		Function StringValue() As String
 		  select case BlizzardCount
@@ -40,6 +41,12 @@ Inherits GridMember
 	#tag ComputedProperty, Flags = &h0
 		#tag Getter
 			Get
+			  #if not DebugBuild
+			    #pragma BoundsChecking false
+			    #pragma NilObjectChecking false
+			    #pragma StackOverflowChecking false
+			  #endif
+			  
 			  return BlizzardCount = 0
 			  
 			End Get
@@ -145,6 +152,54 @@ Inherits GridMember
 				"1 - UseRawValue"
 				"2 - UseValue"
 			#tag EndEnumValues
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="BlizzardCount"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="DownCount"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="IsClear"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="LeftCount"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="RightCount"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="UpCount"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Integer"
+			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class

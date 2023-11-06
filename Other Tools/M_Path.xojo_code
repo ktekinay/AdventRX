@@ -129,6 +129,13 @@ Protected Module M_Path
 
 	#tag Method, Flags = &h1
 		Protected Function ManhattanDistance(x1 As Double, y1 As Double, x2 As Double, y2 As Double) As Double
+		  #if not DebugBuild
+		    #pragma BackgroundTasks false
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
 		  return abs( x1 - x2 ) + abs( y1 - y2 )
 		  
 		End Function
