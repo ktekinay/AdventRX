@@ -22,27 +22,27 @@ Inherits AdventBase
 	#tag EndEvent
 
 	#tag Event
-		Function RunA() As Integer
+		Function RunA() As Variant
 		  return CalculateResultA( Normalize( GetPuzzleInput ) )
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
-		Function RunB() As Integer
+		Function RunB() As Variant
 		  return CalculateResultB( Normalize( GetPuzzleInput ) )
 		End Function
 	#tag EndEvent
 
 	#tag Event
-		Function RunTestA() As Integer
+		Function RunTestA() As Variant
 		  return CalculateResultA( Normalize( kTestInput ) )
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
-		Function RunTestB() As Integer
+		Function RunTestB() As Variant
 		  var input as string = kTestInputB
 		  if input = "" then
 		    input = kTestInput
@@ -55,7 +55,7 @@ Inherits AdventBase
 
 
 	#tag Method, Flags = &h21
-		Private Function CalculateResultA(input As String) As Integer
+		Private Function CalculateResultA(input As String) As Variant
 		  var rows() as string = ToStringArray( input )
 		  
 		  var rx as new RegEx
@@ -82,12 +82,12 @@ Inherits AdventBase
 		    wend
 		  next
 		  
-		  return total
+		  return total : if( IsTest, 4361, 520135 )
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function CalculateResultB(input As String) As Integer
+		Private Function CalculateResultB(input As String) As Variant
 		  var rows() as string = ToStringArray( input )
 		  
 		  var rx as new RegEx
@@ -120,7 +120,7 @@ Inherits AdventBase
 		    wend
 		  next
 		  
-		  return total
+		  return total : if( IsTest, 467835, 72514855 )
 		End Function
 	#tag EndMethod
 

@@ -8,7 +8,7 @@ Inherits AdventBase
 	#tag EndEvent
 
 	#tag Event
-		Function RunA() As Integer
+		Function RunA() As Variant
 		  var arr() as integer = ToIntegerArray( GetPuzzleInput )
 		  
 		  return GetIncreaseCount( arr )
@@ -17,7 +17,7 @@ Inherits AdventBase
 	#tag EndEvent
 
 	#tag Event
-		Function RunB() As Integer
+		Function RunB() As Variant
 		  var arr() as integer = ToIntegerArray( GetPuzzleInput )
 		  var groupArr() as integer
 		  
@@ -31,7 +31,7 @@ Inherits AdventBase
 	#tag EndEvent
 
 	#tag Event
-		Function RunTestA() As Integer
+		Function RunTestA() As Variant
 		  var arr() as integer = ToIntegerArray( kTestInput )
 		  
 		  return GetIncreaseCount( arr )

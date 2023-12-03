@@ -33,27 +33,27 @@ Inherits AdventBase
 	#tag EndEvent
 
 	#tag Event
-		Function RunA() As Integer
+		Function RunA() As Variant
 		  return CalculateResultA( Normalize( GetPuzzleInput ) )
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
-		Function RunB() As Integer
+		Function RunB() As Variant
 		  return CalculateResultB( Normalize( GetPuzzleInput ) )
 		End Function
 	#tag EndEvent
 
 	#tag Event
-		Function RunTestA() As Integer
+		Function RunTestA() As Variant
 		  return CalculateResultA( Normalize( kTestInput ) )
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
-		Function RunTestB() As Integer
+		Function RunTestB() As Variant
 		  var input as string = kTestInputB
 		  if input = "" then
 		    input = kTestInput

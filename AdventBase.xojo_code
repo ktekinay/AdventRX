@@ -47,7 +47,7 @@ Inherits Thread
 		Private Sub DoRun()
 		  var startµs as double
 		  var duration as double
-		  var result as integer
+		  var result as variant
 		  
 		  mIsTest = true
 		  if not CancelRun( Types.TestA ) then
@@ -304,7 +304,7 @@ Inherits Thread
 	#tag EndHook
 
 	#tag Hook, Flags = &h0
-		Event ResultReturned(type As AdventBase.Types, result As Integer, duration As Double)
+		Event ResultReturned(type As AdventBase.Types, result As Variant, duration As Double)
 	#tag EndHook
 
 	#tag Hook, Flags = &h0
@@ -320,19 +320,19 @@ Inherits Thread
 	#tag EndHook
 
 	#tag Hook, Flags = &h0
-		Event RunA() As Integer
+		Event RunA() As Variant
 	#tag EndHook
 
 	#tag Hook, Flags = &h0
-		Event RunB() As Integer
+		Event RunB() As Variant
 	#tag EndHook
 
 	#tag Hook, Flags = &h0
-		Event RunTestA() As Integer
+		Event RunTestA() As Variant
 	#tag EndHook
 
 	#tag Hook, Flags = &h0
-		Event RunTestB() As Integer
+		Event RunTestB() As Variant
 	#tag EndHook
 
 

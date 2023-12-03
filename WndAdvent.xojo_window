@@ -115,7 +115,7 @@ End
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub Advent_ResultReturned(advent As AdventBase, type As AdventBase.Types, result As Integer, duration As Double)
+		Private Sub Advent_ResultReturned(advent As AdventBase, type As AdventBase.Types, result As Variant, duration As Double)
 		  for row as integer = 0 to LbAdvent.LastRowIndex
 		    var rowTag as variant = LbAdvent.RowTagAt( row )
 		    if rowTag is advent then
@@ -143,8 +143,16 @@ End
 		        
 		      end select
 		      
-		      var colText as string = result.ToString + " (" + TimeDisplay( duration ) + ")"
+		      var expected as variant
+		      if result isa Pair then
+		        var p as Pair = result
+		        result = p.Left
+		        expected = p.Right
+		      end if
+		      
+		      var colText as string = result.StringValue + " (" + TimeDisplay( duration ) + ")"
 		      LbAdvent.CellTextAt( row, col ) = colText
+		      LbAdvent.CellTagAt( row, col ) = expected
 		      exit
 		    end if
 		  next
@@ -466,6 +474,8 @@ End
 	#tag EndEvent
 	#tag Event
 		Function PaintCellText(g as Graphics, row as Integer, column as Integer, x as Integer, y as Integer) As Boolean
+		  const kGreenColor as color = &c00AE0000
+		  
 		  if me.RowExpandableAt( row ) and column = integer( Columns.Name ) then
 		    g.Bold = true
 		    return false
@@ -474,7 +484,7 @@ End
 		  if column = integer( Columns.Name ) then
 		    var advent as AdventBase = me.RowTagAt( row )
 		    if advent.IsComplete then
-		      g.DrawingColor = &c00AE0000
+		      g.DrawingColor = kGreenColor
 		    end if
 		    
 		    return false
@@ -489,12 +499,22 @@ End
 		    return false
 		  end if
 		  
+		  var expected as variant = me.CellTagAt( row, column )
+		  
 		  var parts() as string = colText.Split( " (" )
 		  colText = parts( 0 ).Trim
 		  var duration as string = if( parts.Count = 2, parts( 1 ).Trim.Replace( ")", "" ), "" )
 		  
 		  g.Bold = true
-		  g.DrawText colText, x, y
+		  if expected is nil then
+		    g.DrawText colText, x, y
+		  else
+		    var preserve as color = g.DrawingColor
+		    g.DrawingColor = if( colText = expected, kGreenColor, Color.Red )
+		    g.DrawText colText, x, y
+		    g.DrawingColor = preserve
+		  end if
+		  
 		  var colWidth as double = g.TextWidth( colText )
 		  
 		  static spaceWidth as double = g.TextWidth( " " )
