@@ -92,21 +92,44 @@ Inherits AdventBase
 		  
 		  var games() as Dictionary
 		  
+		  //
+		  // Original code
+		  //
+		  
+		  'for each line as string in arr
+		  'var game as new Dictionary
+		  '
+		  'var parts() as string = line.Split( ": " )
+		  'line = parts( 1 )
+		  '
+		  'var sections() as string = line.Split( "; " )
+		  'for each section as string in sections
+		  'var colors() as string = section.Split( ", " )
+		  'for each c as string in colors
+		  'var info() as string = c.Split( " " )
+		  'game.Value( info( 1 ) ) = max( game.Lookup( info( 1 ), 0 ), info( 0 ).ToInteger )
+		  'next
+		  '
+		  'next
+		  '
+		  'games.Add game
+		  'next
+		  
+		  var rx as new RegEx
+		  rx.SearchPattern = "(\d+) (\w+)"
+		  
 		  for each line as string in arr
 		    var game as new Dictionary
 		    
-		    var parts() as string = line.Split( ": " )
-		    line = parts( 1 )
-		    
-		    var sections() as string = line.Split( "; " )
-		    for each section as string in sections
-		      var colors() as string = section.Split( ", " )
-		      for each c as string in colors
-		        var info() as string = c.Split( " " )
-		        game.Value( info( 1 ) ) = max( game.Lookup( info( 1 ), 0 ), info( 0 ).ToInteger )
-		      next
+		    var match as RegExMatch = rx.Search( line )
+		    while match isa object
+		      var c as string = match.SubExpressionString( 2 )
+		      var v as integer = match.SubExpressionString( 1 ).ToInteger
 		      
-		    next
+		      game.Value( c ) = max( game.Lookup( c, 0 ), v )
+		      
+		      match = rx.Search
+		    wend
 		    
 		    games.Add game
 		  next
