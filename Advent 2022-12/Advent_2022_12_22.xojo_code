@@ -278,7 +278,7 @@ Inherits AdventBase
 		      grid( rowIndex, colIndex ) = member
 		    next
 		  next
-		   
+		  
 		  var rx as new RegEx
 		  rx.SearchPattern = "\d+|[rl]"
 		  
