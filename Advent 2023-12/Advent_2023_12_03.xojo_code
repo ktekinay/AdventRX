@@ -214,16 +214,6 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function IsNumber(line As String, pos As Integer) As Boolean
-		  if pos < 0 then
-		    return false
-		  end if
-		  
-		  return IsNumeric( line.MiddleBytes( pos, 1 ) )
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
 		Private Function IsSymbol(line As String, pos As Integer) As Boolean
 		  if pos < 0 then
 		    return false
