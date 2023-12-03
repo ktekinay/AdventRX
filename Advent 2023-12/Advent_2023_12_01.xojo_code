@@ -109,8 +109,6 @@ Inherits AdventBase
 		  mb.Size = mb.Size + 1
 		  var p as ptr = mb
 		  
-		  var destByte as integer = 0
-		  
 		  var lastByteIndex as integer = mb.Size - 1
 		  p.Byte( lastByteIndex ) = 10
 		  
