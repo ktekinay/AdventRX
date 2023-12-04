@@ -218,6 +218,56 @@ Protected Module Advent
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function Squeeze(Extends src As String, charSet As String = " ") As String
+		  // Find any repeating characters, where the character is a member of
+		  // charSet, and replace the run with a single character.  Example:
+		  // Squeeze("wooow maaan", "aeiou") = "wow man".
+		  
+		  // Note: This is roughly the same speed as the StringUtils version, but
+		  // *might* be faster under some circumstances, like in a long string where
+		  // all the repeated strings occur at the end.
+		  
+		  dim srcLen as integer = src.Len
+		  if srcLen < 2 then return src
+		  
+		  #if not DebugBuild
+		    #pragma BackgroundTasks false
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
+		  
+		  dim origEncoding as TextEncoding = src.Encoding
+		  charSet = ConvertEncoding( charSet, origEncoding )
+		  dim charArray() as string = charSet.Split( "" ) // Every character
+		  dim repeatedChar as string // Declared outside the loop as optimization
+		  for each aChar as string in charArray
+		    dim buildArr( -1 ) as string
+		    repeatedChar = aChar + aChar
+		    src = src.ReplaceAll( repeatedChar, aChar )
+		    dim n as integer
+		    do
+		      n = InStr( src, repeatedChar )
+		      if n = 0 then
+		        exit
+		      else
+		        buildArr.Append src.Left( n - 1 )
+		        src = src.Mid( n + 1 )
+		        src = src.ReplaceAll( repeatedChar, aChar )
+		      end if
+		    loop
+		    if buildArr.Ubound > -1 then
+		      buildArr.Append src
+		      src = join( buildArr, "" ).ConvertEncoding( origEncoding )
+		    end if
+		  next
+		  
+		  return src
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function SumArray(arr() As Integer) As Integer
 		  var sum as integer
 		  
