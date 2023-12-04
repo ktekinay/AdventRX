@@ -59,7 +59,7 @@ Inherits AdventBase
 		  
 		  
 		  
-		  return 0 : if( IsTest, nil, nil )
+		  return 0 : if( IsTest, 0, 0 )
 		  
 		End Function
 	#tag EndMethod
@@ -69,7 +69,7 @@ Inherits AdventBase
 		  
 		  
 		  
-		  return 0 : if( IsTest, nil, nil )
+		  return 0 : if( IsTest, 0, 0 )
 		  
 		End Function
 	#tag EndMethod

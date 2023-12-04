@@ -148,6 +148,22 @@ End
 		        var p as Pair = result
 		        result = p.Left
 		        expected = p.Right
+		        
+		        select case expected.Type
+		        case Variant.TypeInteger
+		          if expected.IntegerValue = 0 then
+		            expected = nil
+		          end if
+		        case Variant.TypeString
+		          if expected.StringValue = "" then
+		            expected = nil
+		          end if
+		          
+		        case Variant.TypeDouble
+		          if expected.DoubleValue = 0.0 then
+		            expected = nil
+		          end if
+		        end select
 		      end if
 		      
 		      var colText as string = result.StringValue + " (" + TimeDisplay( duration ) + ")"
