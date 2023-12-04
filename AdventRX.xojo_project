@@ -178,6 +178,7 @@ Folder=Advent 2023-12;Advent 2023-12;&h0000000057767FFF;&h0000000000000000;false
 Class=Advent_2023_12_01;Advent 2023-12/Advent_2023_12_01.xojo_code;&h000000007A83C7FF;&h0000000057767FFF;false
 Class=Advent_2023_12_02;Advent 2023-12/Advent_2023_12_02.xojo_code;&h000000003D7A47FF;&h0000000057767FFF;false
 Class=Advent_2023_12_03;Advent 2023-12/Advent_2023_12_03.xojo_code;&h000000006D73AFFF;&h0000000057767FFF;false
+Class=Advent_2023_12_04;Advent 2023-12/Advent_2023_12_04.xojo_code;&h0000000055D1F7FF;&h0000000057767FFF;false
 Class=PriorityQueue_MTC;Other Tools/PriorityQueue_MTC.xojo_code;&h000000007E5887FF;&h000000007F74CFFF;false
 Module=M_2023;Advent 2023-12/M_2023.xojo_code;&h000000006BEFA7FF;&h0000000057767FFF;false
 DefaultWindow=WndAdvent
