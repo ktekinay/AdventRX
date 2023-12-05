@@ -1,5 +1,14 @@
-#tag Module
-Protected Module M_2023
+#tag Class
+Protected Class Seed
+	#tag Property, Flags = &h0
+		Trail() As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h0
+		Value As Integer
+	#tag EndProperty
+
+
 	#tag ViewBehavior
 		#tag ViewProperty
 			Name="Name"
@@ -41,6 +50,14 @@ Protected Module M_2023
 			Type="Integer"
 			EditorType=""
 		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Value"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
 	#tag EndViewBehavior
-End Module
-#tag EndModule
+End Class
+#tag EndClass

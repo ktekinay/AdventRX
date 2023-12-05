@@ -150,7 +150,7 @@ End
 		        expected = p.Right
 		        
 		        select case expected.Type
-		        case Variant.TypeInteger
+		        case Variant.TypeInteger, Variant.TypeInt32, Variant.TypeInt64
 		          if expected.IntegerValue = 0 then
 		            expected = nil
 		          end if
@@ -307,6 +307,7 @@ End
 		  AddRow new Advent_2023_12_02
 		  AddRow new Advent_2023_12_03
 		  AddRow new Advent_2023_12_04
+		  AddRow new Advent_2023_12_05
 		  
 		  // Expand
 		  ExpandYear 2023
