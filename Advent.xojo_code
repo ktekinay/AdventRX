@@ -99,7 +99,7 @@ Protected Module Advent
 
 	#tag Method, Flags = &h0
 		Function IsWithin(Extends value As Integer, range As Advent.Range) As Boolean
-		  return value >= range.Minimum and value <= range.Maximum
+		  return range.Contains( value )
 		End Function
 	#tag EndMethod
 

@@ -30,6 +30,12 @@ Protected Class Range
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function Contains(value As Integer) As Boolean
+		  return value >= Minimum and value <= Maximum
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function Operator_Convert() As String
 		  return ToString
 		  
@@ -141,6 +147,14 @@ Protected Class Range
 			Group="Behavior"
 			InitialValue=""
 			Type="String"
+			EditorType="MultiLineEditor"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Length"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Integer"
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior
