@@ -56,28 +56,20 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Variant
-		  var seeds() as Seed
+		  var seeds() as integer
 		  var maps() as SeedMap
 		  
 		  Parse( input, seeds, maps )
 		  
 		  var minLocation as integer = 0
 		  
-		  for each seed as Seed in seeds
-		    var id as integer = seed.Value
-		    
-		    if id = 13 then
-		      id = id
-		    end if
-		    
+		  for each seed as integer in seeds
 		    for each map as SeedMap in maps
-		      id = map.Corresponding( id )
-		      seed.Trail.Add id
+		      seed = map.Corresponding( seed )
 		    next
 		    
-		    var loc as integer = seed.Trail( seed.Trail.LastIndex )
-		    if minLocation = 0 or minLocation > loc then
-		      minLocation = loc
+		    if minLocation = 0 or minLocation > seed then
+		      minLocation = seed
 		    end if
 		  next
 		  
@@ -88,7 +80,7 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Variant
-		  var seeds() as Seed
+		  var seeds() as integer
 		  var maps() as SeedMap
 		  
 		  Parse( input, seeds, maps )
@@ -96,10 +88,10 @@ Inherits AdventBase
 		  var seedRanges() as Advent.Range
 		  
 		  for i as integer = 0 to seeds.LastIndex step 2
-		    var s1 as Seed = seeds( i )
-		    var s2 as Seed = seeds( i + 1 )
+		    var s1 as integer = seeds( i )
+		    var s2 as integer = seeds( i + 1 )
 		    
-		    var sr as new Advent.Range( s1.Value, s1.Value + s2.Value - 1 )
+		    var sr as new Advent.Range( s1, s1 + s2 - 1 )
 		    seedRanges.Add sr
 		  next
 		  
@@ -152,15 +144,13 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub Parse(input As String, ByRef toSeeds() As Seed, ByRef toMaps() As SeedMap)
+		Private Sub Parse(input As String, ByRef toSeeds() As Integer, ByRef toMaps() As SeedMap)
 		  var sections() as string = input.Split( EndOfLine + EndOfLine )
 		  
 		  var seedStrings() as string = sections( 0 ).NthField( ": ", 2 ).Split( " " )
-		  var seeds() as Seed
+		  var seeds() as integer
 		  for each seedString as string in seedStrings
-		    var seed as new Seed
-		    seed.Value = seedString.ToInteger
-		    seeds.Add seed
+		    seeds.Add seedString.ToInteger
 		  next
 		  
 		  toSeeds = seeds

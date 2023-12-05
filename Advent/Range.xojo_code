@@ -56,7 +56,7 @@ Protected Class Range
 			  return Maximum - Minimum + 1
 			End Get
 		#tag EndGetter
-		Distance As Integer
+		Length As Integer
 	#tag EndComputedProperty
 
 	#tag Property, Flags = &h0
