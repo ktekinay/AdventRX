@@ -53,6 +53,12 @@ var day as string = parts( 2 )
 //
 // Try to fetch the data
 //
+var asDate as new Date( year.ToInteger, month.ToInteger, day.ToInteger )
+var now as new Date
+
+if now < asDate then
+print "Too soon for data"
+else
 var dataFetched as boolean = MaybeGetData( year, day, month )
 if not dataFetched then
 print "Could not fetch data."
@@ -63,6 +69,7 @@ print "Could not find " + kTemplateCopyName + _
 if( dataFetched, ", but the data was fetched.", "." )
 
 return
+end if
 end if
 
 label = String.FromArray( parts, "_" )
@@ -176,4 +183,57 @@ var parts() As string = path.Split( "/" )
 parts.RemoveAt parts.LastIndex
 return String.FromArray( parts, "/" )
 End Function
+
+Class Date
+Private mYear As Integer
+Private mMonth As Integer
+Private mDay As Integer
+Private mSQLDate As String
+
+Sub Constructor()
+var d as string = DoShellCommand( "date -I" )
+var parts() as string = d.Split( "-" )
+mYear = parts( 0 ).ToInteger
+mMonth = parts( 1 ).ToInteger
+mDay = parts( 2 ).ToInteger
+End Sub
+
+Sub Constructor(year As Integer, month As Integer, day As Integer)
+mYear = year
+mMonth = month
+mDay = day
+End Sub
+
+Function Operator_Compare(other As Date) As Integer
+if SQLDate < other.SQLDate then
+return -1
+elseif SQLDate > other.SQLDate then
+return 1
+else
+return 0
+end if
+End Function
+
+Function Year() As Integer
+Return mYear
+End Function
+
+Function Month() As Integer
+Return mMonth
+End Function
+
+Function Day() As Integer
+Return mDay
+End Function
+
+Function SQLDate() As String
+if mSQLDate = "" then
+mSQLDate = Format( mYear, "0000" ) + "-" + Format( mMonth, "00" ) + "-" + Format( mDay, "00" )
+end if
+
+return mSQLDate
+End Function
+End Class
+
+
 
