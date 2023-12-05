@@ -36,6 +36,19 @@ Protected Class Range
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Attributes( Hidden )  Function Operator_Compare(other As Advent.Range) As Integer
+		  select case true
+		  case Minimum < other.Minimum
+		    return -1
+		  case Minimum = other.Minimum
+		    return other.Maximum - Maximum
+		  case else
+		    return 1
+		  end select
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function Operator_Convert() As String
 		  return ToString
 		  
@@ -51,6 +64,58 @@ Protected Class Range
 		  end if
 		  
 		  return false
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 52657475726E73206D756C7469706C652C2064697374696E63742072616E676573207468617420636F7665722074686520636F6D62696E6564206C656E677468206F6620656163682072616E67652E
+		Function Segment(other As Advent.Range) As Advent.Range()
+		  var segments() as Advent.Range
+		  
+		  if other = self then
+		    segments.Add new Advent.Range( self )
+		    return segments
+		  end if
+		  
+		  var lesser as Advent.Range
+		  var greater as Advent.Range
+		  
+		  if self < other then
+		    lesser = self
+		    greater = other
+		  else
+		    lesser = other
+		    greater = self
+		  end if
+		  
+		  if not lesser.Overlaps( greater ) then
+		    segments.Add new Advent.Range( lesser )
+		    segments.Add new Advent.Range( greater )
+		    
+		    return segments // EARLY RETURN!!
+		  end if
+		  
+		  if lesser.Minimum < greater.Minimum then
+		    segments.Add new Advent.Range( lesser.Minimum, greater.Minimum - 1 )
+		    
+		    if lesser.Maximum = greater.Maximum then
+		      segments.Add new Advent.Range( greater )
+		    elseif lesser.Maximum < greater.Maximum then
+		      segments.Add new Advent.Range( greater.Minimum, lesser.Maximum )
+		      segments.Add new Advent.Range( lesser.Maximum + 1, greater.Maximum )
+		    else // lesser.Maximum > greater.Maximum
+		      segments.Add new Advent.Range( greater )
+		      segments.Add new Advent.Range( greater.Maximum + 1, lesser.Maximum )
+		    end if
+		    
+		    return segments // EARLY RETURN!!
+		  end if
+		  
+		  //
+		  // The Minimums are equal so lesser.Maximum < greater.Maximum
+		  //
+		  segments.Add new Advent.Range( lesser )
+		  segments.Add new Advent.Range( lesser.Maximum + 1, greater.Maximum )
 		  
 		End Function
 	#tag EndMethod
