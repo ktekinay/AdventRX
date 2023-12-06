@@ -3,20 +3,20 @@ Protected Class Advent_2023_12_06
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "Unknown"
+		  return "Boat races"
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return false
+		  return true
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnName() As String
-		  return ""
+		  return "Wait For It"
 		  
 		End Function
 	#tag EndEvent
@@ -80,18 +80,7 @@ Inherits AdventBase
 		  for raceIndex as integer = 0 to times.LastIndex
 		    var time as integer = times( raceIndex )
 		    var dist as integer = dists( raceIndex )
-		    
-		    for hold as integer = 1 to time - 1
-		      var speed as integer = hold
-		      var remaining as integer = time - hold
-		      var travelled as integer = remaining * speed
-		      
-		      if travelled > dist then
-		        winners( raceIndex ) = winners( raceIndex ) + 1
-		      elseif winners( raceIndex ) <> 0 then
-		        exit for hold
-		      end if
-		    next
+		    winners( raceIndex ) = CalcWinners( time, dist )
 		  next
 		  
 		  var result as integer = MultiplyArray( winners, true )
@@ -112,22 +101,73 @@ Inherits AdventBase
 		  
 		  var dist as integer = lines( 1 ).ReplaceAll( " ", "" ).ToInteger
 		  
-		  var winners as integer
-		  
-		  for hold as integer = 1 to time - 1
-		    var speed as integer = hold
-		    var remaining as integer = time - hold
-		    var travelled as integer = remaining * speed
-		    
-		    if travelled > dist then
-		      winners = winners + 1
-		    elseif winners <> 0 then
-		      exit for hold
-		    end if
-		  next
-		  
+		  var winners as integer = CalcWinners( time, dist )
 		  return winners : if( IsTest, 71503, 41513103 )
 		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CalcWinners(time As Integer, dist As Integer) As Integer
+		  var startHold as integer
+		  var endHold as integer
+		  #if DebugBuild
+		    var checked as integer
+		  #endif
+		  
+		  var firstWinningHold as integer 
+		  
+		  startHold = 1
+		  endHold = time - 1
+		  
+		  while startHold <= endHold
+		    #if DebugBuild
+		      checked = checked + 1
+		    #endif
+		    
+		    var hold as integer = ( endHold - startHold ) \ 2 + startHold
+		    
+		    var remaining as integer = time - hold
+		    var travelled as integer = hold * remaining
+		    
+		    if travelled > dist then
+		      firstWinningHold = hold
+		      endHold = hold - 1
+		    else
+		      startHold = hold + 1
+		    end if
+		  wend
+		  
+		  var lastWinningHold as integer
+		  
+		  startHold = firstWinningHold + 1
+		  endHold = time - 1
+		  
+		  while startHold <= endHold
+		    #if DebugBuild
+		      checked = checked + 1
+		    #endif
+		    
+		    var hold as integer = ( endHold - startHold ) \ 2 + startHold
+		    
+		    var remaining as integer = time - hold
+		    var travelled as integer = hold * remaining
+		    
+		    if travelled > dist then
+		      lastWinningHold = hold
+		      startHold = hold + 1
+		    else
+		      endHold = hold - 1
+		    end if
+		  wend
+		  
+		  #if DebugBuild
+		    if not IsTest then
+		      System.DebugLog "Checked: " + checked.ToString
+		    end if
+		  #endif
+		  
+		  return lastWinningHold - firstWinningHold + 1
 		End Function
 	#tag EndMethod
 
