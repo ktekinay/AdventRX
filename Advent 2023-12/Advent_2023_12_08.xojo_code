@@ -88,11 +88,7 @@ Inherits AdventBase
 		    counts( curIndex ) = CountPath( current, "Z", instructions, map )
 		  next
 		  
-		  var count as integer = counts.Pop
-		  
-		  while counts.Count <> 0
-		    count = LeastCommonMultiple( count, counts.Pop )
-		  wend
+		  var count as integer = LeastCommonMultiple( counts )
 		  
 		  return count : if( IsTest, 6, 13385272668829 )
 		  // 13,385,272,668,829

@@ -149,6 +149,19 @@ Protected Module Advent
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function LeastCommonMultiple(values() As Integer) As Integer
+		  var val as integer = values( 0 )
+		  
+		  for i as integer = 1 to values.LastIndex
+		    val = LeastCommonMultiple( val, values( i ) )
+		  next
+		  
+		  return val
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function LeastCommonMultiple(val1 As Integer, val2 As Integer) As Integer
 		  if val1 > val2 then
 		    return ( val1 / GreatestCommonDivisor( val1, val2 ) ) * val2
