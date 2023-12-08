@@ -56,35 +56,11 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Variant
-		  var instructions() as string = input.NthField( EndOfLine, 1 ).Split( "" )
-		  
+		  var instructions() as string
 		  var map as new Dictionary
-		  var rx as new RegEx
-		  rx.SearchPattern = "(\w+) = \((\w+), (\w+)"
+		  ParseInput( input, instructions, map )
 		  
-		  var match as RegExMatch = rx.Search( input )
-		  while match isa RegExMatch
-		    map.Value( match.SubExpressionString( 1 ) ) = match.SubExpressionString( 2 ) : match.SubExpressionString( 3 )
-		    
-		    match = rx.Search
-		  wend
-		  
-		  var count as integer
-		  var instructionIndex as integer = -1
-		  var current as string = "AAA"
-		  
-		  do
-		    count = count + 1
-		    instructionIndex = ( instructionIndex + 1 ) mod instructions.Count
-		    var instruction as string = instructions( instructionIndex )
-		    
-		    var nextStep as pair = map.Value( current )
-		    if instruction = "L" then
-		      current = nextStep.Left
-		    else
-		      current = nextStep.Right
-		    end if
-		  loop until current = "ZZZ"
+		  var count as integer = CountPath( "AAA", "ZZZ", instructions, map )
 		  
 		  return count : if( IsTest, 6, 12083 )
 		  
@@ -93,18 +69,9 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Variant
-		  var instructions() as string = input.NthField( EndOfLine, 1 ).Split( "" )
-		  
+		  var instructions() as string
 		  var map as new Dictionary
-		  var rx as new RegEx
-		  rx.SearchPattern = "(\w+) = \((\w+), (\w+)"
-		  
-		  var match as RegExMatch = rx.Search( input )
-		  while match isa RegExMatch
-		    map.Value( match.SubExpressionString( 1 ) ) = match.SubExpressionString( 2 ) : match.SubExpressionString( 3 )
-		    
-		    match = rx.Search
-		  wend
+		  ParseInput( input, instructions, map )
 		  
 		  var currents() as string
 		  for each key as string in map.Keys
@@ -118,55 +85,57 @@ Inherits AdventBase
 		  
 		  for curIndex as integer = 0 to currents.LastIndex
 		    var current as string = currents( curIndex )
-		    
-		    var count as integer
-		    var instructionIndex as integer = -1 
-		    
-		    do
-		      count = count + 1
-		      instructionIndex = ( instructionIndex + 1 ) mod instructions.Count
-		      var instruction as string = instructions( instructionIndex )
-		      
-		      var nextStep as pair = map.Value( current )
-		      if instruction = "L" then
-		        current = nextStep.Left
-		      else
-		        current = nextStep.Right
-		      end if
-		    loop until current.EndsWith( "Z" )
-		    
-		    counts( curIndex ) = count
+		    counts( curIndex ) = CountPath( current, "Z", instructions, map )
 		  next
-		  
-		  counts.Sort
 		  
 		  var count as integer = counts.Pop
 		  
 		  while counts.Count <> 0
-		    var curCount as integer = count
-		    var mult as integer = 1
-		    
-		    do
-		      for i as integer = counts.LastIndex downto 0
-		        var testCount as integer = counts( i )
-		        
-		        if curCount mod testCount = 0 then
-		          counts.RemoveAt i
-		          count = curCount
-		          continue while
-		        end if
-		      next
-		      
-		      mult = mult + 1
-		      curCount = count * mult
-		    loop
+		    count = LeastCommonMultiple( count, counts.Pop )
 		  wend
-		  
 		  
 		  return count : if( IsTest, 6, 13385272668829 )
 		  // 13,385,272,668,829
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CountPath(current As String, target As String, instructions() As String, map As Dictionary) As Integer
+		  var count as integer
+		  var instructionIndex as integer = -1
+		  
+		  do
+		    count = count + 1
+		    instructionIndex = ( instructionIndex + 1 ) mod instructions.Count
+		    var instruction as string = instructions( instructionIndex )
+		    
+		    var nextStep as pair = map.Value( current )
+		    if instruction = "L" then
+		      current = nextStep.Left
+		    else
+		      current = nextStep.Right
+		    end if
+		  loop until current.EndsWith( target )
+		  
+		  return count
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub ParseInput(input As String, ByRef toInstructions() As String, toMap As Dictionary)
+		  input = input.ReplaceAllBytes( " = (", " " ).ReplaceAllBytes( ")", "" ).ReplaceAllBytes( ",", "" )
+		  
+		  var rows() as string = ToStringArray( input )
+		  toInstructions = rows( 0 ).Split( "" )
+		  
+		  for i as integer = 2 to rows.LastIndex
+		    var row as string = rows( i )
+		    var parts() as string = row.SplitBytes( " " )
+		    toMap.Value( parts( 0 ) ) = parts( 1 ) : parts( 2 )
+		  next
+		  
+		End Sub
 	#tag EndMethod
 
 
