@@ -3,20 +3,20 @@ Protected Class Advent_2023_12_08
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "Unknown"
+		  return "Follow instructions to count steps from start to finish"
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return false
+		  return true
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnName() As String
-		  return ""
+		  return "Haunted Wasteland"
 		  
 		End Function
 	#tag EndEvent
@@ -55,19 +55,6 @@ Inherits AdventBase
 
 
 	#tag Method, Flags = &h21
-		Private Function AllZ(list() As String) As Boolean
-		  for each item as string in list
-		    if not ( item.EndsWith( "Z" ) ) then
-		      return false
-		    end if
-		  next
-		  
-		  return true
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Variant
 		  var instructions() as string = input.NthField( EndOfLine, 1 ).Split( "" )
 		  
@@ -99,7 +86,7 @@ Inherits AdventBase
 		    end if
 		  loop until current = "ZZZ"
 		  
-		  return count : if( IsTest, 6, 0 )
+		  return count : if( IsTest, 6, 12083 )
 		  
 		End Function
 	#tag EndMethod
@@ -119,31 +106,65 @@ Inherits AdventBase
 		    match = rx.Search
 		  wend
 		  
-		  var count as integer
-		  var instructionIndex as integer = -1
-		  var current() as string
+		  var currents() as string
 		  for each key as string in map.Keys
 		    if key.EndsWith( "A" ) then
-		      current.Add key
+		      currents.Add key
 		    end if
 		  next
 		  
-		  do
-		    count = count + 1
-		    instructionIndex = ( instructionIndex + 1 ) mod instructions.Count
-		    var instruction as string = instructions( instructionIndex )
-		    
-		    for i as integer = 0 to current.LastIndex
-		      var nextStep as pair = map.Value( current( i ) )
-		      if instruction = "L" then
-		        current( i ) = nextStep.Left
-		      else
-		        current( i ) = nextStep.Right
-		      end if
-		    next
-		  loop until AllZ( current )
+		  var counts() as integer
+		  counts.ResizeTo currents.LastIndex
 		  
-		  return count : if( IsTest, 6, 0 )
+		  for curIndex as integer = 0 to currents.LastIndex
+		    var current as string = currents( curIndex )
+		    
+		    var count as integer
+		    var instructionIndex as integer = -1 
+		    
+		    do
+		      count = count + 1
+		      instructionIndex = ( instructionIndex + 1 ) mod instructions.Count
+		      var instruction as string = instructions( instructionIndex )
+		      
+		      var nextStep as pair = map.Value( current )
+		      if instruction = "L" then
+		        current = nextStep.Left
+		      else
+		        current = nextStep.Right
+		      end if
+		    loop until current.EndsWith( "Z" )
+		    
+		    counts( curIndex ) = count
+		  next
+		  
+		  counts.Sort
+		  
+		  var count as integer = counts.Pop
+		  
+		  while counts.Count <> 0
+		    var curCount as integer = count
+		    var mult as integer = 1
+		    
+		    do
+		      for i as integer = counts.LastIndex downto 0
+		        var testCount as integer = counts( i )
+		        
+		        if curCount mod testCount = 0 then
+		          counts.RemoveAt i
+		          count = curCount
+		          continue while
+		        end if
+		      next
+		      
+		      mult = mult + 1
+		      curCount = count * mult
+		    loop
+		  wend
+		  
+		  
+		  return count : if( IsTest, 6, 13385272668829 )
+		  // 13,385,272,668,829
 		  
 		End Function
 	#tag EndMethod
@@ -155,7 +176,7 @@ Inherits AdventBase
 	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"LLR\n\nAAA \x3D (BBB\x2C BBB)\nBBB \x3D (AAA\x2C ZZZ)\nZZZ \x3D (ZZZ\x2C ZZZ)", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = kTestInputB, Type = String, Dynamic = False, Default = \"", Scope = Private
+	#tag Constant, Name = kTestInputB, Type = String, Dynamic = False, Default = \"LR\n\n11A \x3D (11B\x2C XXX)\n11B \x3D (XXX\x2C 11Z)\n11Z \x3D (11B\x2C XXX)\n22A \x3D (22B\x2C XXX)\n22B \x3D (22C\x2C 22C)\n22C \x3D (22Z\x2C 22Z)\n22Z \x3D (22B\x2C 22B)\nXXX \x3D (XXX\x2C XXX)", Scope = Private
 	#tag EndConstant
 
 
