@@ -35,6 +35,17 @@ Protected Module Advent
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function GreatestCommonDivisor(val1 As Integer, val2 As Integer) As Integer
+		  if val2 = 0 then
+		    return val1
+		  end if
+		  
+		  return GreatestCommonDivisor( val2, val1 mod val2 )
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function IndexOf(Extends mb As MemoryBlock, b As Byte) As Integer
 		  var p as ptr = mb
 		  var lastByte as integer = mb.Size - 1
@@ -134,6 +145,16 @@ Protected Module Advent
 		    
 		    return minValue * maxValue
 		  loop
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function LeastCommonMultiple(val1 As Integer, val2 As Integer) As Integer
+		  if val1 > val2 then
+		    return ( val1 / GreatestCommonDivisor( val1, val2 ) ) * val2
+		  else
+		    return ( val2 / GreatestCommonDivisor( val1, val2 ) ) * val1
+		  end if
 		End Function
 	#tag EndMethod
 
