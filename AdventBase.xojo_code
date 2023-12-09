@@ -231,6 +231,20 @@ Inherits Thread
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
+		Protected Function ToIntegerArray(vals() As String) As Integer()
+		  var arr() as integer
+		  arr.ResizeTo vals.LastIndex
+		  
+		  for i as integer = 0 to arr.LastIndex
+		    arr( i ) = vals( i ).ToInteger
+		  next
+		  
+		  return arr
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
 		Protected Function ToIntegerArray(s As String) As Integer()
 		  s = s.ReplaceLineEndings( EndOfLine ).ReplaceAll( ",", EndOfLine ).Trim
 		  var sarr() as string = s.Split( EndOfLine )
