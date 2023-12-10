@@ -33,7 +33,7 @@ Begin DesktopWindow WndConsole
       BackgroundColor =   &cFFFFFF
       Bold            =   False
       Enabled         =   True
-      FontName        =   "Source Code Pro"
+      FontName        =   "0xProto Nerd Font Mono"
       FontSize        =   13.0
       FontUnit        =   0
       Format          =   ""
@@ -122,11 +122,35 @@ End
 	#tag EndEvent
 
 	#tag Event
+		Function KeyDown(key As String) As Boolean
+		  return HandleKeyDown( key )
+		End Function
+	#tag EndEvent
+
+	#tag Event
 		Sub Opening()
 		  IsOpen = true
+		  BaseFontSize = FldConsole.FontSize
+		  
 		End Sub
 	#tag EndEvent
 
+
+	#tag Method, Flags = &h21
+		Private Function HandleKeyDown(key As String) As Boolean
+		  if not Keyboard.CommandKey then
+		    return false
+		  end if
+		  
+		  if key = "+" or key = "=" then
+		    FldConsole.FontSize = FldConsole.FontSize + 2
+		    return true
+		  elseif key = "-" and FldConsole.FontSize > BaseFontSize then
+		    FldConsole.FontSize = FldConsole.FontSize - 2
+		    return true
+		  end if
+		End Function
+	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Shared Sub Print(msg As String)
@@ -146,6 +170,10 @@ End
 
 
 	#tag Property, Flags = &h21
+		Private BaseFontSize As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
 		Private Shared IsOpen As Boolean
 	#tag EndProperty
 
@@ -156,6 +184,13 @@ End
 
 #tag EndWindowCode
 
+#tag Events FldConsole
+	#tag Event
+		Function KeyDown(key As String) As Boolean
+		  return HandleKeyDown( key )
+		End Function
+	#tag EndEvent
+#tag EndEvents
 #tag Events TmrPrinter
 	#tag Event
 		Sub Action()
