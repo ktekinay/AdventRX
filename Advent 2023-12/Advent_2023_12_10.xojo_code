@@ -3,20 +3,20 @@ Protected Class Advent_2023_12_10
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "Unknown"
+		  return "A loop and all it encloses"
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return false
+		  return true
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnName() As String
-		  return ""
+		  return "Pipe Maze"
 		  
 		End Function
 	#tag EndEvent
@@ -59,33 +59,9 @@ Inherits AdventBase
 		  var grid as new ObjectGrid
 		  var startPipe as Pipe = ToGrid( grid, input )
 		  
-		  var startingPoint as Pipe = GetStartingPoint( startPipe )
+		  var trail() as Pipe = GetTrail( grid, startPipe )
+		  var count as integer = ( trail.Count + 1 ) \ 2
 		  
-		  var count as integer
-		  var current as Pipe = startingPoint
-		  var visited as new Dictionary
-		  
-		  do
-		    visited.Value( current ) = nil
-		    
-		    count = count + 1
-		    
-		    var neighbors() as Pipe = current.Successors
-		    for each p as Pipe in neighbors
-		      if p is startPipe and count = 1 then
-		        continue
-		      end if
-		      
-		      if visited.HasKey( p ) then
-		        continue
-		      end if
-		      
-		      current = p
-		      exit
-		    next
-		  loop until current is startPipe
-		  
-		  count = ( count + 1 ) \ 2
 		  return count : if( IsTest, 8, 6697 )
 		  
 		End Function
@@ -96,31 +72,31 @@ Inherits AdventBase
 		  'if not IsTest then
 		  'return 0
 		  'end if
-		  '
 		  
 		  
+		  const kInside as string = "I"
+		  const kOutside as string = "o"
 		  
 		  var grid as new ObjectGrid
 		  var startPipe as Pipe = ToGrid( grid, input )
 		  
 		  var trail() as Pipe = GetTrail( grid, startPipe )
+		  for each gm as GridMember in trail
+		    gm.RawValue = gm.Value
+		  next
 		  
 		  const kRight as string = "→︎"
 		  const kLeft as string = "←︎"
 		  const kUp as string = "↑︎"
 		  const kDown as string = "↓︎"
-		  const kOutside as string = "o"
-		  const kInside as string = "I"
 		  
-		  for row as integer = 0 to grid.LastRowIndex
-		    for col as integer = 0 to grid.LastColIndex
-		      grid( row, col ).Value = kOutside
-		    next
+		  for each gm as GridMember in grid
+		    gm.Value = kOutside
 		  next
 		  
-		  for i as integer = 0 to trail.LastIndex - 1
+		  for i as integer = 0 to trail.LastIndex
 		    var this as Pipe = trail( i )
-		    var nxt as Pipe = trail( i + 1 )
+		    var nxt as Pipe = if( i = trail.LastIndex, trail( 0 ), trail( i + 1 ) )
 		    
 		    var use as string
 		    
@@ -137,62 +113,53 @@ Inherits AdventBase
 		    this.Value = use
 		  next
 		  
-		  startPipe.Value = "S"
-		  
-		  select case trail( 0 ).Value
-		  case kUp
-		    trail( 0 ).Value = "⇑"
-		  case kDown
-		    trail( 0 ).Value = "⇓"
-		  case kLeft
-		    trail( 0 ).Value = "⇐"
-		  case kRight
-		    trail( 0 ).Value = "⇒"
-		  end select
-		  
-		  for row as integer = 0 to grid.LastRowIndex
-		    ClearValue( grid, grid( row, 0 ), kOutside )
-		    ClearValue( grid, grid( row, grid.LastColIndex ), kOutside )
-		  next
-		  for col as integer = 0 to grid.LastColIndex
-		    ClearValue( grid, grid( 0, col ), kOutside )
-		    ClearValue( grid, grid( grid.LastRowIndex, col ), kOutside )
+		  for each p as Pipe in trail
+		    select case p.Value
+		    case kRight
+		      Mark( grid, grid.Below( p ), kOutside, kInside )
+		      if p.RawValue = "7" then
+		        Mark( grid, grid.Left( p ), kOutside, kInside )
+		      elseif p.RawValue = "J" then
+		        Mark( grid, grid.Right( p ), kOutside, kInside )
+		      elseif p.RawValue = "L" then
+		        Mark( grid, grid.Left( p ), kOutside, kInside )
+		      elseif p.RawValue = "J" then
+		        Mark( grid, grid.Right( p ), kOutside, kInside )
+		      end if
+		    case kDown
+		      Mark( grid, grid.Left( p ), kOutside, kInside )
+		      if p.RawValue = "J" then
+		        Mark( grid, grid.Above( p ), kOutside, kInside )
+		      elseif p.RawValue = "L" then
+		        Mark( grid, grid.Below( p ), kOutside, kInside )
+		      end if
+		    case kLeft
+		      Mark( grid, grid.Above( p ), kOutside, kInside )
+		      if p.RawValue = "L" then
+		        Mark( grid, grid.Right( p ), kOutside, kInside )
+		      elseif p.RawValue = "F" then
+		        Mark( grid, grid.Left( p ), kOutside, kInside )
+		      end if
+		    case kUp
+		      Mark( grid, grid.Right( p ), kOutside, kInside )
+		      if p.RawValue = "F" then
+		        Mark( grid, grid.Below( p ), kOutside, kInside )
+		      elseif p.RawValue = "7" then
+		        Mark( grid, grid.Above( p ), kOutside, kInside )
+		      end if
+		    end select
 		  next
 		  
 		  var count as integer
 		  for each gm as GridMember in grid
-		    if gm.Value = kOutside then
+		    if gm.Value = kInside then
 		      count = count + 1
-		      gm.Value = kInside
 		    end if
 		  next
 		  
-		  print grid
-		  print ""
-		  
-		  return count : if( IsTest, 8, 0 )
+		  return count : if( IsTest, 8, 423 )
 		  
 		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Sub ClearValue(grid As ObjectGrid, m As GridMember, outside As String)
-		  if m is nil or m.Value = " " then
-		    return
-		  end if
-		  
-		  var p as Pipe = Pipe( m )
-		  if p.Value = outside then
-		    p.Value = " "
-		    
-		    var n() as GridMember = p.Neighbors( true )
-		    
-		    for each gm as GridMember in n
-		      ClearValue( grid, gm, outside )
-		    next
-		  end if
-		  
-		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
@@ -270,6 +237,24 @@ Inherits AdventBase
 		  return trail
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub Mark(grid As ObjectGrid, m As GridMember, fromMark As String, toMark As String)
+		  if m is nil or m.Value <> fromMark then
+		    return
+		  end if
+		  
+		  m.Value = toMark
+		  
+		  var p as Pipe = Pipe( m )
+		  var n() as GridMember = p.Neighbors( false )
+		  
+		  for each gm as GridMember in n
+		    Mark( grid, gm, fromMark, toMark )
+		  next
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
