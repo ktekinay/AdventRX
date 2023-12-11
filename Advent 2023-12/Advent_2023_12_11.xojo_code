@@ -3,20 +3,20 @@ Protected Class Advent_2023_12_11
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "Unknown"
+		  return "Track galaxies in an expanding universe"
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return false
+		  return true
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnName() As String
-		  return ""
+		  return "Cosmic Expansion"
 		  
 		End Function
 	#tag EndEvent
@@ -55,11 +55,70 @@ Inherits AdventBase
 
 
 	#tag Method, Flags = &h21
+		Private Function BlankCols(grid As ObjectGrid) As Integer()
+		  var blankCols() as integer
+		  
+		  for col as integer = 0 to grid.LastColIndex
+		    for row as integer = 0 to grid.LastRowIndex
+		      if grid( row, col ) isa object then
+		        continue for col
+		      end if
+		    next
+		    blankCols.Add col
+		  next
+		  
+		  return blankCols
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function BlankRows(grid As ObjectGrid) As Integer()
+		  var blankRows() as integer
+		  
+		  for row as integer = 0 to grid.LastRowIndex
+		    for col as integer = 0 to grid.LastColIndex
+		      if grid( row, col ) isa object then
+		        continue for row
+		      end if
+		    next
+		    blankRows.Add row
+		  next
+		  
+		  return blankRows
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Variant
+		  return Solve( input, 2 ) : if( IsTest, 374, 9974721 )
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CalculateResultB(input As String) As Variant
+		  return Solve( input, if( IsTest, 100, 1000000 ) ) : if( IsTest, 8410, 702770569197 )
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub NullBlanks(grid As ObjectGrid)
+		  for each gm as GridMember in grid
+		    if gm.Value = "." then
+		      grid( gm.Row, gm.Column ) = nil
+		    end if
+		  next
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function Solve(input As String, multiplier As Integer) As Integer
 		  var grid as ObjectGrid = ObjectGrid.FromStringGrid( ToStringGrid( input ) )
 		  NullBlanks grid
-		  
-		  Expand grid
 		  
 		  var galaxies() as GridMember
 		  
@@ -70,6 +129,41 @@ Inherits AdventBase
 		    
 		    galaxies.Add gm
 		  next
+		  
+		  var add as integer = multiplier - 1
+		  
+		  if true then
+		    var blankRows() as integer = BlankRows( grid )
+		    
+		    for i as integer = 1 to blankRows.LastIndex
+		      blankRows( i ) = blankRows( i ) + ( i * add )
+		    next
+		    
+		    for each row as integer in blankRows
+		      for each gm as GridMember in Galaxies
+		        if gm.Row > row then
+		          gm.Row = gm.Row + add
+		        end if
+		      next
+		    next
+		  end if
+		  
+		  if true then
+		    var blankCols() as integer = BlankCols( grid )
+		    
+		    for i as integer = 1 to blankCols.LastIndex
+		      blankCols( i ) = blankCols( i ) + ( i * add )
+		    next
+		    
+		    var colAdd as integer = add
+		    for each col as integer in blankCols
+		      for each gm as GridMember in Galaxies
+		        if gm.Column > col then
+		          gm.Column = gm.Column + add
+		        end if
+		      next
+		    next
+		  end if
 		  
 		  var total as integer
 		  
@@ -82,72 +176,9 @@ Inherits AdventBase
 		    next
 		  next
 		  
-		  'if IsTest then
-		  'print grid
-		  'end if
-		  
-		  return total : if( IsTest, 374, 0 )
+		  return total 
 		  
 		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Function CalculateResultB(input As String) As Variant
-		  
-		  
-		  
-		  return 0 : if( IsTest, 0, 0 )
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Sub Expand(grid As ObjectGrid)
-		  var blankRows() as integer
-		  
-		  for row as integer = 0 to grid.LastRowIndex
-		    for col as integer = 0 to grid.LastColIndex
-		      if grid( row, col ) isa object then
-		        continue for row
-		      end if
-		    next
-		    blankRows.Add row
-		  next
-		  
-		  var blankCols() as integer
-		  
-		  for col as integer = 0 to grid.LastColIndex
-		    for row as integer = 0 to grid.LastRowIndex
-		      if grid( row, col ) isa object then
-		        continue for col
-		      end if
-		    next
-		    blankCols.Add col
-		  next
-		  
-		  for i as integer = blankRows.LastIndex downto 0
-		    var row as integer = blankRows( i )
-		    grid.InsertRowAt row
-		  next
-		  
-		  for i as integer = blankCols.LastIndex downto 0
-		    var col as integer = blankCols( i )
-		    grid.InsertColumnAt col
-		  next
-		  
-		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Sub NullBlanks(grid As ObjectGrid)
-		  for each gm as GridMember in grid
-		    if gm.Value = "." then
-		      grid( gm.Row, gm.Column ) = nil
-		    end if
-		  next
-		  
-		End Sub
 	#tag EndMethod
 
 
