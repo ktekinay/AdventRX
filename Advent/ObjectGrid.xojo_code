@@ -142,6 +142,42 @@ Implements Iterable,Iterator
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub InsertColumnAt(beforeColumn As Integer)
+		  if beforeColumn < 0 or beforeColumn > LastColIndex + 1 then
+		    raise new OutOfBoundsException
+		  end if
+		  
+		  ResizeTo LastRowIndex, LastColIndex + 1
+		  
+		  for row as integer = 0 to LastRowIndex
+		    for col as integer = LastColIndex - 1 downto beforeColumn
+		      var gm as GridMember = Grid( row, col )
+		      Operator_Subscript( row, col + 1 ) = gm
+		    next
+		  next
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub InsertRowAt(beforeRow As Integer)
+		  if beforeRow < 0 or beforeRow > LastRowIndex + 1 then
+		    raise new OutOfBoundsException
+		  end if
+		  
+		  ResizeTo LastRowIndex + 1, LastColIndex
+		  
+		  for row as integer = LastRowIndex - 1 downto beforeRow
+		    for col as integer = 0 to LastColIndex
+		      var gm as GridMember = Grid( row, col )
+		      Operator_Subscript( row + 1, col ) = gm
+		    next
+		  next
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21
 		Private Function Iterator() As Iterator
 		  // Part of the Iterable interface.
@@ -227,10 +263,11 @@ Implements Iterable,Iterator
 	#tag Method, Flags = &h0
 		Sub Operator_Subscript(row As Integer, col As Integer, Assigns m As GridMember)
 		  Grid( row, col ) = m
-		  m.Grid = self
-		  m.Row = row
-		  m.Column = col
-		  
+		  if m isa object then
+		    m.Grid = self
+		    m.Row = row
+		    m.Column = col
+		  end if
 		End Sub
 	#tag EndMethod
 
