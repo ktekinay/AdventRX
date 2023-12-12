@@ -155,7 +155,6 @@ Inherits AdventBase
 		      blankCols( i ) = blankCols( i ) + ( i * add )
 		    next
 		    
-		    var colAdd as integer = add
 		    for each col as integer in blankCols
 		      for each gm as GridMember in Galaxies
 		        if gm.Column > col then
