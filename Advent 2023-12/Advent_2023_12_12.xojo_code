@@ -3,20 +3,20 @@ Protected Class Advent_2023_12_12
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "Unknown"
+		  return "How many permutations fit the pattern?"
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return false
+		  return true
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnName() As String
-		  return ""
+		  return "Hot Springs"
 		  
 		End Function
 	#tag EndEvent
@@ -73,7 +73,7 @@ Inherits AdventBase
 		    
 		    var springIndex as integer = LocateFirst( row )
 		    
-		    counts.Add CountArrangements( springs, patterns, springIndex, lastStartingIndex )
+		    counts.Add CountArrangements( springs, patterns, springIndex, lastStartingIndex, new Dictionary )
 		  next
 		  
 		  var count as integer = SumArray( counts )
@@ -98,16 +98,16 @@ Inherits AdventBase
 		    
 		    var springIndex as integer = LocateFirst( row )
 		    
-		    count = count + CountArrangements( springs, patterns, springIndex, lastStartingIndex )
+		    count = count + CountArrangements( springs, patterns, springIndex, lastStartingIndex, new Dictionary )
 		  next
 		  
-		  return count : if( IsTest, 525152, 0 )
+		  return count : if( IsTest, 525152, 17788038834112 )
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function CountArrangements(springs As MemoryBlock, patterns() As Integer, springIndex As Integer, lastStartingIndex As Integer, hashCount As Integer = 0, patternIndex As Integer = 0) As Integer
+		Private Function CountArrangements(springs As MemoryBlock, patterns() As Integer, springIndex As Integer, lastStartingIndex As Integer, trail As Dictionary, hashCount As Integer = 0, patternIndex As Integer = 0) As Integer
 		  if springIndex >= springs.Size then
 		    if patternIndex > patterns.LastIndex and hashCount = 0 then
 		      return 1
@@ -118,35 +118,37 @@ Inherits AdventBase
 		    else
 		      return 0
 		    end if
-		    
-		    'var count as integer = Matches( springs, patterns )
-		    'if count = 1 then
-		    'count = count
-		    'end if
-		    
-		    'return count
 		  end if
+		  
+		  var trailKey as integer = hashCount * 10000000 + patternIndex * 1000000 + springIndex * 100000 + lastStartingIndex
+		  
+		  if trail.HasKey( trailKey ) then
+		    return trail.Value( trailKey )
+		  end if
+		  
+		  var count as integer
 		  
 		  var p as ptr = springs
 		  
 		  if patternIndex > patterns.LastIndex then
 		    for i as integer = springIndex to springs.Size - 1
 		      if p.Byte( i ) = kHash then
-		        return 0
+		        goto Fin
 		      end if
 		    next
 		    
-		    return 1
+		    count = 1
+		    goto Fin
 		  end if
 		  
 		  if hashCount = 0 and springIndex > lastStartingIndex then
-		    return 0
+		    goto Fin
 		  end if
 		  
 		  var pattern as integer = patterns( patternIndex )
 		  
 		  if hashCount > pattern then
-		    return 0
+		    goto Fin
 		  end if
 		  
 		  var spring as integer = p.Byte( springIndex )
@@ -155,12 +157,12 @@ Inherits AdventBase
 		    if spring = kHash then
 		      hashCount = hashCount + 1
 		      if hashCount > pattern then
-		        return 0
+		        goto Fin
 		      end if
 		      
 		    elseif hashCount <> 0 then // It's a dot
 		      if hashCount <> pattern then
-		        return 0
+		        goto Fin
 		      end if
 		      
 		      hashCount = 0 
@@ -169,25 +171,31 @@ Inherits AdventBase
 		      
 		    end if
 		    
-		    return CountArrangements( springs, patterns, springIndex + 1, lastStartingIndex, hashCount, patternIndex )
+		    count = CountArrangements( springs, patterns, springIndex + 1, lastStartingIndex, trail, hashCount, patternIndex )
+		    goto Fin
 		  end if
 		  
-		  if hashCount = 0 and springIndex > lastStartingIndex then
-		    return 0
-		  end if
-		  
-		  var count as integer
-		  
+		  //
+		  // Test a hash
+		  //
 		  if hashCount < pattern then
-		    count = count + CountArrangements( springs, patterns, springIndex + 1, lastStartingIndex, hashCount + 1, patternIndex )
+		    count = count + CountArrangements( springs, patterns, springIndex + 1, lastStartingIndex, trail, hashCount + 1, patternIndex )
 		  end if
 		  
+		  //
+		  // Test a dot
+		  //
 		  if hashCount = 0 then
-		    count = count + CountArrangements( springs, patterns, springIndex + 1, lastStartingIndex, 0, patternIndex )
+		    count = count + CountArrangements( springs, patterns, springIndex + 1, lastStartingIndex, trail, 0, patternIndex )
 		  elseif hashCount = pattern then
-		    count = count + CountArrangements( springs, patterns, springIndex + 1, lastStartingIndex + pattern + 1, 0, patternIndex + 1 )
+		    count = count + CountArrangements( springs, patterns, springIndex + 1, lastStartingIndex + pattern + 1, trail, 0, patternIndex + 1 )
 		  end if
 		  
+		  //
+		  // Using evil goto because refactoring at this point was more than I wanted to do
+		  //
+		  Fin:
+		  trail.Value( trailKey ) = count
 		  return count
 		  
 		End Function
@@ -268,7 +276,7 @@ Inherits AdventBase
 		Private Sub Parse(row As String, repeat As Integer, ByRef toSprings As String, ByRef toPatterns() As Integer, ByRef toLastStartingIndex As Integer)
 		  var parts() as string = row.Split( " " )
 		  if repeat > 1 then
-		    parts( 0 ) = Duplicate( parts( 0 ), repeat, "" )
+		    parts( 0 ) = Duplicate( parts( 0 ), repeat, "?" )
 		    parts( 1 ) = Duplicate( parts( 1 ), repeat, "," )
 		  end if
 		  
