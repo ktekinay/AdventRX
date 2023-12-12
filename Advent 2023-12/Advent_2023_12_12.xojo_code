@@ -56,11 +56,6 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Variant
-		  'if not IsTest then
-		  'return 0
-		  'end if
-		  
-		  'input = ".??..??...?##. 1,1,3"
 		  var rows() as string = ToStringArray( input )
 		  
 		  var counts() as integer
@@ -108,18 +103,6 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CountArrangements(springs As MemoryBlock, patterns() As Integer, springIndex As Integer, lastStartingIndex As Integer, trail As Dictionary, hashCount As Integer = 0, patternIndex As Integer = 0) As Integer
-		  if springIndex >= springs.Size then
-		    if patternIndex > patterns.LastIndex and hashCount = 0 then
-		      return 1
-		    elseif patternIndex > patterns.LastIndex then
-		      return 0
-		    elseif patternIndex = patterns.LastIndex and hashCount = patterns( patterns.LastIndex ) then
-		      return 1
-		    else
-		      return 0
-		    end if
-		  end if
-		  
 		  var trailKey as integer = hashCount * 10000000 + patternIndex * 1000000 + springIndex * 100000 + lastStartingIndex
 		  
 		  if trail.HasKey( trailKey ) then
@@ -222,52 +205,6 @@ Inherits AdventBase
 		      return i
 		    end if
 		  next
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Function Matches(springs As MemoryBlock, patterns() As Integer) As Integer
-		  var p as ptr = springs
-		  var lastByteIndex as integer = springs.Size - 1
-		  
-		  var existingPatterns() as integer
-		  var patternCount as integer
-		  
-		  for i as integer = 0 to lastByteIndex
-		    if p.Byte( i ) = kDot then
-		      if patternCount <> 0 then
-		        if existingPatterns.LastIndex = patterns.LastIndex then
-		          return 0
-		        end if
-		        
-		        if patterns( existingPatterns.Count ) <> patternCount then
-		          return 0
-		        end if
-		        
-		        existingPatterns.Add patternCount
-		        patternCount = 0
-		      end if
-		      
-		    else
-		      patternCount = patternCount + 1
-		      
-		    end if
-		  next
-		  
-		  if patternCount <> 0 then
-		    existingPatterns.Add patternCount
-		  end if
-		  
-		  if existingPatterns.LastIndex <> patterns.LastIndex then
-		    return 0
-		  end if
-		  
-		  if existingPatterns( existingPatterns.LastIndex ) <> patterns( patterns.LastIndex ) then
-		    return 0
-		  end if
-		  
-		  return 1
 		  
 		End Function
 	#tag EndMethod
