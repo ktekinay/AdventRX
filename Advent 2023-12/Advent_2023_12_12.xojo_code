@@ -56,15 +56,24 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Variant
+		  'if not IsTest then
+		  'return 0
+		  'end if
+		  
+		  'input = ".??..??...?##. 1,1,3"
 		  var rows() as string = ToStringArray( input )
 		  
 		  var counts() as integer
 		  for each row as string in rows
-		    var parts() as string = row.Split( " " )
-		    var springs as string = parts( 0 )
-		    var patterns() as integer = ToIntegerArray( parts( 1 ).Split( "," ) )
+		    var springs as string 
+		    var patterns() as integer
+		    var lastStartingIndex as integer
 		    
-		    counts.Add CountArrangements( springs, patterns )
+		    Parse( row, 1, springs, patterns, lastStartingIndex )
+		    
+		    var springIndex as integer = LocateFirst( row )
+		    
+		    counts.Add CountArrangements( springs, patterns, springIndex, lastStartingIndex )
 		  next
 		  
 		  var count as integer = SumArray( counts )
@@ -81,14 +90,15 @@ Inherits AdventBase
 		  
 		  var count as integer
 		  for each row as string in rows
-		    var parts() as string = row.Split( " " )
-		    parts( 0 ) = Duplicate( parts( 0 ), kRepeat, "?" )
-		    parts( 1 ) = Duplicate( parts( 1 ), kRepeat, "," )
+		    var springs as string 
+		    var patterns() as integer
+		    var lastStartingIndex as integer
 		    
-		    var springs as string = parts( 0 )
-		    var patterns() as integer = ToIntegerArray( parts( 1 ).Split( "," ) )
+		    Parse( row, kRepeat, springs, patterns, lastStartingIndex )
 		    
-		    count = count + CountArrangements( springs, patterns )
+		    var springIndex as integer = LocateFirst( row )
+		    
+		    count = count + CountArrangements( springs, patterns, springIndex, lastStartingIndex )
 		  next
 		  
 		  return count : if( IsTest, 525152, 0 )
@@ -97,32 +107,86 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function CountArrangements(springs As MemoryBlock, patterns() As Integer, springIndex As Integer = 0) As Integer
+		Private Function CountArrangements(springs As MemoryBlock, patterns() As Integer, springIndex As Integer, lastStartingIndex As Integer, hashCount As Integer = 0, patternIndex As Integer = 0) As Integer
 		  if springIndex >= springs.Size then
-		    var count as integer = Matches( springs, patterns )
-		    if count = 1 then
-		      count = count
+		    if patternIndex > patterns.LastIndex and hashCount = 0 then
+		      return 1
+		    elseif patternIndex > patterns.LastIndex then
+		      return 0
+		    elseif patternIndex = patterns.LastIndex and hashCount = patterns( patterns.LastIndex ) then
+		      return 1
+		    else
+		      return 0
 		    end if
 		    
-		    return count
+		    'var count as integer = Matches( springs, patterns )
+		    'if count = 1 then
+		    'count = count
+		    'end if
+		    
+		    'return count
 		  end if
 		  
 		  var p as ptr = springs
 		  
+		  if patternIndex > patterns.LastIndex then
+		    for i as integer = springIndex to springs.Size - 1
+		      if p.Byte( i ) = kHash then
+		        return 0
+		      end if
+		    next
+		    
+		    return 1
+		  end if
+		  
+		  if hashCount = 0 and springIndex > lastStartingIndex then
+		    return 0
+		  end if
+		  
+		  var pattern as integer = patterns( patternIndex )
+		  
+		  if hashCount > pattern then
+		    return 0
+		  end if
+		  
 		  var spring as integer = p.Byte( springIndex )
+		  
 		  if spring <> kQuestionMark then
-		    return CountArrangements( springs, patterns, springIndex + 1 )
+		    if spring = kHash then
+		      hashCount = hashCount + 1
+		      if hashCount > pattern then
+		        return 0
+		      end if
+		      
+		    elseif hashCount <> 0 then // It's a dot
+		      if hashCount <> pattern then
+		        return 0
+		      end if
+		      
+		      hashCount = 0 
+		      patternIndex = patternIndex + 1
+		      lastStartingIndex = lastStartingIndex + pattern + 1
+		      
+		    end if
+		    
+		    return CountArrangements( springs, patterns, springIndex + 1, lastStartingIndex, hashCount, patternIndex )
+		  end if
+		  
+		  if hashCount = 0 and springIndex > lastStartingIndex then
+		    return 0
 		  end if
 		  
 		  var count as integer
 		  
-		  p.Byte( springIndex ) = kHash
-		  count = CountArrangements( springs, patterns, springIndex + 1 )
+		  if hashCount < pattern then
+		    count = count + CountArrangements( springs, patterns, springIndex + 1, lastStartingIndex, hashCount + 1, patternIndex )
+		  end if
 		  
-		  p.Byte( springIndex ) = kDot
-		  count = count + CountArrangements( springs, patterns, springIndex + 1 )
-		  
-		  p.Byte( springIndex ) = spring
+		  if hashCount = 0 then
+		    count = count + CountArrangements( springs, patterns, springIndex + 1, lastStartingIndex, 0, patternIndex )
+		  elseif hashCount = pattern then
+		    count = count + CountArrangements( springs, patterns, springIndex + 1, lastStartingIndex + pattern + 1, 0, patternIndex + 1 )
+		  end if
 		  
 		  return count
 		  
@@ -139,6 +203,17 @@ Inherits AdventBase
 		  next
 		  
 		  return String.FromArray( arr, joiner )
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function LocateFirst(s As String) As Integer
+		  for i as integer = 0 to s.Bytes - 1
+		    if s.MiddleBytes( i, 1 ) <> "." then
+		      return i
+		    end if
+		  next
 		  
 		End Function
 	#tag EndMethod
@@ -187,6 +262,26 @@ Inherits AdventBase
 		  return 1
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub Parse(row As String, repeat As Integer, ByRef toSprings As String, ByRef toPatterns() As Integer, ByRef toLastStartingIndex As Integer)
+		  var parts() as string = row.Split( " " )
+		  if repeat > 1 then
+		    parts( 0 ) = Duplicate( parts( 0 ), repeat, "" )
+		    parts( 1 ) = Duplicate( parts( 1 ), repeat, "," )
+		  end if
+		  
+		  toSprings = parts( 0 )
+		  toPatterns = ToIntegerArray( parts( 1 ).Split( "," ) )
+		  
+		  var patternSum as integer = SumArray( toPatterns )
+		  var sepCount as integer = toPatterns.LastIndex
+		  var springLen as integer = toSprings.Bytes
+		  
+		  toLastStartingIndex = springLen - ( patternSum + sepCount )
+		  
+		End Sub
 	#tag EndMethod
 
 
