@@ -56,13 +56,13 @@ Inherits AdventBase
 
 
 	#tag Method, Flags = &h21
-		Private Function CalculateResultA(input As String) As Integer
-		  return Solve( input )
+		Private Function CalculateResultA(input As String) As Variant
+		  return Solve( input ) : if( IsTest, 142, 54239 )
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function CalculateResultB(input As String) As Integer
+		Private Function CalculateResultB(input As String) As Variant
 		  #if not DebugBuild
 		    #pragma BackgroundTasks false
 		    #pragma BoundsChecking false
@@ -80,7 +80,7 @@ Inherits AdventBase
 		  input = input.ReplaceAllBytes( "eight", "e8t" )
 		  input = input.ReplaceAllBytes( "nine", "n9e" )
 		  
-		  return Solve( input )
+		  return Solve( input ) : if( IsTest, 281, 55343 )
 		End Function
 	#tag EndMethod
 

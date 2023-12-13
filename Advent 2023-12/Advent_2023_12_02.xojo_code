@@ -55,7 +55,7 @@ Inherits AdventBase
 
 
 	#tag Method, Flags = &h21
-		Private Function CalculateResultA(input As String) As Integer
+		Private Function CalculateResultA(input As String) As Variant
 		  var games() as Dictionary = ToGames( input )
 		  
 		  var ids() as integer
@@ -67,12 +67,12 @@ Inherits AdventBase
 		    end if
 		  next
 		  
-		  return SumArray( ids )
+		  return SumArray( ids ) : if( IsTest, 8, 2176 )
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function CalculateResultB(input As String) As Integer
+		Private Function CalculateResultB(input As String) As Variant
 		  var games() as Dictionary = ToGames( input )
 		  
 		  var powers as integer
@@ -81,7 +81,7 @@ Inherits AdventBase
 		    powers = powers + ( game.Lookup( "red", 0 ) * game.Lookup( "green", 0 ) * game.Lookup( "blue", 0 ) )
 		  next
 		  
-		  return powers
+		  return powers : if( IsTest, 2286, 63700 )
 		  
 		End Function
 	#tag EndMethod

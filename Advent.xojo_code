@@ -35,6 +35,19 @@ Protected Module Advent
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function Column(Extends arr(, ) As String, column As Integer) As String()
+		  var colValues() as string
+		  var lastRowIndex as integer = arr.LastIndex( 1 )
+		  for row as integer = 0 to lastRowIndex
+		    colValues.Add arr( row, column )
+		  next
+		  
+		  return colValues
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function GreatestCommonDivisor(val1 As Integer, val2 As Integer) As Integer
 		  if val2 = 0 then
 		    return val1
@@ -252,6 +265,19 @@ Protected Module Advent
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function Row(Extends arr(, ) As String, row As Integer) As String()
+		  var rowValues() as string
+		  var lastColIndex as integer = arr.LastIndex( 2 )
+		  for col as integer = 0 to lastColIndex
+		    rowValues.Add arr( row, col )
+		  next
+		  
+		  return rowValues
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function Squeeze(Extends src As String, charSet As String = " ") As String
 		  // Find any repeating characters, where the character is a member of
 		  // charSet, and replace the run with a single character.  Example:
@@ -418,6 +444,13 @@ Protected Module Advent
 	#tag Method, Flags = &h0
 		Function ToKey(Extends pt As Xojo.Point, adjuster As Double = 10000000.0) As Variant
 		  return pt.X * adjuster + pt.Y
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function ToString(Extends arr() As String, sep As String = "") As String
+		  return String.FromArray( arr, sep )
 		  
 		End Function
 	#tag EndMethod

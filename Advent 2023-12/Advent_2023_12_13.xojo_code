@@ -126,26 +126,12 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function ColumnToString(grid(, ) As String, column As Integer) As String
-		  var arr() as string
-		  arr.ResizeTo grid.LastIndex( 1 )
-		  
-		  for row as integer = 0 to arr.LastIndex
-		    arr( row ) = grid( row, column )
-		  next
-		  
-		  return String.FromArray( arr, "" )
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
 		Private Function HorizontalReflection(grid(, ) As String, ignore As Integer = -1) As Integer
 		  var lastColIndex as integer = grid.LastIndex( 2 )
 		  
 		  var cols() as string
 		  for col as integer = 0 to lastColIndex
-		    cols.Add ColumnToString( grid, col )
+		    cols.Add grid.Column( col ).ToString
 		  next
 		  
 		  for checkCol as integer = 1 to cols.LastIndex
@@ -174,26 +160,12 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function RowToString(grid(, ) As String, row As Integer) As String
-		  var arr() as string
-		  arr.ResizeTo grid.LastIndex( 2 )
-		  
-		  for col as integer = 0 to arr.LastIndex
-		    arr( col ) = grid( row, col )
-		  next
-		  
-		  return String.FromArray( arr, "" )
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
 		Private Function VerticalReflection(grid(, ) As String, ignore As Integer = -1) As Integer
 		  var lastRowIndex as integer = grid.LastIndex( 1 )
 		  
 		  var rows() as string
 		  for row as integer = 0 to lastRowIndex
-		    rows.Add RowToString( grid, row )
+		    rows.Add grid.Row( row ).ToString
 		  next
 		  
 		  for checkRow as integer = 1 to rows.LastIndex
