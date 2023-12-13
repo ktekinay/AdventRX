@@ -11,9 +11,14 @@ label = label.ReplaceAll( "-", "_" )
 var parts() as string = label.Split( "_" )
 
 select case parts.Count
-case is < 2
+case is < 1
 print "Not enough parts!"
 return
+
+case 1
+var now as new Date
+parts.AddAt 0, now.Year.ToString
+parts.AddAt 1, "12"
 
 case 2
 parts.Add parts( 1 )
