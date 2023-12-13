@@ -187,6 +187,7 @@ Class=Advent_2023_12_09;Advent 2023-12/Advent_2023_12_09.xojo_code;&h000000005C3
 Class=Advent_2023_12_10;Advent 2023-12/Advent_2023_12_10.xojo_code;&h000000003D9CC7FF;&h0000000057767FFF;false
 Class=Advent_2023_12_11;Advent 2023-12/Advent_2023_12_11.xojo_code;&h0000000006EDAFFF;&h0000000057767FFF;false
 Class=Advent_2023_12_12;Advent 2023-12/Advent_2023_12_12.xojo_code;&h0000000065813FFF;&h0000000057767FFF;false
+Class=Advent_2023_12_13;Advent 2023-12/Advent_2023_12_13.xojo_code;&h0000000013AA2FFF;&h0000000057767FFF;false
 Class=PriorityQueue_MTC;Other Tools/PriorityQueue_MTC.xojo_code;&h000000007E5887FF;&h000000007F74CFFF;false
 Module=M_2023;Advent 2023-12/M_2023.xojo_code;&h000000006BEFA7FF;&h0000000057767FFF;false
 Class=SeedMap;Advent 2023-12/M_2023/SeedMap.xojo_code;&h0000000017EBCFFF;&h000000006BEFA7FF;false
