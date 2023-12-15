@@ -66,7 +66,7 @@ Inherits AdventBase
 		  for row as integer = 0 to rows.LastIndex
 		    var line as string = rows( row )
 		    
-		    var match as RegExMAtch = rx.Search( line )
+		    var match as RegExMatch = rx.Search( line )
 		    
 		    while match isa RegExMatch
 		      var d as string = match.SubExpressionString( 0 )

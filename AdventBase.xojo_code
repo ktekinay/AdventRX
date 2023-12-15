@@ -123,6 +123,12 @@ Inherits Thread
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
+		Protected Sub Print(grid(, ) As String)
+		  PrintStringGrid grid
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
 		Protected Sub Print(msg As Variant)
 		  #pragma BackgroundTasks true
 		  
