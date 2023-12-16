@@ -318,6 +318,7 @@ End
 		  AddRow new Advent_2023_12_13
 		  AddRow new Advent_2023_12_14
 		  AddRow new Advent_2023_12_15
+		  AddRow new Advent_2023_12_16
 		  
 		  // Expand
 		  ExpandYear 2023
