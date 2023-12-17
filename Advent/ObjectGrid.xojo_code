@@ -124,7 +124,28 @@ Implements Iterable,Iterator
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Shared Function FromStringGrid(sgrid(, ) As String) As ObjectGrid
+		Shared Function FromStringGrid(sgrid(, ) As String, template As GridMember = Nil) As ObjectGrid
+		  var templateConstructor as Introspection.ConstructorInfo
+		  
+		  if template isa object then
+		    var ti as Introspection.TypeInfo = Introspection.GetType( template )
+		    for each c as Introspection.ConstructorInfo in ti.GetConstructors
+		      var params() as Introspection.ParameterInfo = c.GetParameters
+		      if params.Count <> 1 then
+		        continue for c
+		      end if
+		      var param as Introspection.ParameterInfo = params( 0 )
+		      if param.ParameterType.Name = "Variant" then
+		        templateConstructor = c
+		        exit for c
+		      end if
+		    next
+		    
+		    if templateConstructor is nil then
+		      raise new RuntimeException( "Could not locate Constructor" )
+		    end if
+		  end if
+		  
 		  var lastRowIndex as integer = sgrid.LastIndex( 1 )
 		  var lastColIndex as integer = sgrid.LastIndex( 2 )
 		  
@@ -133,7 +154,14 @@ Implements Iterable,Iterator
 		  
 		  for row as integer = 0  to lastRowIndex
 		    for col as integer = 0 to lastColIndex
-		      grid( row, col ) = new GridMember( sgrid( row, col ) )
+		      var value as variant = sgrid( row, col )
+		      if template isa object then
+		        var values() as variant
+		        values.Add value
+		        grid( row, col ) = templateConstructor.Invoke( values )
+		      else
+		        grid( row, col ) = new GridMember( sgrid( row, col ) )
+		      end if
 		    next
 		  next
 		  
