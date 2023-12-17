@@ -126,8 +126,6 @@ Inherits AdventBase
 		  
 		  while beams.Count <> 0
 		    
-		    var newBeams() as LightBeam
-		    
 		    for i as integer = beams.LastIndex downto 0
 		      var beam as LightBeam = beams( i )
 		      beam.Move
@@ -168,7 +166,8 @@ Inherits AdventBase
 		        newBeam.Direction = "E"
 		        newBeam.Row = beam.Row
 		        newBeam.Column = beam.Column
-		        newBeams.Add newBeam
+		        'newBeams.Add newBeam
+		        beams.Add newBeam
 		        
 		      case "|"
 		        if beam.Direction = "N" or beam.Direction = "S" then
@@ -180,13 +179,10 @@ Inherits AdventBase
 		        newBeam.Direction = "S"
 		        newBeam.Row = beam.Row
 		        newBeam.Column = beam.Column
-		        newBeams.Add newBeam
+		        'newBeams.Add newBeam
+		        beams.Add newBeam
 		        
 		      end select
-		    next
-		    
-		    for each beam as LightBeam in newBeams
-		      beams.Add beam
 		    next
 		    
 		  wend
