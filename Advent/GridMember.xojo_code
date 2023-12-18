@@ -16,8 +16,10 @@ Class GridMember
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function Neighbors(includeDiagonal As Boolean, reset As Boolean = False) As GridMember()
-		  if not reset and GotNeighbors then
+		Function Neighbors(includeDiagonal As Boolean, ignoreCache As Boolean = False) As GridMember()
+		  var useCache as boolean = not ignoreCache
+		  
+		  if useCache and GotNeighbors then
 		    return MyNeighbors
 		  end if
 		  
@@ -42,10 +44,12 @@ Class GridMember
 		    end if
 		  next
 		  
-		  MyNeighbors = neighbors
-		  GotNeighbors = true
+		  if useCache then
+		    MyNeighbors = neighbors
+		    GotNeighbors = true
+		  end if
 		  
-		  return MyNeighbors
+		  return neighbors
 		  
 		End Function
 	#tag EndMethod

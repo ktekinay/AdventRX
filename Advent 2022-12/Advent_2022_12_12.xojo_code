@@ -56,7 +56,7 @@ Inherits AdventBase
 
 
 	#tag Method, Flags = &h21
-		Private Function CalculateResultA(input As String) As Integer
+		Private Function CalculateResultA(input As String) As Variant
 		  var grid as new ObjectGrid
 		  var startPos as TreeGridMember
 		  var endPos as TreeGridMember
@@ -66,12 +66,12 @@ Inherits AdventBase
 		  StartProfiling
 		  var trail() as M_Path.MilestoneInterface = M_Path.FindPath( endPos, startPos ).Trail
 		  StopProfiling
-		  return trail.LastIndex
+		  return trail.LastIndex : if( IsTest, 31, 520 )
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function CalculateResultB(input As String) As Integer
+		Private Function CalculateResultB(input As String) As Variant
 		  StartProfiling
 		  
 		  #if not DebugBuild
@@ -143,7 +143,7 @@ Inherits AdventBase
 		  StopProfiling
 		  
 		  best = best
-		  return best
+		  return best : if( IsTest, 29, 508 )
 		End Function
 	#tag EndMethod
 

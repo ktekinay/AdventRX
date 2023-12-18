@@ -22,7 +22,7 @@ Protected Module M_Path
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
-		Protected Function FindPath(goal As MilestoneInterface, start As MilestoneInterface) As M_Path.Result
+		Protected Function FindPath(goal As MilestoneInterface, start As MilestoneInterface, useNeighborCache As Boolean = True) As M_Path.Result
 		  #if not DebugBuild
 		    #pragma BackgroundTasks false
 		    #pragma BoundsChecking false
@@ -43,7 +43,10 @@ Protected Module M_Path
 		  var queue as new PriorityQueue_MTC
 		  var costDict as new Dictionary
 		  var trailDict as new Dictionary
-		  var neighborDict as new Dictionary
+		  var neighborDict as Dictionary
+		  if useNeighborCache then
+		    neighborDict = new Dictionary
+		  end if
 		  
 		  var currentCost as CostStructure
 		  currentCost.ToGoal = start.DistanceToGoal( goal )
@@ -83,11 +86,13 @@ Protected Module M_Path
 		    
 		    currentCost = costDict.Value( currentKey )
 		    var neighbors() as MilestoneInterface 
-		    if neighborDict.HasKey( currentKey ) then
+		    if useNeighborCache and neighborDict.HasKey( currentKey ) then
 		      neighbors = neighborDict.Value( currentKey )
 		    else
 		      neighbors = current.Successors
-		      neighborDict.Value( currentKey ) = neighbors
+		      if useNeighborCache then
+		        neighborDict.Value( currentKey ) = neighbors
+		      end if
 		    end if
 		    
 		    for each neighbor as MilestoneInterface in neighbors
