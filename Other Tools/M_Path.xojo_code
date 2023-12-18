@@ -107,8 +107,8 @@ Protected Module M_Path
 		      neighborCost.Total = neighborCost.ToStart + neighborCost.ToGoal
 		      costDict.Value( neighborKey ) = neighborCost
 		      
-		      
 		      trailDict.Value( neighborKey ) = current
+		      neighbor.SetParent current
 		      queue.Add neighborCost.Total, neighbor
 		    next
 		  wend

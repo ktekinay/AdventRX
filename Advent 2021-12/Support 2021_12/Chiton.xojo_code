@@ -23,6 +23,12 @@ Implements M_Path.MilestoneInterface
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub SetParent(parent As M_Path.MilestoneInterface)
+		  #pragma unused parent
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function Successors() As M_Path.MilestoneInterface()
 		  var neighbors() as GridMember = self.Neighbors( false )
 		  
