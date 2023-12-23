@@ -320,6 +320,12 @@ End
 		  AddRow new Advent_2023_12_15
 		  AddRow new Advent_2023_12_16
 		  AddRow new Advent_2023_12_17
+		  AddRow new Advent_2023_12_18
+		  AddRow new Advent_2023_12_19
+		  AddRow new Advent_2023_12_20
+		  AddRow new Advent_2023_12_21
+		  AddRow new Advent_2023_12_22
+		  AddRow new Advent_2023_12_23
 		  
 		  // Expand
 		  ExpandYear 2023
