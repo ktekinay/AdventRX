@@ -3,20 +3,20 @@ Protected Class Advent_2023_12_19
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "Unknown"
+		  return "Follow workflows"
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return false
+		  return true
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnName() As String
-		  return ""
+		  return "Aplenty"
 		  
 		End Function
 	#tag EndEvent
@@ -93,74 +93,27 @@ Inherits AdventBase
 		  ToWorkflows input.NthField( EndOfLine + EndOfLine, 1 ), workflows
 		  var inWf as Workflow = workflows.Value( "in" )
 		  
-		  var result as integer = 1
+		  var acc() as PartSet
 		  
-		  for each prop as string in array( "a", "m", "s", "x" )
-		    var testRange as new Advent.Range( 1, 4000 )
-		    var acc() as Advent.Range
-		    
-		    Follow testRange, prop, inWf, workflows, acc
-		    
-		    if IsTest then
-		      print prop
-		    end if
-		    
-		    Combine acc
-		    
-		    var count as integer
-		    for each r as Advent.Range in acc
-		      count = count + r.Length
-		    next
-		    
-		    if count <> 0 then
-		      result = result * count
-		    end if
-		    
+		  var ps as new PartSet
+		  
+		  Follow ps, inWf, workflows, acc
+		  
+		  var result as integer
+		  
+		  for each ps in acc
+		    var combinations as integer = ps.A.Length * ps.M.Length * ps.S.Length * ps.X.Length
+		    result = result + combinations
 		  next
 		  
-		  return result : if( IsTest, 167409079868000, 0 )
+		  return result : if( IsTest, 167409079868000, 122112157518711 )
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub Combine(ranges() As Advent.Range)
-		  ranges.Sort AddressOf Advent.Range.Sorter
-		  
-		  if IsTest then
-		    for each r as Advent.Range in ranges
-		      print r.ToString + ", " + r.Length.ToString
-		    next
-		  end if
-		  
-		  for i as integer = ranges.LastIndex downto 1
-		    var thisRange as Advent.Range = ranges( i )
-		    var prevRange as Advent.Range = ranges( i - 1 )
-		    
-		    if thisRange.Overlaps( prevRange ) then
-		      prevRange.Maximum = max( thisRange.Maximum, prevRange.Maximum )
-		      ranges.RemoveAt i
-		      
-		    elseif thisRange.Minimum = ( prevRange.Maximum + 1 ) then
-		      prevRange.Maximum = thisRange.Maximum
-		      ranges.RemoveAt i
-		      
-		    end if
-		  next
-		  
-		  if IsTest then
-		    print "---"
-		    
-		    for each r as Advent.Range in ranges
-		      print r.ToString + ", " + r.Length.ToString
-		    next
-		  end if
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Sub Follow(testRange As Advent.Range, prop As String, wf As Workflow, workflows As Dictionary, acc() As Advent.Range)
-		  if testRange.Length <= 0 then
+		Private Sub Follow(testSet As PartSet, wf As Workflow, workflows As Dictionary, acc() As PartSet)
+		  if not testSet.IsValid then
 		    return
 		  end if
 		  
@@ -169,46 +122,54 @@ Inherits AdventBase
 		    return
 		    
 		  case "A"
-		    acc.Add new Advent.Range( testRange )
+		    acc.Add new PartSet( testSet )
 		    return
 		    
 		  end select
 		  
 		  for each wfs as WorkflowStep in wf.Steps
-		    if testRange.Length <= 0 then
+		    if not testSet.IsValid then
 		      return
 		    end if
 		    
-		    testRange = new Advent.Range( testRange )
+		    testSet = new PartSet( testSet )
 		    
 		    if wfs.TestProperty = "" then
-		      Follow testRange, prop, workflows.Value( wfs.ToWorkFlow ), workflows, acc
+		      Follow testSet, workflows.Value( wfs.ToWorkFlow ), workflows, acc
 		      return
 		    end if
 		    
-		    if wfs.TestProperty <> prop then
-		      if wfs.ToWorkFlow <> "A" then
-		        Follow testRange, prop, workflows.Value( wfs.ToWorkFlow ), workflows, acc
-		      end if
-		      
-		      continue
-		    end if
+		    var nextSet as new PartSet( testSet )
 		    
-		    var nextRange as new Advent.Range
+		    var testRange as Advent.Range
+		    var nextRange as Advent.Range
 		    
-		    if wfs.Comparison = "<" then
-		      nextRange.Minimum = testRange.Minimum
+		    select case wfs.TestProperty
+		    case "a"
+		      testRange = testSet.A
+		      nextRange = nextSet.A
+		    case "m"
+		      testRange = testSet.M
+		      nextRange = nextSet.M
+		    case "s" 
+		      testRange = testSet.S
+		      nextRange = nextSet.S
+		    case "x"
+		      testRange = testSet.X
+		      nextRange = nextSet.X
+		    end select
+		    
+		    select case wfs.Comparison
+		    case "<"
 		      nextRange.Maximum = wfs.CompareValue - 1
 		      testRange.Minimum = wfs.CompareValue
-		    else // ">"
-		      nextRange.Maximum = testRange.Maximum
+		    case ">"
 		      nextRange.Minimum = wfs.CompareValue + 1
 		      testRange.Maximum = wfs.CompareValue
-		    end if
+		    end select
 		    
-		    Follow nextRange, prop, workflows.Value( wfs.ToWorkFlow ), workflows, acc
+		    Follow nextSet, workflows.Value( wfs.ToWorkFlow ), workflows, acc
 		  next
-		  
 		  
 		End Sub
 	#tag EndMethod
