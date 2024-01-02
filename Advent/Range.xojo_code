@@ -120,6 +120,17 @@ Protected Class Range
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Shared Function Sorter(r1 As Advent.Range, r2 As Advent.Range) As Integer
+		  if r1.Minimum <> r2.Minimum then
+		    return r1.Minimum - r2.Minimum
+		  else
+		    return r1.Maximum - r2.Maximum
+		  end if
+		  
+		End Function
+	#tag EndMethod
+
 
 	#tag ComputedProperty, Flags = &h0
 		#tag Getter
