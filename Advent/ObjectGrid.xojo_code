@@ -24,11 +24,56 @@ Implements Iterable
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function AboveLeftWrapping(member As GridMember) As GridMember
+		  var useRow as integer = member.Row - 1
+		  var useColumn as integer = member.Column - 1
+		  
+		  if useRow < 0 then
+		    useRow = LastRowIndex
+		  end if
+		  
+		  if useColumn < 0 then
+		    useColumn = LastColIndex
+		  end if
+		  
+		  return Grid( useRow, useColumn )
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function AboveRight(member As GridMember) As GridMember
 		  if member.Row = 0 or member.Column = LastColIndex then
 		    return nil
 		  else
 		    return Grid( member.Row - 1, member.Column + 1 )
+		  end if
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function AboveRightWrapping(member As GridMember) As GridMember
+		  var useRow as integer = member.Row - 1
+		  var useColumn as integer = member.Column + 1
+		  
+		  if useRow < 0 then
+		    useRow = LastRowIndex
+		  end if
+		  if useColumn > LastColIndex then
+		    useColumn = 0
+		  end if
+		  
+		  return Grid( useRow, useColumn )
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function AboveWrapping(member As GridMember) As GridMember
+		  if member.Row = 0 then
+		    return Grid( LastRowIndex, member.Column )
+		  else
+		    return Grid( member.Row - 1, member.Column )
 		  end if
 		  
 		End Function
@@ -42,6 +87,20 @@ Implements Iterable
 		  directionals.Add AddressOf AboveRight
 		  directionals.Add AddressOf BelowLeft
 		  directionals.Add AddressOf BelowRight
+		  
+		  return directionals
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function AllDirectionalsWrapping() As ObjectGrid.NextDelegate()
+		  var directionals() as ObjectGrid.NextDelegate = MainDirectionalsWrapping
+		  
+		  directionals.Add AddressOf AboveLeftWrapping
+		  directionals.Add AddressOf AboveRightWrapping
+		  directionals.Add AddressOf BelowLeftWrapping
+		  directionals.Add AddressOf BelowRightWrapping
 		  
 		  return directionals
 		  
@@ -71,11 +130,58 @@ Implements Iterable
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function BelowLeftWrapping(member As GridMember) As GridMember
+		  var useRow as integer = member.Row + 1
+		  var useColumn as integer = member.Column - 1
+		  
+		  if useRow > LastRowIndex then
+		    useRow = 0
+		  end if
+		  
+		  if useColumn < 0 then
+		    useColumn = LastColIndex
+		  end if
+		  
+		  return Grid( useRow, useColumn )
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function BelowRight(member As GridMember) As GridMember
 		  if member.Row = LastRowIndex or member.Column = LastColIndex then
 		    return nil
 		  else
 		    return Grid( member.Row + 1, member.Column + 1 )
+		  end if
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function BelowRightWrapping(member As GridMember) As GridMember
+		  var useRow as integer = member.Row + 1
+		  var useColumn as integer = member.Column + 1
+		  
+		  if useRow > LastRowIndex then
+		    useRow = 0
+		  end if
+		  
+		  if useColumn > LastColIndex then
+		    useColumn = 0
+		  end if
+		  
+		  return Grid( useRow, useColumn )
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function BelowWrapping(member As GridMember) As GridMember
+		  if member.Row = LastRowIndex then
+		    return Grid( 0, member.Column )
+		  else
+		    return Grid( member.Row + 1, member.Column )
 		  end if
 		  
 		End Function
@@ -210,6 +316,7 @@ Implements Iterable
 		Private Function Iterator() As Iterator
 		  // Part of the Iterable interface.
 		  return new ObjectGridIterator( self )
+		  
 		End Function
 	#tag EndMethod
 
@@ -217,6 +324,17 @@ Implements Iterable
 		Function Left(member As GridMember) As GridMember
 		  if member.Column = 0 then
 		    return nil
+		  else
+		    return Grid( member.Row, member.Column - 1 )
+		  end if
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function LeftWrapping(member As GridMember) As GridMember
+		  if member.Column = 0 then
+		    return Grid( member.Row, LastColIndex )
 		  else
 		    return Grid( member.Row, member.Column - 1 )
 		  end if
@@ -237,7 +355,15 @@ Implements Iterable
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Function MainDirectionalsWrapping() As ObjectGrid.NextDelegate()
+		  var directionals() as ObjectGrid.NextDelegate
+		  directionals.Add AddressOf AboveWrapping
+		  directionals.Add AddressOf RightWrapping
+		  directionals.Add AddressOf BelowWrapping
+		  directionals.Add AddressOf LeftWrapping
 		  
+		  return directionals
 		  
 		End Function
 	#tag EndMethod
@@ -304,6 +430,17 @@ Implements Iterable
 		Function Right(member As GridMember) As GridMember
 		  if member.Column = LastColIndex then
 		    return nil
+		  else
+		    return Grid( member.Row, member.Column + 1 )
+		  end if
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function RightWrapping(member As GridMember) As GridMember
+		  if member.Column = LastColIndex then
+		    return Grid( member.Row, 0 )
 		  else
 		    return Grid( member.Row, member.Column + 1 )
 		  end if
