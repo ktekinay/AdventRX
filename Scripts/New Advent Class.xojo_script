@@ -17,7 +17,12 @@ return
 
 case 1
 var now as new Date
+if now.Month  = 12 then
 parts.AddAt 0, now.Year.ToString
+else
+var year as integer = now.Year - 1
+parts.AddAt 0, year.ToString
+end if
 parts.AddAt 1, "12"
 
 case 2
