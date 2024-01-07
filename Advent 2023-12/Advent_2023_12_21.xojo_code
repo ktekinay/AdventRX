@@ -56,10 +56,28 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Variant
+		  var grid as ObjectGrid = ObjectGrid.FromStringGrid( ToStringGrid( input ) )
 		  
+		  var startPos as GridMember
+		  for each gm as GridMember in grid
+		    if gm.Value = "S" then
+		      startPos = gm
+		      exit
+		    end if
+		  next
 		  
+		  var goal as integer = if( IsTest, 6, 64 )
+		  Traverse grid, startPos, goal, new Dictionary
 		  
-		  return 0 : if( IsTest, 0, 0 )
+		  var count as integer
+		  
+		  for each gm as GridMember in grid
+		    if gm.Value = "O" then
+		      count = count + 1
+		    end if
+		  next
+		  
+		  return count : if( IsTest, 16, 3666 )
 		  
 		End Function
 	#tag EndMethod
@@ -74,15 +92,46 @@ Inherits AdventBase
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21
+		Private Sub Traverse(grid As ObjectGrid, pos As GridMember, remaining As Integer, touched As Dictionary)
+		  if remaining = 0 then
+		    pos.Value = "O"
+		    return
+		  end if
+		  
+		  var key as integer = ( pos.Row * ( grid.LastColIndex + 1 ) ) + pos.Column + ( remaining * 100000000 )
+		  
+		  if touched.HasKey( key ) then
+		    return
+		  end if
+		  
+		  for each dir as ObjectGrid.NextDelegate in grid.MainDirectionals
+		    var nextGm as GridMember = dir.Invoke( pos )
+		    if nextGm is nil or nextGm.Value = "#" then
+		      continue
+		    end if
+		    
+		    Traverse grid, nextGm, remaining - 1, touched
+		  next
+		  
+		  touched.Value( key ) = nil
+		  
+		End Sub
+	#tag EndMethod
+
 
 	#tag Constant, Name = kPuzzleInput, Type = String, Dynamic = False, Default = \"", Scope = Private, Description = 5768656E2070617374696E67207468652064617461206973206E65636573736172792E
 	#tag EndConstant
 
-	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"", Scope = Private
+	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"...........\n.....###.#.\n.###.##..#.\n..#.#...#..\n....#.#....\n.##..S####.\n.##..#...#.\n.......##..\n.##.#.####.\n.##..##.##.\n...........", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = kTestInputB, Type = String, Dynamic = False, Default = \"", Scope = Private
 	#tag EndConstant
+
+
+	#tag Using, Name = M_2023
+	#tag EndUsing
 
 
 	#tag ViewBehavior
