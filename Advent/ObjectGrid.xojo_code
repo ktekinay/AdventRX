@@ -1,6 +1,6 @@
 #tag Class
 Class ObjectGrid
-Implements Iterable,Iterator
+Implements Iterable
 	#tag Method, Flags = &h0
 		Function Above(member As GridMember) As GridMember
 		  if member.Row = 0 then
@@ -209,7 +209,7 @@ Implements Iterable,Iterator
 	#tag Method, Flags = &h21
 		Private Function Iterator() As Iterator
 		  // Part of the Iterable interface.
-		  return self
+		  return new ObjectGridIterator( self )
 		End Function
 	#tag EndMethod
 
@@ -237,20 +237,7 @@ Implements Iterable,Iterator
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Function MoveNext() As Boolean
-		  IteratorColumn = IteratorColumn + 1
-		  if IteratorColumn > LastColIndex then
-		    IteratorColumn = 0
-		    IteratorRow = IteratorRow + 1
-		    if IteratorRow > LastRowIndex then
-		      IteratorRow = 0
-		      IteratorColumn = -1
-		      return false
-		    end if
-		  end if
 		  
-		  return true
 		  
 		End Function
 	#tag EndMethod
@@ -390,25 +377,9 @@ Implements Iterable,Iterator
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Function Value() As Variant
-		  // Part of the Iterator interface.
-		  return Grid( IteratorRow, IteratorColumn )
-		  
-		End Function
-	#tag EndMethod
-
 
 	#tag Property, Flags = &h1
 		Protected Grid(-1,-1) As GridMember
-	#tag EndProperty
-
-	#tag Property, Flags = &h21
-		Private IteratorColumn As Integer = -1
-	#tag EndProperty
-
-	#tag Property, Flags = &h21
-		Private IteratorRow As Integer = 0
 	#tag EndProperty
 
 	#tag ComputedProperty, Flags = &h0

@@ -213,6 +213,7 @@ Class=WorkflowStep;Advent 2023-12/M_2023/WorkflowStep.xojo_code;&h00000000113B37
 Class=Workflow;Advent 2023-12/M_2023/Workflow.xojo_code;&h0000000021FD17FF;&h000000006BEFA7FF;false
 Class=MachinePart;Advent 2023-12/M_2023/MachinePart.xojo_code;&h0000000067C347FF;&h000000006BEFA7FF;false
 Class=PartSet;Advent 2023-12/M_2023/PartSet.xojo_code;&h000000000E3297FF;&h000000006BEFA7FF;false
+Class=ObjectGridIterator;Advent/ObjectGridIterator.xojo_code;&h000000003DC287FF;&h0000000010970FFF;false
 DefaultWindow=WndAdvent
 AppMenuBar=MainMenuBar
 MajorVersion=1
