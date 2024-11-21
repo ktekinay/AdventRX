@@ -15,6 +15,25 @@ Begin Menu MainMenuBar
          AutoEnable = True
          Visible = True
       End
+      Begin DesktopMenuItem UntitledSeparator0
+         SpecialMenu = 0
+         Index = -2147483648
+         Text = "-"
+         AutoEnabled = True
+         AutoEnable = True
+         Visible = True
+      End
+      Begin DesktopMenuItem FileUsePreemptiveThreads
+         SpecialMenu = 0
+         Index = -2147483648
+         Text = "Use Preemptive Threads"
+         ShortcutKey = "T"
+         Shortcut = "Cmd+T"
+         MenuModifier = True
+         AutoEnabled = True
+         AutoEnable = True
+         Visible = True
+      End
       Begin DesktopMenuItem UntitledSeparator
          SpecialMenu = 0
          Index = -2147483648

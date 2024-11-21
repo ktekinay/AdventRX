@@ -77,12 +77,27 @@ End
 
 #tag WindowCode
 	#tag Event
+		Sub MenuBarSelected()
+		  FileUsePreemptiveThreads.HasCheckMark = UsePreemptive
+		End Sub
+	#tag EndEvent
+
+	#tag Event
 		Sub Opening()
 		  InitAdvent
 		  
 		  App.AllowAutoQuit = true
 		End Sub
 	#tag EndEvent
+
+
+	#tag MenuHandler
+		Function FileUsePreemptiveThreads() As Boolean Handles FileUsePreemptiveThreads.Action
+		  UsePreemptive = not UsePreemptive
+		  Return True
+		  
+		End Function
+	#tag EndMenuHandler
 
 
 	#tag Method, Flags = &h21
@@ -376,6 +391,11 @@ End
 		  
 		End Function
 	#tag EndMethod
+
+
+	#tag Property, Flags = &h21
+		Private UsePreemptive As Boolean = True
+	#tag EndProperty
 
 
 	#tag Constant, Name = kLabelFinished, Type = String, Dynamic = False, Default = \"Done", Scope = Private
