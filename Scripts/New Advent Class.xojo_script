@@ -171,7 +171,13 @@ if cookie = "" then
 return false
 end if
 
-var destPath as string = ProjectFolderShellPath + "/Puzzle\ Data/Advent_" + year + "_" + month + "_" + day + ".txt"
+//
+// Make sure Puzzle Data exists
+//
+var destPath as string = ProjectFolderShellPath + "/Puzzle\ Data/"
+call DoShellCommand( "mkdir " + destPath )
+
+destPath = destPath + "Advent_" + year + "_" + month + "_" + day + ".txt"
 
 var url as string = "https://adventofcode.com/" + year + "/day/" + day.ToInteger.ToString + "/input"
 
