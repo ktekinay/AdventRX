@@ -448,6 +448,12 @@ End
 		      me.CellTextAt( row, column ) = ""
 		    next
 		    
+		    if UsePreemptive then
+		      advent.Type = Thread.Types.Preemptive
+		    else
+		      advent.Type = Thread.Types.Cooperative
+		    end if
+		    
 		    AddHandler advent.ResultReturned, WeakAddressOf Advent_ResultReturned
 		    advent.Start
 		    
