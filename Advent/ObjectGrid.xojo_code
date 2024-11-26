@@ -201,12 +201,23 @@ Implements Iterable
 
 	#tag Method, Flags = &h21
 		Private Sub Destructor()
-		  for each m as GridMember in self
-		    if m isa object then
-		      m.Teardown
-		    end if
-		  next
+		  'for each m as GridMember in self
+		  'if m isa object then
+		  'm.Teardown
+		  'end if
+		  'next
 		  
+		  var lastRow as integer = grid.LastIndex( 1 )
+		  var lastCol as integer = Grid.LastIndex( 2 )
+		  
+		  for row as integer = 0 to lastRow
+		    for col as integer = 0 to lastCol
+		      var m as GridMember = Grid( row, col )
+		      if m isa object then
+		        m.Teardown
+		      end if
+		    next
+		  next
 		End Sub
 	#tag EndMethod
 
