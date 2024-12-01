@@ -2,8 +2,10 @@
 Private Class ObjectGridIterator
 Implements Iterator
 	#tag Method, Flags = &h0
-		Sub Constructor(grid As ObjectGrid)
+		Sub Constructor(grid(, ) As GridMember)
 		  self.Grid = grid
+		  LastRowIndex = grid.LastIndex( 1 )
+		  LastColIndex = grid.LastIndex( 2 )
 		  
 		End Sub
 	#tag EndMethod
@@ -11,12 +13,12 @@ Implements Iterator
 	#tag Method, Flags = &h21
 		Private Function MoveNext() As Boolean
 		  NextColumn = NextColumn + 1
-		  if NextColumn > grid.LastColIndex then
+		  if NextColumn > LastColIndex then
 		    NextColumn = 0
 		    NextRow = NextRow + 1
 		  end if
 		  
-		  return NextRow <= grid.LastRowIndex
+		  return NextRow <= LastRowIndex
 		  
 		  
 		End Function
@@ -31,7 +33,15 @@ Implements Iterator
 
 
 	#tag Property, Flags = &h21
-		Private Grid As ObjectGrid
+		Private Grid(-1,-1) As GridMember
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private LastColIndex As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private LastRowIndex As Integer
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
@@ -81,14 +91,6 @@ Implements Iterator
 			Visible=true
 			Group="Position"
 			InitialValue="0"
-			Type="Integer"
-			EditorType=""
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Grid"
-			Visible=false
-			Group="Behavior"
-			InitialValue=""
 			Type="Integer"
 			EditorType=""
 		#tag EndViewProperty
