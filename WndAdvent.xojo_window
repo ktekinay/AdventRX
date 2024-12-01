@@ -192,6 +192,52 @@ End
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
+		Private Sub DoublePress(row As Integer)
+		  if row < 0 or row > LbAdvent.LastRowIndex then
+		    return
+		  end if
+		  
+		  if LbAdvent.RowExpandableAt( row ) then
+		    LbAdvent.RowExpandedAt( row ) = not LbAdvent.RowExpandedAt( row )
+		    return
+		  end if
+		  
+		  var advent as AdventBase = LbAdvent.RowTagAt( row )
+		  
+		  var status as string
+		  
+		  if advent.ThreadState = Thread.ThreadStates.NotRunning then
+		    for column as integer = integer( Columns.ResultTestA ) to integer( Columns.ResultB )
+		      LbAdvent.CellTextAt( row, column ) = ""
+		    next
+		    
+		    if UsePreemptive then
+		      advent.Type = Thread.Types.Preemptive
+		    else
+		      advent.Type = Thread.Types.Cooperative
+		    end if
+		    
+		    AddHandler advent.ResultReturned, WeakAddressOf Advent_ResultReturned
+		    advent.Start
+		    
+		    status = kLabelRunning
+		    
+		  elseif advent.ThreadState = Thread.ThreadStates.Paused then
+		    advent.Resume
+		    status = kLabelRunning
+		    
+		  else
+		    advent.Pause
+		    status = kLabelPaused
+		    
+		  end if
+		  
+		  LbAdvent.CellTextAt( row, integer( Columns.Status ) ) = status
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Sub EndThread(row As Integer, advent As AdventBase)
 		  if advent.ThreadState <> Thread.ThreadStates.NotRunning then
 		    advent.Stop
@@ -350,6 +396,9 @@ End
 		  // Expand
 		  ExpandYear 2024
 		  
+		  // Auto-run
+		  Timer.CallLater 10, AddressOf RunEventTimer, new Advent_2024_12_01
+		  
 		End Sub
 	#tag EndMethod
 
@@ -363,6 +412,27 @@ End
 		  return - 1
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub RunEventTimer(advent As Variant)
+		  var targetName as string = Introspection.GetType( advent ).Name
+		  
+		  for row as integer = LbAdvent.LastRowIndex downto 0
+		    if LbAdvent.RowExpandableAt( row ) then
+		      continue
+		    end if
+		    
+		    var tag as variant = LbAdvent.RowTagAt( row )
+		    
+		    if Introspection.GetType( tag ).Name = targetName then
+		      LbAdvent.RowSelectedAt( row ) = true
+		      DoublePress( row )
+		      return
+		    end if
+		  next
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
@@ -433,47 +503,7 @@ End
 #tag Events LbAdvent
 	#tag Event
 		Sub DoublePressed()
-		  var row as integer = me.SelectedRowIndex
-		  if row < 0 or row > me.LastRowIndex then
-		    return
-		  end if
-		  
-		  if me.RowExpandableAt( row ) then
-		    me.RowExpandedAt( row ) = not me.RowExpandedAt( row )
-		    return
-		  end if
-		  
-		  var advent as AdventBase = me.RowTagAt( row )
-		  
-		  var status as string
-		  
-		  if advent.ThreadState = Thread.ThreadStates.NotRunning then
-		    for column as integer = integer( Columns.ResultTestA ) to integer( Columns.ResultB )
-		      me.CellTextAt( row, column ) = ""
-		    next
-		    
-		    if UsePreemptive then
-		      advent.Type = Thread.Types.Preemptive
-		    else
-		      advent.Type = Thread.Types.Cooperative
-		    end if
-		    
-		    AddHandler advent.ResultReturned, WeakAddressOf Advent_ResultReturned
-		    advent.Start
-		    
-		    status = kLabelRunning
-		    
-		  elseif advent.ThreadState = Thread.ThreadStates.Paused then
-		    advent.Resume
-		    status = kLabelRunning
-		    
-		  else
-		    advent.Pause
-		    status = kLabelPaused
-		    
-		  end if
-		  
-		  me.CellTextAt( row, integer( Columns.Status ) ) = status
+		  DoublePress me.SelectedRowIndex
 		  
 		End Sub
 	#tag EndEvent
