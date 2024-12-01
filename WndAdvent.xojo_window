@@ -282,6 +282,9 @@ End
 		  AddRow new Advent_2015_12_12
 		  AddRow new Advent_2015_12_13
 		  
+		  // 2016
+		  AddRow new Advent_2016_12_01
+		  
 		  // 2020
 		  AddRow new Advent_2020_12_01
 		  AddRow new Advent_2020_12_02
@@ -393,11 +396,12 @@ End
 		  // 2024
 		  AddRow new Advent_2024_12_01
 		  
+		  // Auto-run
+		  Timer.CallLater 10, AddressOf RunEventTimer, new Advent_2024_12_01
+		  
 		  // Expand
 		  ExpandYear 2024
 		  
-		  // Auto-run
-		  Timer.CallLater 10, AddressOf RunEventTimer, new Advent_2024_12_01
 		  
 		End Sub
 	#tag EndMethod
