@@ -344,8 +344,12 @@ End
 		  AddRow new Advent_2023_12_24
 		  AddRow new Advent_2023_12_25
 		  
+		  // 2024
+		  AddRow new Advent_2024_12_01
+		  
 		  // Expand
-		  ExpandYear 2023
+		  ExpandYear 2024
+		  
 		End Sub
 	#tag EndMethod
 
