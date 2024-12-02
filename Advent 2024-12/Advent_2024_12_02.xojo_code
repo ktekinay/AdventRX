@@ -61,9 +61,7 @@ Inherits AdventBase
 		  var count as integer
 		  
 		  for each report as string in reports
-		    report = report.Squeeze
-		    
-		    var items() as string = report.Split( " " )
+		    var items() as string = report.SplitBytes( " " )
 		    
 		    var values() as integer = ToIntegerArray( items )
 		    
@@ -84,21 +82,20 @@ Inherits AdventBase
 		  var count as integer
 		  
 		  for each report as string in reports
-		    report = report.Squeeze
-		    
-		    var items() as string = report.Split( " " )
+		    var items() as string = report.SplitBytes( " " )
 		    
 		    var values() as integer = ToIntegerArray( items )
 		    
 		    var removalIndex as integer
 		    while removalIndex <= values.LastIndex
 		      var newValues() as integer
+		      newValues.ResizeTo values.LastIndex
 		      
 		      for i as integer = 0 to values.LastIndex
-		        if i <> removalIndex then
-		          newValues.Add values( i )
-		        end if
+		        newValues( i ) = values( i )
 		      next
+		      
+		      newValues.RemoveAt removalIndex
 		      
 		      if CheckValues( newValues ) then
 		        count = count + 1
@@ -115,36 +112,61 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function CheckValues(values() As Integer) As Boolean
-		  var isGood as boolean = true
+		Private Shared Function CheckValues(values() As Integer) As Boolean
+		  #if not DebugBuild
+		    #pragma BackgroundTasks false
+		    #pragma BoundsChecking false
+		    #pragma NilObjectChecking false
+		    #pragma StackOverflowChecking false
+		  #endif
 		  
-		  var lastIndex as integer = values.LastIndex - 1
-		  for i as integer = 0 to lastIndex
-		    var v1 as integer = values( i )
-		    var v2 as integer = values( i + 1 )
+		  var v1 as integer
+		  var v2 as integer
+		  
+		  v1 = values( 0 )
+		  
+		  for i as integer = 1 to values.LastIndex
+		    v2 = values( i )
 		    
-		    if v1 < v2 and abs( v1 - v2 ) <= 3 then
-		      continue
+		    var diff as integer = abs( v1 - v2 )
+		    
+		    if diff > 3 then
+		      return false
 		    end if
 		    
-		    isGood = false
-		    exit
+		    v1 = v2
+		  next
+		  
+		  var isGood as boolean = true
+		  
+		  v1 = values( 0 )
+		  
+		  for i as integer = 1 to values.LastIndex
+		    v2 = values( i )
+		    
+		    if v1 >= v2 then
+		      isGood = false
+		      exit
+		    end if
+		    
+		    v1 = v2
 		  next
 		  
 		  if isGood then
 		    return true
 		  end if
 		  
-		  for i as integer = values.LastIndex downto 1
-		    var v1 as integer = values( i )
-		    var v2 as integer = values( i - 1 )
+		  var lastIndex as integer = values.LastIndex - 1
+		  v1 = values( values.LastIndex )
+		  
+		  for i as integer = lastIndex downto 0
+		    v2 = values( i )
 		    
-		    if v1 < v2 and abs( v1 - v2 ) <= 3 then
-		      continue
+		    if v1 >= v2 then
+		      return false
 		    end if
 		    
-		    return false
-		    exit
+		    v1 = v2
 		  next
 		  
 		  return true
