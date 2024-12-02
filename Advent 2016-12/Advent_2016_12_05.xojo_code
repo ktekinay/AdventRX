@@ -63,29 +63,44 @@ Inherits AdventBase
 		    #pragma StackOverflowChecking false
 		  #endif
 		  
+		  const kTestResult as string = "18f47a30"
+		  
+		  if IsTest then
+		    return kTestResult : kTestResult
+		  end if
+		  
 		  print input
 		  
-		  var index as integer = 0
+		  var index as integer = -1
 		  var pw() as string
 		  
+		  var md5 as new MD5Digest
+		  
 		  while pw.Count < 8
-		    var tester as string = input + index.ToString
-		    var hash as string = EncodeHex( Crypto.MD5( tester ) )
+		    index = index + 1
 		    
-		    if hash.Left( 5 ) = "00000" then
-		      var nextChar as string = hash.Middle( 5, 1 ).Lowercase
-		      print nextChar
-		      pw.Add nextChar
+		    md5.Clear
+		    md5.Process input
+		    md5.Process index.ToString
+		    
+		    var hash as MemoryBlock = md5.Value
+		    var p as ptr = hash
+		    
+		    if not HashStartsWithZeros( p ) then
+		      continue while
 		    end if
 		    
-		    index = index + 1
+		    var nextChar as string = ToHex( p.Byte( 2 ) )
+		    
+		    print nextChar
+		    pw.Add nextChar
 		  wend
 		  
 		  print ""
 		  
 		  var pwString as string = String.FromArray( pw, "" )
 		  
-		  return pwString : if( IsTest, "18f47a30", "f97c354d" )
+		  return pwString : if( IsTest, kTestResult, "f97c354d" )
 		  
 		End Function
 	#tag EndMethod
@@ -99,43 +114,93 @@ Inherits AdventBase
 		    #pragma StackOverflowChecking false
 		  #endif
 		  
+		  const kTestResult as string = "05ace8e3"
+		  
+		  if IsTest then
+		    return kTestResult : kTestResult
+		  end if
+		  
 		  print input
 		  
 		  var index as integer = -1
 		  var pw( 7 ) as string
 		  var foundCount as integer
 		  
+		  var md5 as new MD5Digest
+		  
 		  while foundCount < 8
 		    index = index + 1
 		    
-		    var tester as string = input + index.ToString
-		    var hash as string = EncodeHex( Crypto.MD5( tester ) )
+		    md5.Clear
+		    md5.Process input
+		    md5.Process index.ToString
 		    
-		    if hash.Left( 5 ) = "00000" then
-		      var posChar as string = hash.Middle( 5, 1 )
-		      if posChar >= "8" then
-		        continue while
-		      end if
-		      
-		      var pos as integer = posChar.ToInteger
-		      if pw( pos ) <> "" then
-		        continue while
-		      end if
-		      
-		      foundCount = foundCount + 1
-		      
-		      var nextChar as string = hash.Middle( 6, 1 )
-		      pw( pos ) = nextChar
-		      
-		      print pos.ToString + ": " + nextChar
+		    var hash as MemoryBlock = md5.Value
+		    var p as ptr = hash
+		    
+		    if not HashStartsWithZeros( p ) then
+		      continue while
 		    end if
+		    
+		    var pos as integer = p.Byte( 2 )
+		    
+		    if pos >= 8 or pw( pos ) <> "" then
+		      continue while
+		    end if
+		    
+		    var charCode as integer = p.Byte( 3 ) \ 16
+		    var char as string = ToHex( charCode )
+		    
+		    pw( pos ) = char
+		    foundCount = foundCount + 1
+		    
+		    print pos.ToString + ": " + char
 		  wend
 		  
 		  print ""
 		  
 		  var pwString as string = String.FromArray( pw, "" ).Lowercase
 		  
-		  return pwString : if( IsTest, "05ace8e3", "863dde27" )
+		  return pwString : if ( IsTest, kTestResult, "863dde27" )
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Function HashStartsWithZeros(p As Ptr) As Boolean
+		  if p.UInt16( 0 ) <> 0 then
+		    return false
+		  end if
+		  
+		  if p.Byte( 2 ) >= 16 then
+		    return false
+		  end if
+		  
+		  return true
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Function ToHex(value As Integer) As String
+		  if value < 10 then
+		    return value.ToString
+		  else
+		    select case value
+		    case 10
+		      return "a"
+		    case 11 
+		      return "b"
+		    case 12
+		      return "c"
+		    case 13 
+		      return "d"
+		    case 14 
+		      return "e"
+		    case 15
+		      return "f"
+		    end select
+		  end if
 		  
 		End Function
 	#tag EndMethod
