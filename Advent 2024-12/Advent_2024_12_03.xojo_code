@@ -75,7 +75,7 @@ Inherits AdventBase
 	#tag Method, Flags = &h21
 		Private Shared Function GetResult(input As String, considerDos As Boolean) As Integer
 		  const kPatternWithoutDos as string = "mul\((\d{1,3}),(\d{1,3})\)"
-		  const kPatternWithDos as string = "do\(\)|don't\(\)|mul\((\d{1,3}),(\d{1,3})\)"
+		  const kPatternWithDos as string = "do\(\)|don't\(\)|" + kPatternWithoutDos
 		  
 		  var result as integer
 		  
