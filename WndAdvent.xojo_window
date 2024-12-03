@@ -289,6 +289,7 @@ End
 		  AddRow new Advent_2016_12_04
 		  AddRow new Advent_2016_12_05
 		  AddRow new Advent_2016_12_06
+		  AddRow new Advent_2016_12_07
 		  
 		  // 2020
 		  AddRow new Advent_2020_12_01
