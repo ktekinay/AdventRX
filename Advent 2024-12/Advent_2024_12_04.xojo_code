@@ -55,81 +55,12 @@ Inherits AdventBase
 
 
 	#tag Method, Flags = &h21
-		Private Shared Function AllDirectionsXmas(grid(, ) As String, row As Integer, lastRowIndex As Integer, col As Integer, lastColIndex As Integer) As Integer
-		  var count as integer
-		  
-		  // Horizontal right
-		  if col+3 <= lastColIndex and _
-		    grid( row, col+1 ) = "M" and grid( row, col+2 ) = "A" and grid( row, col+3 ) = "S" then
-		    count = count + 1
-		  end if
-		  
-		  // Horizontal left
-		  if col >= 3 and _
-		    grid( row, col-1 ) = "M" and grid( row, col-2 ) = "A" and grid( row, col-3 ) = "S" then
-		    count = count + 1
-		  end if
-		  
-		  // Vertical down
-		  if row+3 <= lastRowIndex and _
-		    grid( row+1, col ) = "M" and grid( row+2, col ) = "A" and grid( row+3, col ) = "S" then
-		    count = count + 1
-		  end if
-		  
-		  // Vertical up
-		  if row >= 3 and _
-		    grid( row-1, col ) = "M" and grid( row-2, col ) = "A" and grid( row-3, col ) = "S" then
-		    count = count + 1
-		  end if
-		  
-		  // Diagonal, down, right
-		  if col+3 <= lastColIndex and row+3 <= lastRowIndex and _
-		    grid( row+1, col+1 ) = "M" and grid( row+2, col+2 ) = "A" and grid( row+3, col+3 ) = "S" then
-		    count = count + 1
-		  end if
-		  
-		  // Diagonal, down, left
-		  if col >= 3 and row+3 <= lastRowIndex and _
-		    grid( row+1, col-1 ) = "M" and grid( row+2, col-2 ) = "A" and grid( row+3, col-3 ) = "S" then
-		    count = count + 1
-		  end if
-		  
-		  // Diagonal, up, right
-		  if col+3 <= lastColIndex and row >= 3 and _
-		    grid( row-1, col+1 ) = "M" and grid( row-2, col+2 ) = "A" and grid( row-3, col+3 ) = "S" then
-		    count = count + 1
-		  end if
-		  
-		  // Diagonal, up, left
-		  if col >= 3 and row >= 3 and _
-		    grid( row-1, col-1 ) = "M" and grid( row-2, col-2 ) = "A" and grid( row-3, col-3 ) = "S" then
-		    count = count + 1
-		  end if
-		  
-		  
-		  return count
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Variant
 		  var count as integer
 		  
 		  var grid( -1, -1 ) as string = ToStringGrid( input )
 		  
-		  var lastRowIndex as integer = grid.LastIndex( 1 )
-		  var lastColIndex as integer = grid.LastIndex( 2 )
-		  
-		  
-		  for row as integer = 0 to lastRowIndex
-		    for col as integer = 0 to lastColIndex
-		      var char as string = grid( row, col )
-		      
-		      if char = "X" then
-		        count = count + AllDirectionsXmas( grid, row, lastRowIndex, col, lastColIndex )
-		      end if
-		    next
-		  next
+		  count = LoopForXmas( grid )
 		  
 		  return count : if( IsTest, 18, 2547 )
 		  
@@ -157,6 +88,25 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
+		Private Shared Function CheckDirection(grid(, ) As String, targetArr() As String, row As Integer, col As Integer, rowInc As Integer, colInc As Integer) As Integer
+		  for increment as integer = 1 to targetArr.LastIndex
+		    row = row + rowInc
+		    col = col + colInc
+		    
+		    var target as string = targetArr( increment )
+		    var gridChar as string = grid( row, col )
+		    
+		    if gridChar <> target then
+		      return 0
+		    end if
+		  next
+		  
+		  return 1
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Shared Function CheckForMas(grid(, ) As String, row As Integer, lastRowIndex As Integer, col As Integer, lastColIndex As Integer) As Integer
 		  var thisChar as string = grid( row, col )
 		  var oppChar as string
@@ -178,6 +128,44 @@ Inherits AdventBase
 		  end if
 		  
 		  return 0
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Function LoopForXmas(grid(, ) As String) As Integer
+		  var count as integer
+		  
+		  var lastRowIndex as integer = grid.LastIndex( 1 )
+		  var lastColIndex as integer = grid.LastIndex( 2 )
+		  
+		  var forward() as string = split( "XMAS", "" )
+		  var backward() as string = split( "SAMX", "" )
+		  
+		  for row as integer = 0 to lastRowIndex
+		    var canDown as boolean = ( row + forward.LastIndex ) <= lastRowIndex
+		    
+		    for col as integer = 0 to lastColIndex
+		      var canLeft as boolean = col >= forward.LastIndex
+		      var canRight as boolean = ( col + forward.LastIndex ) <= lastColIndex
+		      
+		      var char as string = grid( row, col )
+		      
+		      var thisArr() as string = forward
+		      
+		      for counter as integer = 1 to 2
+		        if char = thisArr( 0 ) then
+		          count = count + if( canRight, CheckDirection( grid, thisArr, row, col, 0, 1 ), 0 )
+		          count = count + if( canDown, CheckDirection( grid, thisArr, row, col, 1, 0 ), 0 )
+		          count = count + if( canLeft and canDown, CheckDirection( grid, thisArr, row, col, 1, -1 ), 0 )
+		          count = count + if( canRight and canDown, CheckDirection( grid, thisArr, row, col, 1, 1 ), 0 )
+		        end if
+		        
+		        thisArr = backward
+		      next
+		    next
+		  next
+		  
+		  return count
 		End Function
 	#tag EndMethod
 

@@ -63,7 +63,6 @@ Inherits AdventBase
 		  var rows() as string = input.Split( EndOfLine )
 		  
 		  var lastColIndex as integer = rows( 0 ).Bytes - 1
-		  var lastRowIndex as integer = rows.LastIndex
 		  
 		  var mb as MemoryBlock = input.ReplaceAll( EndOfLine , "" )
 		  var p as ptr = mb
@@ -101,7 +100,6 @@ Inherits AdventBase
 		  var rows() as string = input.Split( EndOfLine )
 		  
 		  var lastColIndex as integer = rows( 0 ).Bytes - 1
-		  var lastRowIndex as integer = rows.LastIndex
 		  
 		  var mb as MemoryBlock = input.ReplaceAll( EndOfLine , "" )
 		  var p as ptr = mb

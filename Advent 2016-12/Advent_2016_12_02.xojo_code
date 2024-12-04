@@ -112,8 +112,6 @@ Inherits AdventBase
 		  
 		  var keypad( 4, 4 ) as string
 		  
-		  var key as integer = 1
-		  
 		  keypad( 0, 2 ) = "1"
 		  keypad( 1, 1 ) = "2"
 		  keypad( 1, 2 ) = "3"
