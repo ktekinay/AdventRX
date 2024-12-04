@@ -227,6 +227,7 @@ Module=M_2024;Advent 2024-12/M_2024.xojo_code;&h000000001709EFFF;&h000000005FB0E
 Class=Advent_2024_12_01;Advent 2024-12/Advent_2024_12_01.xojo_code;&h0000000015A7F7FF;&h000000005FB0EFFF;false
 Class=Advent_2024_12_02;Advent 2024-12/Advent_2024_12_02.xojo_code;&h0000000059F607FF;&h000000005FB0EFFF;false
 Class=Advent_2024_12_03;Advent 2024-12/Advent_2024_12_03.xojo_code;&h000000005035FFFF;&h000000005FB0EFFF;false
+Class=Advent_2024_12_04;Advent 2024-12/Advent_2024_12_04.xojo_code;&h000000007ACEDFFF;&h000000005FB0EFFF;false
 DefaultWindow=WndAdvent
 AppMenuBar=MainMenuBar
 MajorVersion=1
