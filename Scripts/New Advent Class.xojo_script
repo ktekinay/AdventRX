@@ -165,6 +165,10 @@ next
 return ""
 End Function
 
+Function GetBaseURL(year As String, day As String, month As String = "12") As String
+return "https://adventofcode.com/" + year + "/day/" + day.ToInteger.ToString
+End Function
+
 Function MaybeGetData(year As String, day As String, month As String = "12") As Boolean
 var cookie as string = GetAOCCookie
 if cookie = "" then
@@ -179,7 +183,7 @@ call DoShellCommand( "mkdir " + destPath )
 
 destPath = destPath + "Advent_" + year + "_" + month + "_" + day + ".txt"
 
-var url as string = "https://adventofcode.com/" + year + "/day/" + day.ToInteger.ToString + "/input"
+var url as string = GetBaseURL(year, day, month) + "/input"
 
 var curl as string = _
 "curl " + _
