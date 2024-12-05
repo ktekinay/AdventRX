@@ -54,17 +54,16 @@ Inherits AdventBase
 
 
 	#tag Method, Flags = &h21
-		Private Function CalculateResultA(input As String) As Integer
+		Private Function CalculateResultA(input As String) As Variant
 		  var arr() as string = ToStringArray( input )
 		  
 		  var totals() as integer = SumIntegerGroups( arr )
-		  return totals.Max
-		  
+		  return totals.Max : if( IsTest, 24000, 64929 )
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function CalculateResultB(input As String) As Integer
+		Private Function CalculateResultB(input As String) As Variant
 		  var arr() as string = ToStringArray( input )
 		  
 		  var totals() as integer = SumIntegerGroups( arr )
@@ -75,7 +74,8 @@ Inherits AdventBase
 		    grandTotal = grandTotal + totals.Pop
 		  next
 		  
-		  return grandTotal
+		  return grandTotal : if( IsTest, 45000, 193697 )
+		  
 		End Function
 	#tag EndMethod
 
@@ -91,6 +91,18 @@ Inherits AdventBase
 
 
 	#tag ViewBehavior
+		#tag ViewProperty
+			Name="Type"
+			Visible=true
+			Group="Behavior"
+			InitialValue=""
+			Type="Types"
+			EditorType="Enum"
+			#tag EnumValues
+				"0 - Cooperative"
+				"1 - Preemptive"
+			#tag EndEnumValues
+		#tag EndViewProperty
 		#tag ViewProperty
 			Name="IsComplete"
 			Visible=false

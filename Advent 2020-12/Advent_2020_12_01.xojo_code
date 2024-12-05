@@ -8,6 +8,12 @@ Inherits AdventBase
 	#tag EndEvent
 
 	#tag Event
+		Function ReturnName() As String
+		  return "Report Repair"
+		End Function
+	#tag EndEvent
+
+	#tag Event
 		Function RunA() As Variant
 		  return CalculateResultA( GetPuzzleInput )
 		  
@@ -50,7 +56,7 @@ Inherits AdventBase
 		    next
 		    
 		  next
-		  
+		  // 158916
 		End Function
 	#tag EndMethod
 
@@ -75,7 +81,7 @@ Inherits AdventBase
 		    next
 		    
 		  next
-		  
+		  // 165795564
 		End Function
 	#tag EndMethod
 
@@ -88,6 +94,18 @@ Inherits AdventBase
 
 
 	#tag ViewBehavior
+		#tag ViewProperty
+			Name="Type"
+			Visible=true
+			Group="Behavior"
+			InitialValue=""
+			Type="Types"
+			EditorType="Enum"
+			#tag EnumValues
+				"0 - Cooperative"
+				"1 - Preemptive"
+			#tag EndEnumValues
+		#tag EndViewProperty
 		#tag ViewProperty
 			Name="IsComplete"
 			Visible=false
