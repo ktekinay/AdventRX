@@ -92,6 +92,24 @@ End
 
 
 	#tag MenuHandler
+		Function FileRunEmAll() As Boolean Handles FileRunEmAll.Action
+		  ExpandAll true
+		  
+		  var lb as DesktopListBox = LbAdvent
+		  
+		  for row as integer = 0 to lb.LastRowIndex
+		    if lb.RowExpandableAt( row ) = false then
+		      DoublePress row
+		    end if
+		  next
+		  
+		  return true
+		  
+		  
+		End Function
+	#tag EndMenuHandler
+
+	#tag MenuHandler
 		Function FileUsePreemptiveThreads() As Boolean Handles FileUsePreemptiveThreads.Action
 		  UsePreemptive = not UsePreemptive
 		  Return True
@@ -254,6 +272,18 @@ End
 		  
 		  LbAdvent.CellTextAt( row, integer( Columns.Status ) ) = kLabelFinished
 		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub ExpandAll(expandIt As Boolean)
+		  var lb as DesktopListBox = LbAdvent
+		  
+		  for row as integer = lb.LastRowIndex downto 0
+		    if lb.RowExpandableAt( row ) and not ( lb.RowExpandedAt( row ) = expandIt ) then
+		      lb.RowExpandedAt( row ) = expandIt
+		    end if
+		  next
 		End Sub
 	#tag EndMethod
 
