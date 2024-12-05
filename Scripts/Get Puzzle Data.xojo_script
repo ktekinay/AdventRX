@@ -24,9 +24,13 @@ end if
 //
 // Get puzzle title
 //
-var title as string = Parse( data, "<h2>--- Day 5: ", " ---" )
+var marker1 as string = "<h2>--- Day " + day.ToInteger.ToString + ": "
+
+var title as string = Parse( data, marker1, " ---" )
+if title <> "" then
 Location = aClass + ".ReturnName"
 Text = "return """ + title + """"
+end if
 
 //
 // Get answers
@@ -40,8 +44,19 @@ var answer1 as string = Parse( parts( 1 ), "<code>", "</code>" )
 if answer1 <> "" then
 Location = aClass + ".CalculateResultA"
 var t as string = Text.Trim
-if t.Right( 5 ) = ", 0 )" then
+
+if t.Right( 4 + answer1.Length ) = ", " + answer1 + " )" then
+// Do nothing
+
+elseif t.Right( 5 ) = ", 0 )" then
 Text = t.Left( t.Length - 3 ) + answer1 + " )"
+
+else
+var commented as string = "// " + answer1
+if t.Right( commented.Length ) <> commented then
+Text = t + EndOfLine + commented
+end if
+
 end if
 end if
 
@@ -50,8 +65,19 @@ var answer2 as string = Parse( parts( 2 ), "<code>", "</code>" )
 if answer1 <> "" then
 Location = aClass + ".CalculateResultB"
 var t as string = Text.Trim
-if t.Right( 5 ) = ", 0 )" then
+
+if t.Right( 4 + answer2.Length ) = ", " + answer2 + " )" then
+// Do nothing
+
+elseif t.Right( 5 ) = ", 0 )" then
 Text = t.Left( t.Length - 3 ) + answer2 + " )"
+
+else
+var commented as string = "// " + answer2
+if t.Right( commented.Length ) <> commented then
+Text = t + EndOfLine + commented
+end if
+
 end if
 end if
 end if
