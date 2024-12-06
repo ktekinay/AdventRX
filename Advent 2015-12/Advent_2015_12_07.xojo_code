@@ -157,7 +157,23 @@ Inherits AdventBase
 	#tag EndConstant
 
 
+	#tag Using, Name = M_2015
+	#tag EndUsing
+
+
 	#tag ViewBehavior
+		#tag ViewProperty
+			Name="Type"
+			Visible=true
+			Group="Behavior"
+			InitialValue=""
+			Type="Types"
+			EditorType="Enum"
+			#tag EnumValues
+				"0 - Cooperative"
+				"1 - Preemptive"
+			#tag EndEnumValues
+		#tag EndViewProperty
 		#tag ViewProperty
 			Name="IsComplete"
 			Visible=false

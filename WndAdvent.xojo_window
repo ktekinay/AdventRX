@@ -17,8 +17,8 @@ Begin DesktopWindow WndAdvent
    MaximumWidth    =   32000
    MenuBar         =   1943463935
    MenuBarVisible  =   False
-   MinimumHeight   =   64
-   MinimumWidth    =   64
+   MinimumHeight   =   300
+   MinimumWidth    =   1106
    Resizeable      =   True
    Title           =   "Advent"
    Type            =   0
@@ -93,7 +93,7 @@ End
 
 	#tag MenuHandler
 		Function FileRunEmAll() As Boolean Handles FileRunEmAll.Action
-		  ExpandAll true
+		  'ExpandAll true
 		  
 		  var lb as DesktopListBox = LbAdvent
 		  
@@ -311,6 +311,7 @@ End
 		  AddRow new Advent_2015_12_11
 		  AddRow new Advent_2015_12_12
 		  AddRow new Advent_2015_12_13
+		  AddRow new Advent_2015_12_14
 		  
 		  // 2016
 		  AddRow new Advent_2016_12_01

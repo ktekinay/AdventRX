@@ -166,6 +166,14 @@ Protected Class Circuit
 			Type="String"
 			EditorType="MultiLineEditor"
 		#tag EndViewProperty
+		#tag ViewProperty
+			Name="IsReady"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Boolean"
+			EditorType=""
+		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class
 #tag EndClass

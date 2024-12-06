@@ -64,28 +64,10 @@ Inherits AdventBase
 		  for each row as string in rows
 		    var pages() as string = row.Split( "," )
 		    
-		    for each rule as pair in rules
-		      var leftPage as string = rule.Left.StringValue
-		      var rightPage as string = rule.Right.StringValue
-		      
-		      var leftPos as integer = pages.IndexOf( leftPage )
-		      if leftPos = -1 then
-		        continue for rule
-		      end if
-		      
-		      var rightPos as integer = pages.IndexOf( rightPage )
-		      if rightPos = -1 then
-		        continue for rule
-		      end if
-		      
-		      if leftPos > rightPos then
-		        // Invalid!
-		        continue for row
-		      end if
-		    next
-		    
-		    var midPos as integer = pages.LastIndex \ 2
-		    result = result + pages( midPos ).ToInteger
+		    if IsValid( pages, rules ) then
+		      var midPos as integer = pages.LastIndex \ 2
+		      result = result + pages( midPos ).ToInteger
+		    end if
 		  next
 		  
 		  return result : if( IsTest, 143, 5964 )

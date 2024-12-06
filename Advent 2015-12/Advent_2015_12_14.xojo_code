@@ -1,9 +1,9 @@
 #tag Class
-Protected Class Advent_2015_12_03
+Protected Class Advent_2015_12_14
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "Directions to Santa/Robo-Santa"
+		  return "Reindeer rates of travel"
 		End Function
 	#tag EndEvent
 
@@ -16,7 +16,7 @@ Inherits AdventBase
 
 	#tag Event
 		Function ReturnName() As String
-		  return "Perfectly Spherical Houses in a Vacuum"
+		  return "Reindeer Olympics"
 		End Function
 	#tag EndEvent
 
@@ -54,97 +54,109 @@ Inherits AdventBase
 
 
 	#tag Method, Flags = &h21
-		Private Function CalculateResultA(input As String) As Integer
-		  const mult as integer = 100000000
+		Private Function CalculateResultA(input As String) As Variant
+		  var secs as integer = if( IsTest, 1000, 2503 )
 		  
-		  var visited as new Dictionary( 0 : nil )
-		  var houseCount as integer = 1
+		  var maxDistance as integer
 		  
-		  var x, y as integer
+		  var rx as new RegEx
+		  rx.SearchPattern = "(\d+)\D+(\d+)\D+(\d+)"
 		  
-		  for each direction as string in input.Split( "" )
-		    select case direction
-		    case ">"
-		      x = x + 1
-		    case "v"
-		      y = y - 1
-		    case "<"
-		      x = x - 1
-		    case "^"
-		      y = y + 1
-		    end select
+		  var match as RegExMatch = rx.Search( input )
+		  
+		  while match isa object
+		    var ratePerSecond as integer = match.SubExpressionString( 1 ).ToInteger
+		    var flyTime as integer = match.SubExpressionString( 2 ).ToInteger
+		    var restTime as integer = match.SubExpressionString( 3 ).ToInteger
 		    
-		    var key as integer = x * mult + y
+		    var blockTime as integer = flyTime + restTime
+		    var distanceOverBlock as integer = flyTime * ratePerSecond
 		    
-		    if not visited.HasKey( key ) then
-		      houseCount = houseCount + 1
-		      visited.Value( key ) = nil
+		    var blocks as integer = secs / blockTime
+		    var remainingSecs as integer = secs mod blockTime
+		    
+		    var distance as integer = blocks * distanceOverBlock
+		    
+		    if remainingSecs < flyTime then
+		      distance = distance + ( remainingSecs * ratePerSecond )
+		    else
+		      distance = distance + ( flyTime * ratePerSecond )
 		    end if
-		  next
+		    
+		    maxDistance = max( maxDistance, distance )
+		    
+		    match = rx.Search
+		  wend
 		  
-		  return houseCount
-		  // 2081
+		  
+		  return maxDistance : if( IsTest, 1120, 2696 )
+		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Function CalculateResultB(input As String) As Integer
-		  const mult as integer = 100000000
+		Private Function CalculateResultB(input As String) As Variant
+		  var secs as integer = if( IsTest, 1000, 2503 )
 		  
-		  var visited as new Dictionary( 0 : nil )
-		  var houseCount as integer = 1
+		  var deers() as Reindeer
 		  
-		  var x, y as integer
+		  var rx as new RegEx
+		  rx.SearchPattern = "^(\w+)\D+(\d+)\D+(\d+)\D+(\d+)"
 		  
-		  var directions() as string = input.Split( "" )
+		  var match as RegExMatch = rx.Search( input )
 		  
-		  for i as integer = 0 to directions.LastIndex step 2
-		    var direction as string = directions( i )
-		    select case direction
-		    case ">"
-		      x = x + 1
-		    case "v"
-		      y = y - 1
-		    case "<"
-		      x = x - 1
-		    case "^"
-		      y = y + 1
-		    end select
+		  while match isa object
+		    var name as string = match.SubExpressionString( 1 )
+		    var ratePerSecond as integer = match.SubExpressionString( 2 ).ToInteger
+		    var flyTime as integer = match.SubExpressionString( 3 ).ToInteger
+		    var restTime as integer = match.SubExpressionString( 4 ).ToInteger
 		    
-		    var key as integer = x * mult + y
+		    var deer as new Reindeer
+		    deer.Name = name
+		    deer.FlyTime = flyTime
+		    deer.RestTime = restTime
+		    deer.RatePerSecond = ratePerSecond
+		    deer.RemainingFlyTime = flyTime
+		    deer.RemainingRestTime = restTime
 		    
-		    if not visited.HasKey( key ) then
-		      houseCount = houseCount + 1
-		      visited.Value( key ) = nil
-		    end if
+		    deers.Add deer
+		    
+		    match = rx.Search
+		  wend
+		  
+		  for sec as integer = 1 to secs
+		    for each deer as Reindeer in deers
+		      if deer.RemainingFlyTime = 0 and deer.RemainingRestTime = 0 then
+		        deer.RemainingRestTime = deer.RestTime
+		        deer.RemainingFlyTime = deer.FlyTime - 1
+		        deer.DistanceTravelled = deer.DistanceTravelled + deer.RatePerSecond
+		      elseif deer.RemainingFlyTime > 0 then
+		        deer.RemainingFlyTime = deer.RemainingFlyTime - 1
+		        deer.DistanceTravelled = deer.DistanceTravelled + deer.RatePerSecond
+		      else
+		        deer.RemainingRestTime = deer.RemainingRestTime - 1
+		      end if
+		    next
+		    
+		    var maxDistance as integer
+		    for each deer as Reindeer in deers
+		      maxDistance = max( maxDistance, deer.DistanceTravelled )
+		    next
+		    
+		    for each deer as Reindeer in deers
+		      if deer.DistanceTravelled = maxDistance then
+		        deer.Points = deer.Points + 1
+		      end if
+		    next
 		  next
 		  
-		  x = 0
-		  y = 0
+		  var maxPoints as integer
 		  
-		  for i as integer = 1 to directions.LastIndex step 2
-		    var direction as string = directions( i )
-		    select case direction
-		    case ">"
-		      x = x + 1
-		    case "v"
-		      y = y - 1
-		    case "<"
-		      x = x - 1
-		    case "^"
-		      y = y + 1
-		    end select
-		    
-		    var key as integer = x * mult + y
-		    
-		    if not visited.HasKey( key ) then
-		      houseCount = houseCount + 1
-		      visited.Value( key ) = nil
-		    end if
+		  for each deer as Reindeer in deers
+		    maxPoints = max( maxPoints, deer.Points )
 		  next
 		  
-		  return houseCount
-		  // 2341
+		  return maxPoints : if( IsTest, 689, 1084 )
 		End Function
 	#tag EndMethod
 
@@ -152,11 +164,15 @@ Inherits AdventBase
 	#tag Constant, Name = kPuzzleInput, Type = String, Dynamic = False, Default = \"", Scope = Private, Description = 5768656E2070617374696E67207468652064617461206973206E65636573736172792E
 	#tag EndConstant
 
-	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"^v^v^v^v^v", Scope = Private
+	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"Comet can fly 14 km/s for 10 seconds\x2C but then must rest for 127 seconds.\nDancer can fly 16 km/s for 11 seconds\x2C but then must rest for 162 seconds", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = kTestInputB, Type = String, Dynamic = False, Default = \"^v^v^v^v^v", Scope = Private
+	#tag Constant, Name = kTestInputB, Type = String, Dynamic = False, Default = \"", Scope = Private
 	#tag EndConstant
+
+
+	#tag Using, Name = M_2015
+	#tag EndUsing
 
 
 	#tag ViewBehavior
