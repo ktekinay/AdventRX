@@ -57,6 +57,9 @@ Inherits AdventBase
 		Private Function CalculateResultA(input As String) As Variant
 		  var grid( -1, -1 ) as string = ToStringGrid( input )
 		  
+		  var lastRowIndex as integer = grid.LastIndex( 1 )
+		  var lastColIndex as integer = grid.LastIndex( 2 )
+		  
 		  var row, col as integer
 		  
 		  StartingPosition grid, row, col
@@ -65,13 +68,11 @@ Inherits AdventBase
 		  var visited as new Dictionary( Key( row, col ) : nil )
 		  
 		  do
-		    #pragma BreakOnExceptions false
-		    try
-		      Move( grid, direction, row, col )
-		    catch err as OutOfBoundsException
+		    Move( grid, direction, row, col )
+		    
+		    if row < 0 or row > lastRowIndex or col < 0 or col > lastColIndex then
 		      exit
-		    end try
-		    #pragma BreakOnExceptions default
+		    end if
 		    
 		    visited.Value( Key( row, col ) ) = nil
 		  loop
@@ -84,61 +85,85 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Variant
+		  self.Type = Thread.Types.Cooperative
+		  
 		  var grid( -1, -1 ) as string = ToStringGrid( input )
 		  
 		  var lastRowIndex as integer = grid.LastIndex( 1 )
-		  var lastColIndex as integer = grid.LastIndex( 2 )
 		  
 		  var startingRow, startingCol as integer
 		  
 		  StartingPosition grid, startingRow, startingCol
 		  var startingDirection as string = grid( startingRow, startingCol )
 		  
-		  var result as integer
+		  var tp as new Day6ThreadPool
 		  
-		  for obstacleRow as integer = 0 to lastRowIndex
-		    for obstacleCol as integer = 0 to lastColIndex
-		      var char as string = grid( obstacleRow, obstacleCol )
-		      if char <> "." then
-		        continue for obstacleCol
-		      end if
-		      
-		      grid( obstacleRow, obstacleCol ) = "#"
-		      
-		      var visited as new Dictionary
-		      
-		      var row as integer = startingRow
-		      var col as integer = startingCol
-		      var direction as string = startingDirection
-		      
-		      do
-		        #pragma BreakOnExceptions false
-		        try
-		          Move( grid, direction, row, col )
-		        catch err as OutOfBoundsException
-		          exit
-		        end try
-		        #pragma BreakOnExceptions default
-		        
-		        var key as integer = Key( row, col, direction )
-		        if visited.HasKey( key ) then
-		          result = result + 1
-		          exit
-		        end if
-		        
-		        visited.Value( key ) = nil
-		      loop
-		      
-		      grid( obstacleRow, obstacleCol ) = "."
-		    next
+		  var stepper as integer = 4
+		  
+		  for checkRowStart as integer = 0 to lastRowIndex step stepper
+		    var settings as new Dictionary
+		    
+		    var thisGrid( -1, -1 ) as string = ToStringGrid( input )
+		    
+		    settings.Value( "grid" ) = thisGrid
+		    settings.Value( "startingRow" ) = startingRow
+		    settings.Value( "startingCol" ) = startingCol
+		    settings.Value( "startingDirection" ) = startingDirection
+		    settings.Value( "checkRowStart" ) = checkRowStart
+		    settings.Value( "checkRowEnd" ) = checkRowStart + stepper - 1
+		    
+		    tp.Add settings
 		  next
+		  
+		  tp.Wait
+		  
+		  var result as integer = tp.Result
+		  
+		  'var result as integer
+		  '
+		  'for obstacleRow as integer = 0 to lastRowIndex
+		  'for obstacleCol as integer = 0 to lastColIndex
+		  'var char as string = grid( obstacleRow, obstacleCol )
+		  'if char <> "." then
+		  'continue for obstacleCol
+		  'end if
+		  '
+		  'grid( obstacleRow, obstacleCol ) = "#"
+		  '
+		  'var visited as new Dictionary
+		  '
+		  'var row as integer = startingRow
+		  'var col as integer = startingCol
+		  'var direction as string = startingDirection
+		  '
+		  'do
+		  '#pragma BreakOnExceptions false
+		  'try
+		  'Move( grid, direction, row, col )
+		  'catch err as OutOfBoundsException
+		  'exit
+		  'end try
+		  '#pragma BreakOnExceptions default
+		  '
+		  'var key as integer = Key( row, col, direction )
+		  'if visited.HasKey( key ) then
+		  'result = result + 1
+		  'exit
+		  'end if
+		  '
+		  'visited.Value( key ) = nil
+		  'loop
+		  '
+		  'grid( obstacleRow, obstacleCol ) = "."
+		  'next
+		  'next
 		  
 		  return result : if( IsTest, 6, 2188 )
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Shared Function Key(row As Integer, col As Integer, direction As String = "") As Integer
+	#tag Method, Flags = &h0
+		Shared Function Key(row As Integer, col As Integer, direction As String = "") As Integer
 		  var key as integer = row * 10000 + col
 		  select case direction
 		  case "", "^"
@@ -153,8 +178,8 @@ Inherits AdventBase
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21
-		Private Shared Sub Move(grid(, ) As String, ByRef direction As String, ByRef row As Integer, ByRef col As Integer)
+	#tag Method, Flags = &h0
+		Shared Sub Move(grid(, ) As String, ByRef direction As String, ByRef row As Integer, ByRef col As Integer)
 		  var newRow as integer
 		  var newCol as integer 
 		  
@@ -173,7 +198,8 @@ Inherits AdventBase
 		      newCol = newCol - 1
 		    end select
 		    
-		    if grid( newRow, newCol ) <> "#" then
+		    if newRow < 0 or newCol < 0 or newRow > grid.LastIndex( 1 ) or newCol > grid.LastIndex( 2 ) or _
+		      grid( newRow, newCol ) <> "#" then
 		      row = newRow
 		      col = newCol
 		      return
