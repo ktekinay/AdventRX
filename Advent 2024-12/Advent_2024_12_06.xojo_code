@@ -57,9 +57,6 @@ Inherits AdventBase
 		Private Function CalculateResultA(input As String) As Variant
 		  var grid( -1, -1 ) as string = ToStringGrid( input )
 		  
-		  var lastRowIndex as integer = grid.LastIndex( 1 )
-		  var lastColIndex as integer = grid.LastIndex( 2 )
-		  
 		  var row, col as integer
 		  
 		  StartingPosition grid, row, col
