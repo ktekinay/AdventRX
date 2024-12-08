@@ -62,7 +62,7 @@ end if
 
 if parts.Count >= 3 then
 var answer2 as string = Parse( parts( 2 ), "<code>", "</code>" )
-if answer1 <> "" then
+if answer2 <> "" then
 Location = aClass + ".CalculateResultB"
 var t as string = Text.Trim
 
@@ -79,6 +79,10 @@ Text = t + EndOfLine + commented
 end if
 
 end if
+
+// We have both answers so mark it done
+Location = aClass + ".ReturnIsComplete"
+Text = "return true"
 end if
 end if
 
