@@ -57,6 +57,9 @@ Inherits AdventBase
 		Private Function CalculateResultA(input As String) As Variant
 		  var grid( -1, -1 ) as string = ToStringGrid( input )
 		  
+		  var lastRowIndex as integer = grid.LastIndex( 1 )
+		  var lastColIndex as integer = grid.LastIndex( 2 )
+		  
 		  var row, col as integer
 		  
 		  StartingPosition grid, row, col
@@ -65,13 +68,12 @@ Inherits AdventBase
 		  var visited as new Dictionary( Key( row, col ) : nil )
 		  
 		  do
-		    #pragma BreakOnExceptions false
-		    try
-		      Move( grid, direction, row, col )
-		    catch err as OutOfBoundsException
+		    Move( grid, direction, row, col )
+		    
+		    if row < 0 or row > lastRowIndex or _
+		      col < 0 or col > lastColIndex then
 		      exit
-		    end try
-		    #pragma BreakOnExceptions default
+		    end if
 		    
 		    visited.Value( Key( row, col ) ) = nil
 		  loop
@@ -89,49 +91,47 @@ Inherits AdventBase
 		  var lastRowIndex as integer = grid.LastIndex( 1 )
 		  var lastColIndex as integer = grid.LastIndex( 2 )
 		  
-		  var startingRow, startingCol as integer
+		  var rowCount as integer = lastRowIndex + 1
 		  
+		  var startingRow, startingCol as integer
 		  StartingPosition grid, startingRow, startingCol
 		  var startingDirection as string = grid( startingRow, startingCol )
 		  
+		  var availableProcessors as integer = max( System.CoreCount - 2, 1 )
+		  
+		  var rowsPerThread as integer = rowCount / availableProcessors + 1
+		  
+		  var strippedInput as string = input.ReplaceLineEndings( "" )
+		  
+		  var threads() as Day6Thread 
+		  
+		  for row as integer = 0 to lastRowIndex step rowsPerThread
+		    var t as new Day6Thread
+		    t.Type = Thread.Types.Preemptive
+		    
+		    t.StartingObstacleRow = row
+		    t.EndingObstacleRow = row + rowsPerThread - 1
+		    t.StartingRow = startingRow
+		    t.StartingCol = startingCol
+		    t.StartingDirection = startingDirection
+		    t.Grid = strippedInput
+		    t.LastRowIndex = lastRowIndex
+		    t.LastColIndex = lastColIndex
+		    
+		    t.Start
+		    threads.Add t
+		  next
+		  
 		  var result as integer
 		  
-		  for obstacleRow as integer = 0 to lastRowIndex
-		    for obstacleCol as integer = 0 to lastColIndex
-		      var char as string = grid( obstacleRow, obstacleCol )
-		      if char <> "." then
-		        continue for obstacleCol
-		      end if
-		      
-		      grid( obstacleRow, obstacleCol ) = "#"
-		      
-		      var visited as new Dictionary
-		      
-		      var row as integer = startingRow
-		      var col as integer = startingCol
-		      var direction as string = startingDirection
-		      
-		      do
-		        #pragma BreakOnExceptions false
-		        try
-		          Move( grid, direction, row, col )
-		        catch err as OutOfBoundsException
-		          exit
-		        end try
-		        #pragma BreakOnExceptions default
-		        
-		        var key as integer = Key( row, col, direction )
-		        if visited.HasKey( key ) then
-		          result = result + 1
-		          exit
-		        end if
-		        
-		        visited.Value( key ) = nil
-		      loop
-		      
-		      grid( obstacleRow, obstacleCol ) = "."
-		    next
-		  next
+		  do
+		    var t as Day6Thread = threads.Pop
+		    
+		    while t.ThreadState <> Thread.ThreadStates.NotRunning
+		    wend
+		    
+		    result = result + t.Result
+		  loop until threads.Count = 0
 		  
 		  return result : if( IsTest, 6, 2188 )
 		End Function
@@ -155,6 +155,9 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Shared Sub Move(grid(, ) As String, ByRef direction As String, ByRef row As Integer, ByRef col As Integer)
+		  var lastRowIndex as integer = grid.LastIndex( 1 )
+		  var lastColIndex as integer = grid.LastIndex( 2 )
+		  
 		  var newRow as integer
 		  var newCol as integer 
 		  
@@ -173,7 +176,9 @@ Inherits AdventBase
 		      newCol = newCol - 1
 		    end select
 		    
-		    if grid( newRow, newCol ) <> "#" then
+		    if newRow < 0 or newRow > lastRowIndex or _
+		      newCol < 0 or newCol > lastColIndex or _
+		      grid( newRow, newCol ) <> "#" then
 		      row = newRow
 		      col = newCol
 		      return

@@ -235,6 +235,7 @@ Class=Advent_2024_12_07;Advent 2024-12/Advent_2024_12_07.xojo_code;&h000000005B8
 Class=Advent_2024_12_08;Advent 2024-12/Advent_2024_12_08.xojo_code;&h000000004138F7FF;&h000000005FB0EFFF;false
 Class=Advent_2024_12_09;Advent 2024-12/Advent_2024_12_09.xojo_code;&h0000000035FE97FF;&h000000005FB0EFFF;false
 Class=Reindeer;Advent 2015-12/M_2015/Reindeer.xojo_code;&h0000000066719FFF;&h000000004A13EFFF;false
+Class=Day6Thread;Advent 2024-12/M_2024/Day6Thread.xojo_code;&h000000005CAB77FF;&h000000001709EFFF;false
 DefaultWindow=WndAdvent
 AppMenuBar=MainMenuBar
 MajorVersion=1
