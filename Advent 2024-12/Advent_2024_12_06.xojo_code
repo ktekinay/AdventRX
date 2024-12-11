@@ -57,26 +57,7 @@ Inherits AdventBase
 		Private Function CalculateResultA(input As String) As Variant
 		  var grid( -1, -1 ) as string = ToStringGrid( input )
 		  
-		  var lastRowIndex as integer = grid.LastIndex( 1 )
-		  var lastColIndex as integer = grid.LastIndex( 2 )
-		  
-		  var row, col as integer
-		  
-		  StartingPosition grid, row, col
-		  var direction as string = grid( row, col )
-		  
-		  var visited as new Dictionary( Key( row, col ) : nil )
-		  
-		  do
-		    Move( grid, direction, row, col )
-		    
-		    if row < 0 or row > lastRowIndex or _
-		      col < 0 or col > lastColIndex then
-		      exit
-		    end if
-		    
-		    visited.Value( Key( row, col ) ) = nil
-		  loop
+		  var visited as Dictionary = Solve( grid )
 		  
 		  var result as integer = visited.KeyCount
 		  return result : if( IsTest, 41, 5453 )
@@ -87,6 +68,9 @@ Inherits AdventBase
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Variant
 		  var grid( -1, -1 ) as string = ToStringGrid( input )
+		  
+		  var visited as Dictionary = Solve( grid )
+		  var visitedJSON as string = GenerateJSON( visited.Keys )
 		  
 		  var lastRowIndex as integer = grid.LastIndex( 1 )
 		  var lastColIndex as integer = grid.LastIndex( 2 )
@@ -117,6 +101,7 @@ Inherits AdventBase
 		    t.Grid = strippedInput
 		    t.LastRowIndex = lastRowIndex
 		    t.LastColIndex = lastColIndex
+		    t.VisitedJSON = visitedJSON
 		    
 		    t.Start
 		    threads.Add t
@@ -125,12 +110,12 @@ Inherits AdventBase
 		  var result as integer
 		  
 		  do
-		    var t as Day6Thread = threads.Pop
+		    var t as Day6Thread = threads( threads.LastIndex )
 		    
-		    while t.ThreadState <> Thread.ThreadStates.NotRunning
-		    wend
-		    
-		    result = result + t.Result
+		    if t.ThreadState = Thread.ThreadStates.NotRunning then
+		      call threads.Pop
+		      result = result + t.Result
+		    end if
 		  loop until threads.Count = 0
 		  
 		  return result : if( IsTest, 6, 2188 )
@@ -138,18 +123,11 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Shared Function Key(row As Integer, col As Integer, direction As String = "") As Integer
-		  var key as integer = row * 10000 + col
-		  select case direction
-		  case "", "^"
-		    return key
-		  case ">"
-		    return key + 200000000
-		  case "v"
-		    return key + 300000000
-		  case "<"
-		    return key + 400000000
-		  end select
+		Private Shared Function Key(row As Integer, col As Integer, colCount As Integer) As Integer
+		  var key as integer = row * colCount + col
+		  
+		  return key
+		  
 		End Function
 	#tag EndMethod
 
@@ -188,6 +166,34 @@ Inherits AdventBase
 		  loop
 		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Function Solve(grid(, ) As String) As Dictionary
+		  var lastRowIndex as integer = grid.LastIndex( 1 )
+		  var lastColIndex as integer = grid.LastIndex( 2 )
+		  var colCount as integer = lastColIndex + 1
+		  
+		  var row, col as integer
+		  
+		  StartingPosition grid, row, col
+		  var direction as string = grid( row, col )
+		  
+		  var visited as new Dictionary( Key( row, col, colCount ) : nil )
+		  
+		  do
+		    Move( grid, direction, row, col )
+		    
+		    if row < 0 or row > lastRowIndex or _
+		      col < 0 or col > lastColIndex then
+		      exit
+		    end if
+		    
+		    visited.Value( Key( row, col, colCount ) ) = nil
+		  loop
+		  
+		  return visited
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21

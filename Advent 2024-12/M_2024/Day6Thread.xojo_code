@@ -31,6 +31,12 @@ Inherits Thread
 		    startingDirection = 3
 		  end select
 		  
+		  var visitedArr() as variant = ParseJSON( VisitedJSON )
+		  var visited as new Dictionary
+		  for each v as variant in visitedArr
+		    visited.Value( v ) = nil
+		  next
+		  
 		  var result as integer
 		  
 		  var startingObstacleRow as integer = self.StartingObstacleRow
@@ -39,6 +45,10 @@ Inherits Thread
 		  for obstacleRow as integer = startingObstacleRow to endingObstacleRow
 		    for obstacleCol as integer = 0 to lastColIndex
 		      var obstacleIndex as integer = obstacleRow * colCount + obstacleCol
+		      
+		      if not visited.HasKey( obstacleIndex ) then
+		        continue
+		      end if
 		      
 		      var char as integer = gridPtr.Byte( obstacleIndex )
 		      
@@ -152,6 +162,10 @@ Inherits Thread
 
 	#tag Property, Flags = &h0
 		StartingRow As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h0
+		VisitedJSON As String
 	#tag EndProperty
 
 
