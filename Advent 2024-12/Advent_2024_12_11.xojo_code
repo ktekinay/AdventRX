@@ -81,25 +81,12 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Shared Sub Evaluate(stone As Integer, blinks As Integer, ByRef result As Integer, cache As Dictionary)
-		  static lookUpArr() as integer = array( _
-		  1, _
-		  1 * 2024, _
-		  2 * 2024, _
-		  3 * 2024, _
-		  4 * 2024, _
-		  5 * 2024, _
-		  6 * 2024, _
-		  7 * 2024, _
-		  8 * 2024, _
-		  9 * 2024 _
-		  )
-		  
 		  if blinks = 0 then
 		    return
 		  end if
 		  
-		  var stoneKey as string = stone.ToString
-		  var key as string = stoneKey + "," + blinks.ToString
+		  var stoneKey as string = stone.ToString + ","
+		  var key as string = stoneKey + blinks.ToString
 		  
 		  var existing as variant = cache.Lookup( key, nil )
 		  if existing.Type = Variant.TypeInt64 then
@@ -108,45 +95,23 @@ Inherits AdventBase
 		  end if
 		  
 		  var startingResult as integer = result
+		  var left, right as integer
 		  
 		  for i as integer = 1 to blinks
-		    if stone < 10 then
-		      stone = lookUpArr( stone )
-		      continue
-		    end if
-		    
-		    existing = cache.Lookup( stone, nil )
-		    
-		    if existing is nil then
-		      var left, right as integer
+		    if stone = 0 then
+		      stone = 1
 		      
-		      if MaybeSplit( stone, left, right ) then
-		        result = result + 1
-		        
-		        var values() as integer = array( left, right )
-		        cache.Value( stone ) = values
-		        
-		        stone = left
-		        Evaluate( right, blinks - i, result, cache )
-		        
-		      else
-		        var nextStone as integer = stone * 2024
-		        cache.Value( stone ) = nextStone
-		        stone = nextStone
-		        
-		      end if
-		      
-		    elseif existing.IsArray then
+		    elseif MaybeSplit( stone, left, right ) then
 		      result = result + 1
 		      
-		      var values() as integer = existing
-		      stone = values( 0 )
-		      Evaluate( values( 1 ), blinks - i, result, cache )
+		      stone = left
+		      Evaluate( right, blinks - i, result, cache )
 		      
 		    else
-		      stone = existing
+		      stone = stone * 2024
 		      
 		    end if
+		    
 		  next
 		  
 		  var diff as integer = result - startingResult
