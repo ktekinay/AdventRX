@@ -29,7 +29,7 @@ Inherits Thread
 
 
 	#tag Method, Flags = &h21
-		Private Function ConvertToString(msg As Variant) As String
+		Private Shared Function ConvertToString(msg As Variant) As String
 		  if msg.IsArray or msg isa Dictionary then
 		    msg = GenerateJSON( msg )
 		    
@@ -123,13 +123,13 @@ Inherits Thread
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
-		Protected Sub Print(grid(, ) As String)
+		Protected Shared Sub Print(grid(, ) As String)
 		  PrintStringGrid grid
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
-		Protected Sub Print(msg As Variant)
+		Protected Shared Sub Print(msg As Variant)
 		  #pragma BackgroundTasks true
 		  
 		  if msg isa RowSet then
@@ -146,13 +146,13 @@ Inherits Thread
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
-		Protected Sub Print(msg1 As Variant, msg2 As Variant, ParamArray moreMsgs() As Variant)
+		Protected Shared Sub Print(msg1 As Variant, msg2 As Variant, ParamArray moreMsgs() As Variant)
 		  Print msg1, msg2, moreMsgs
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
-		Protected Sub Print(msg1 As Variant, msg2 As Variant, moreMsgs() As Variant)
+		Protected Shared Sub Print(msg1 As Variant, msg2 As Variant, moreMsgs() As Variant)
 		  #pragma BackgroundTasks true
 		  
 		  var printer() as string = array( ConvertToString( msg1 ), ConvertToString( msg2 ) )
@@ -167,7 +167,7 @@ Inherits Thread
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub PrintRowSet(rs As RowSet)
+		Private Shared Sub PrintRowSet(rs As RowSet)
 		  #pragma BackgroundTasks true
 		  
 		  if rs.AfterLastRow then
@@ -192,7 +192,7 @@ Inherits Thread
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
-		Protected Sub PrintStringGrid(grid(, ) As String, colDefault As String = "")
+		Protected Shared Sub PrintStringGrid(grid(, ) As String, colDefault As String = "")
 		  var lastRowIndex as integer = grid.LastIndex( 1 )
 		  var lastColIndex as integer = grid.LastIndex( 2 )
 		  
@@ -252,7 +252,7 @@ Inherits Thread
 
 	#tag Method, Flags = &h1
 		Protected Function ToIntegerArray(s As String) As Integer()
-		  s = s.ReplaceLineEndings( EndOfLine ).ReplaceAll( ",", EndOfLine ).Trim
+		  s = s.ReplaceLineEndings( EndOfLine ).ReplaceAll( ",", EndOfLine ).ReplaceAll( " ", EndOfLine ).Trim
 		  var sarr() as string = s.Split( EndOfLine )
 		  
 		  var arr() as integer

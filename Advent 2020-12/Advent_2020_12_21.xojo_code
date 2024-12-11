@@ -68,7 +68,7 @@ Inherits AdventBase
 		  PrintDbInfo db, "Matched"
 		  
 		  var rs as RowSet = db.SelectSQL( "SELECT * FROM confirmed_match" )
-		  Print rs
+		  self.Print rs
 		  
 		  var result as integer = CountUnmatchedIngredients( db )
 		  return result
@@ -88,7 +88,7 @@ Inherits AdventBase
 		  IdentifyMatches db
 		  
 		  var rs as RowSet = db.SelectSQL( "SELECT * FROM confirmed_match" )
-		  Print rs
+		  self.Print rs
 		  
 		  var sql as string = _
 		  "SELECT ingredient FROM confirmed_match ORDER BY allergen"
@@ -100,7 +100,7 @@ Inherits AdventBase
 		    rs.MoveToNextRow
 		  wend
 		  
-		  Print String.FromArray( ingredients, "," )
+		  self.Print String.FromArray( ingredients, "," )
 		  return -1
 		  
 		End Function
@@ -253,7 +253,7 @@ Inherits AdventBase
 		  
 		  do
 		    matchPass = matchPass + 1
-		    Print "MatchPass " + matchPass.ToString
+		    self.Print "MatchPass " + matchPass.ToString
 		    
 		    sql = _
 		    "SELECT allergen, ingredient" + EndOfLine + _
@@ -379,14 +379,14 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Sub PrintDbInfo(db As Database, tag As String)
-		  print tag
-		  print "================================="
+		  self.Print tag
+		  self.Print "================================="
 		  
 		  var tableRs as RowSet = db.Tables
 		  while not tableRs.AfterLastRow
 		    var table as string = tableRs.ColumnAt( 0 ).StringValue
 		    var countRs as RowSet = db.SelectSQL( "SELECT COUNT (*) FROM " + table )
-		    print table + ": " + countRs.ColumnAt( 0 ).StringValue
+		    self.Print table + ": " + countRs.ColumnAt( 0 ).StringValue
 		    
 		    tableRs.MoveToNextRow
 		  wend
@@ -400,7 +400,7 @@ Inherits AdventBase
 		  'print "  rows where ingredient_count = 1: " + rs.ColumnAt( 0 ).StringValue
 		  
 		  
-		  print ""
+		  self.Print ""
 		  
 		End Sub
 	#tag EndMethod
@@ -417,6 +417,18 @@ Inherits AdventBase
 
 
 	#tag ViewBehavior
+		#tag ViewProperty
+			Name="Type"
+			Visible=true
+			Group="Behavior"
+			InitialValue=""
+			Type="Types"
+			EditorType="Enum"
+			#tag EnumValues
+				"0 - Cooperative"
+				"1 - Preemptive"
+			#tag EndEnumValues
+		#tag EndViewProperty
 		#tag ViewProperty
 			Name="IsComplete"
 			Visible=false

@@ -58,7 +58,7 @@ Inherits AdventBase
 		Private Function Advance(remainingMinutes as Integer, scenario as MiningScenario, history as Dictionary, ByRef highCount as Integer) As Integer
 		  if remainingMinutes = 0 then
 		    if scenario.Inventory.Geode > highCount then
-		      Print "", "New High" : scenario.Inventory.Geode
+		      self.Print "", "New High" : scenario.Inventory.Geode
 		      highCount = scenario.Inventory.Geode
 		    end if
 		    
@@ -128,7 +128,7 @@ Inherits AdventBase
 		  var quality as integer
 		  
 		  for each bp as RobotBlueprint in blueprints
-		    Print "Blueprint id" : bp.ID
+		    self.Print "Blueprint id" : bp.ID
 		    
 		    var scenario as MiningScenario = MiningScenario.NewScenario
 		    scenario.Blueprint = bp
@@ -136,7 +136,7 @@ Inherits AdventBase
 		    var highCount as integer
 		    call Advance( 24, scenario, new Dictionary, highCount )
 		    
-		    Print "", "Count" : highCount
+		    self.Print "", "Count" : highCount
 		    
 		    quality = quality + ( bp.ID * highCount )
 		  next
@@ -323,6 +323,18 @@ Inherits AdventBase
 
 
 	#tag ViewBehavior
+		#tag ViewProperty
+			Name="Type"
+			Visible=true
+			Group="Behavior"
+			InitialValue=""
+			Type="Types"
+			EditorType="Enum"
+			#tag EnumValues
+				"0 - Cooperative"
+				"1 - Preemptive"
+			#tag EndEnumValues
+		#tag EndViewProperty
 		#tag ViewProperty
 			Name="IsComplete"
 			Visible=false

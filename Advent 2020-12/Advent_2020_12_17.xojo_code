@@ -108,7 +108,7 @@ Inherits AdventBase
 		    return -1
 		  end if
 		  
-		  print "Count=0"
+		  self.Print "Count=0"
 		  PrintGrid grid
 		  
 		  for count as integer = 1 to 6
@@ -140,7 +140,7 @@ Inherits AdventBase
 		      cube.Value = not cube.Value.BooleanValue
 		    next
 		    
-		    print "Count=" + count.ToString
+		    self.Print "Count=" + count.ToString
 		    PrintGrid grid
 		  next count
 		  
@@ -200,7 +200,7 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub Print(msg As Variant)
+		Private Shared Sub Print(msg As Variant)
 		  #if FALSE then
 		    Super.Print(msg)
 		  #else
@@ -225,8 +225,8 @@ Inherits AdventBase
 		      builder.Add String.FromArray( rowBuilder, "" )
 		    next y
 		    
-		    print String.FromArray( builder, EndOfLine )
-		    print ""
+		    self.print String.FromArray( builder, EndOfLine )
+		    self.print ""
 		  next z
 		  
 		  
@@ -245,6 +245,18 @@ Inherits AdventBase
 
 
 	#tag ViewBehavior
+		#tag ViewProperty
+			Name="Type"
+			Visible=true
+			Group="Behavior"
+			InitialValue=""
+			Type="Types"
+			EditorType="Enum"
+			#tag EnumValues
+				"0 - Cooperative"
+				"1 - Preemptive"
+			#tag EndEnumValues
+		#tag EndViewProperty
 		#tag ViewProperty
 			Name="IsComplete"
 			Visible=false

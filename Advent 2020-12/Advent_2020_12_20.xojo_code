@@ -19,60 +19,60 @@ Inherits AdventBase
 		  
 		  var tile as new SatelliteTile( data )
 		  if tile.ID <> 1 then
-		    Print "Test failed at ID"
+		    self.Print "Test failed at ID"
 		    return true
 		  end if
 		  
 		  if tile.LeftHash <> Crypto.SHA2_256( "AFKPU" ) then
-		    Print "Test failed at 1"
+		    self.Print "Test failed at 1"
 		    return true
 		  end if
 		  
 		  if tile.TopHash <> Crypto.SHA2_256( "ABCDE" ) then
-		    Print "Test failed at 2"
+		    self.Print "Test failed at 2"
 		    return true
 		  end if
 		  
 		  if tile.RightHash <> Crypto.SHA2_256( "EJOTY" ) then
-		    Print "Test failed at 3"
+		    self.Print "Test failed at 3"
 		    return true
 		  end if
 		  
 		  if tile.BottomHash <> Crypto.SHA2_256( "UVWXY" ) then
-		    Print "Test failed at 4"
+		    self.Print "Test failed at 4"
 		    return true
 		  end if
 		  
 		  tile.WriteTo writeGrid, 0, 0
 		  if writeGrid( 0, 0 ) <> "G" or writeGrid( 2, 2 ) <> "S" then
-		    Print "Failed WriteTo R0"
+		    self.Print "Failed WriteTo R0"
 		  end if
 		  
 		  tile.Orientation = SatelliteTile.Orientations.R90
 		  
 		  if tile.LeftHash <> Crypto.SHA2_256( "UVWXY" ) then
-		    Print "Test failed at 5"
+		    self.Print "Test failed at 5"
 		    return true
 		  end if
 		  
 		  if tile.TopHash <> Crypto.SHA2_256( "UPKFA" ) then
-		    Print "Test failed at 6"
+		    self.Print "Test failed at 6"
 		    return true
 		  end if
 		  
 		  if tile.RightHash <> Crypto.SHA2_256( "ABCDE" ) then
-		    Print "Test failed at 7"
+		    self.Print "Test failed at 7"
 		    return true
 		  end if
 		  
 		  if tile.BottomHash <> Crypto.SHA2_256( "YTOJE" ) then
-		    Print "Test failed at 8"
+		    self.Print "Test failed at 8"
 		    return true
 		  end if
 		  
 		  tile.WriteTo writeGrid, 0, 0
 		  if writeGrid( 0, 0 ) <> "Q" or writeGrid( 2, 2 ) <> "I" then
-		    Print "Failed WriteTo R90"
+		    self.Print "Failed WriteTo R90"
 		  end if
 		  
 		  
@@ -85,22 +85,22 @@ Inherits AdventBase
 		  tile.Orientation = SatelliteTile.Orientations.R180
 		  
 		  if tile.LeftHash <> Crypto.SHA2_256( "YTOJE" ) then
-		    Print "Test failed at 9"
+		    self.Print "Test failed at 9"
 		    return true
 		  end if
 		  
 		  if tile.TopHash <> Crypto.SHA2_256( "YXWVU" ) then
-		    Print "Test failed at 10"
+		    self.Print "Test failed at 10"
 		    return true
 		  end if
 		  
 		  if tile.RightHash <> Crypto.SHA2_256( "UPKFA" ) then
-		    Print "Test failed at 11"
+		    self.Print "Test failed at 11"
 		    return true
 		  end if
 		  
 		  if tile.BottomHash <> Crypto.SHA2_256( "EDCBA" ) then
-		    Print "Test failed at 12"
+		    self.Print "Test failed at 12"
 		    return true
 		  end if
 		  
@@ -113,22 +113,22 @@ Inherits AdventBase
 		  tile.Orientation = SatelliteTile.Orientations.R270
 		  
 		  if tile.LeftHash <> Crypto.SHA2_256( "EDCBA" ) then
-		    Print "Test failed at 12"
+		    self.Print "Test failed at 12"
 		    return true
 		  end if
 		  
 		  if tile.TopHash <> Crypto.SHA2_256( "EJOTY" ) then
-		    Print "Test failed at 14"
+		    self.Print "Test failed at 14"
 		    return true
 		  end if
 		  
 		  if tile.RightHash <> Crypto.SHA2_256( "YXWVU" ) then
-		    Print "Test failed at 15"
+		    self.Print "Test failed at 15"
 		    return true
 		  end if
 		  
 		  if tile.BottomHash <> Crypto.SHA2_256( "AFKPU" ) then
-		    Print "Test failed at 16"
+		    self.Print "Test failed at 16"
 		    return true
 		  end if
 		  
@@ -141,22 +141,22 @@ Inherits AdventBase
 		  tile.Orientation = SatelliteTile.Orientations.R0FlippedHorizontal
 		  
 		  if tile.LeftHash <> Crypto.SHA2_256( "EJOTY" ) then
-		    Print "Test failed at 17"
+		    self.Print "Test failed at 17"
 		    return true
 		  end if
 		  
 		  if tile.TopHash <> Crypto.SHA2_256( "EDCBA" ) then
-		    Print "Test failed at 18"
+		    self.Print "Test failed at 18"
 		    return true
 		  end if
 		  
 		  if tile.RightHash <> Crypto.SHA2_256( "AFKPU" ) then
-		    Print "Test failed at 19"
+		    self.Print "Test failed at 19"
 		    return true
 		  end if
 		  
 		  if tile.BottomHash <> Crypto.SHA2_256( "YXWVU" ) then
-		    Print "Test failed at 20"
+		    self.Print "Test failed at 20"
 		    return true
 		  end if
 		  
@@ -169,22 +169,22 @@ Inherits AdventBase
 		  tile.Orientation = SatelliteTile.Orientations.R90FlippedHorizontal
 		  
 		  if tile.LeftHash <> Crypto.SHA2_256( "ABCDE" ) then
-		    Print "Test failed at 21"
+		    self.Print "Test failed at 21"
 		    return true
 		  end if
 		  
 		  if tile.TopHash <> Crypto.SHA2_256( "AFKPU" ) then
-		    Print "Test failed at 22"
+		    self.Print "Test failed at 22"
 		    return true
 		  end if
 		  
 		  if tile.RightHash <> Crypto.SHA2_256( "UVWXY" ) then
-		    Print "Test failed at 23"
+		    self.Print "Test failed at 23"
 		    return true
 		  end if
 		  
 		  if tile.BottomHash <> Crypto.SHA2_256( "EJOTY" ) then
-		    Print "Test failed at 24"
+		    self.Print "Test failed at 24"
 		    return true
 		  end if
 		  
@@ -197,22 +197,22 @@ Inherits AdventBase
 		  tile.Orientation = SatelliteTile.Orientations.R180FlippedHorizontal
 		  
 		  if tile.LeftHash <> Crypto.SHA2_256( "UPKFA" ) then
-		    Print "Test failed at 25"
+		    self.Print "Test failed at 25"
 		    return true
 		  end if
 		  
 		  if tile.TopHash <> Crypto.SHA2_256( "UVWXY" ) then
-		    Print "Test failed at 26"
+		    self.Print "Test failed at 26"
 		    return true
 		  end if
 		  
 		  if tile.RightHash <> Crypto.SHA2_256( "YTOJE" ) then
-		    Print "Test failed at 27"
+		    self.Print "Test failed at 27"
 		    return true
 		  end if
 		  
 		  if tile.BottomHash <> Crypto.SHA2_256( "ABCDE" ) then
-		    Print "Test failed at 28"
+		    self.Print "Test failed at 28"
 		    return true
 		  end if
 		  
@@ -225,22 +225,22 @@ Inherits AdventBase
 		  tile.Orientation = SatelliteTile.Orientations.R270FlippedHorizontal
 		  
 		  if tile.LeftHash <> Crypto.SHA2_256( "YXWVU" ) then
-		    Print "Test failed at 29"
+		    self.Print "Test failed at 29"
 		    return true
 		  end if
 		  
 		  if tile.TopHash <> Crypto.SHA2_256( "YTOJE" ) then
-		    Print "Test failed at 30"
+		    self.Print "Test failed at 30"
 		    return true
 		  end if
 		  
 		  if tile.RightHash <> Crypto.SHA2_256( "EDCBA" ) then
-		    Print "Test failed at 31"
+		    self.Print "Test failed at 31"
 		    return true
 		  end if
 		  
 		  if tile.BottomHash <> Crypto.SHA2_256( "UPKFA" ) then
-		    Print "Test failed at 32"
+		    self.Print "Test failed at 32"
 		    return true
 		  end if
 		  
@@ -253,22 +253,22 @@ Inherits AdventBase
 		  tile.Orientation = SatelliteTile.Orientations.R0FlippedVertical
 		  
 		  if tile.LeftHash <> Crypto.SHA2_256( "UPKFA" ) then
-		    Print "Test failed at 33"
+		    self.Print "Test failed at 33"
 		    return true
 		  end if
 		  
 		  if tile.TopHash <> Crypto.SHA2_256( "UVWXY" ) then
-		    Print "Test failed at 34"
+		    self.Print "Test failed at 34"
 		    return true
 		  end if
 		  
 		  if tile.RightHash <> Crypto.SHA2_256( "YTOJE" ) then
-		    Print "Test failed at 35"
+		    self.Print "Test failed at 35"
 		    return true
 		  end if
 		  
 		  if tile.BottomHash <> Crypto.SHA2_256( "ABCDE" ) then
-		    Print "Test failed at 36"
+		    self.Print "Test failed at 36"
 		    return true
 		  end if
 		  
@@ -281,22 +281,22 @@ Inherits AdventBase
 		  tile.Orientation = SatelliteTile.Orientations.R90FlippedVertical
 		  
 		  if tile.LeftHash <> Crypto.SHA2_256( "YXWVU" ) then
-		    Print "Test failed at 37"
+		    self.Print "Test failed at 37"
 		    return true
 		  end if
 		  
 		  if tile.TopHash <> Crypto.SHA2_256( "YTOJE" ) then
-		    Print "Test failed at 38"
+		    self.Print "Test failed at 38"
 		    return true
 		  end if
 		  
 		  if tile.RightHash <> Crypto.SHA2_256( "EDCBA" ) then
-		    Print "Test failed at 39"
+		    self.Print "Test failed at 39"
 		    return true
 		  end if
 		  
 		  if tile.BottomHash <> Crypto.SHA2_256( "UPKFA" ) then
-		    Print "Test failed at 40"
+		    self.Print "Test failed at 40"
 		    return true
 		  end if
 		  
@@ -309,22 +309,22 @@ Inherits AdventBase
 		  tile.Orientation = SatelliteTile.Orientations.R180FlippedVertical
 		  
 		  if tile.LeftHash <> Crypto.SHA2_256( "EJOTY" ) then
-		    Print "Test failed at 41"
+		    self.Print "Test failed at 41"
 		    return true
 		  end if
 		  
 		  if tile.TopHash <> Crypto.SHA2_256( "EDCBA" ) then
-		    Print "Test failed at 42"
+		    self.Print "Test failed at 42"
 		    return true
 		  end if
 		  
 		  if tile.RightHash <> Crypto.SHA2_256( "AFKPU" ) then
-		    Print "Test failed at 43"
+		    self.Print "Test failed at 43"
 		    return true
 		  end if
 		  
 		  if tile.BottomHash <> Crypto.SHA2_256( "YXWVU" ) then
-		    Print "Test failed at 44"
+		    self.Print "Test failed at 44"
 		    return true
 		  end if
 		  
@@ -337,22 +337,22 @@ Inherits AdventBase
 		  tile.Orientation = SatelliteTile.Orientations.R270FlippedVertical
 		  
 		  if tile.LeftHash <> Crypto.SHA2_256( "ABCDE" ) then
-		    Print "Test failed at 45"
+		    self.Print "Test failed at 45"
 		    return true
 		  end if
 		  
 		  if tile.TopHash <> Crypto.SHA2_256( "AFKPU" ) then
-		    Print "Test failed at 46"
+		    self.Print "Test failed at 46"
 		    return true
 		  end if
 		  
 		  if tile.RightHash <> Crypto.SHA2_256( "UVWXY" ) then
-		    Print "Test failed at 47"
+		    self.Print "Test failed at 47"
 		    return true
 		  end if
 		  
 		  if tile.BottomHash <> Crypto.SHA2_256( "EJOTY" ) then
-		    Print "Test failed at 48"
+		    self.Print "Test failed at 48"
 		    return true
 		  end if
 		  
@@ -365,22 +365,22 @@ Inherits AdventBase
 		  tile.Orientation = SatelliteTile.Orientations.R0FlippedBoth
 		  
 		  if tile.LeftHash <> Crypto.SHA2_256( "YTOJE" ) then
-		    Print "Test failed at 49"
+		    self.Print "Test failed at 49"
 		    return true
 		  end if
 		  
 		  if tile.TopHash <> Crypto.SHA2_256( "YXWVU" ) then
-		    Print "Test failed at 50"
+		    self.Print "Test failed at 50"
 		    return true
 		  end if
 		  
 		  if tile.RightHash <> Crypto.SHA2_256( "UPKFA" ) then
-		    Print "Test failed at 51"
+		    self.Print "Test failed at 51"
 		    return true
 		  end if
 		  
 		  if tile.BottomHash <> Crypto.SHA2_256( "EDCBA" ) then
-		    Print "Test failed at 52"
+		    self.Print "Test failed at 52"
 		    return true
 		  end if
 		  
@@ -393,28 +393,28 @@ Inherits AdventBase
 		  tile.Orientation = SatelliteTile.Orientations.R90FlippedBoth
 		  
 		  if tile.LeftHash <> Crypto.SHA2_256( "EDCBA" ) then
-		    Print "Test failed at 53"
+		    self.Print "Test failed at 53"
 		    return true
 		  end if
 		  
 		  if tile.TopHash <> Crypto.SHA2_256( "EJOTY" ) then
-		    Print "Test failed at 54"
+		    self.Print "Test failed at 54"
 		    return true
 		  end if
 		  
 		  if tile.RightHash <> Crypto.SHA2_256( "YXWVU" ) then
-		    Print "Test failed at 55"
+		    self.Print "Test failed at 55"
 		    return true
 		  end if
 		  
 		  if tile.BottomHash <> Crypto.SHA2_256( "AFKPU" ) then
-		    Print "Test failed at 56"
+		    self.Print "Test failed at 56"
 		    return true
 		  end if
 		  
 		  tile.WriteTo writeGrid, 0, 0
 		  if writeGrid( 0, 0 ) <> "I" or writeGrid( 2, 2 ) <> "Q" then
-		    Print "Failed WriteTo R90FlippedBoth"
+		    self.Print "Failed WriteTo R90FlippedBoth"
 		  end if
 		  
 		  '"ABCDE" + EndOfLine + _
@@ -426,22 +426,22 @@ Inherits AdventBase
 		  tile.Orientation = SatelliteTile.Orientations.R270FlippedBoth
 		  
 		  if tile.LeftHash <> Crypto.SHA2_256( "UVWXY" ) then
-		    Print "Test failed at 57"
+		    self.Print "Test failed at 57"
 		    return true
 		  end if
 		  
 		  if tile.TopHash <> Crypto.SHA2_256( "UPKFA" ) then
-		    Print "Test failed at 58"
+		    self.Print "Test failed at 58"
 		    return true
 		  end if
 		  
 		  if tile.RightHash <> Crypto.SHA2_256( "ABCDE" ) then
-		    Print "Test failed at 59"
+		    self.Print "Test failed at 59"
 		    return true
 		  end if
 		  
 		  if tile.BottomHash <> Crypto.SHA2_256( "YTOJE" ) then
-		    Print "Test failed at 60"
+		    self.Print "Test failed at 60"
 		    return true
 		  end if
 		  
@@ -946,7 +946,7 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub Print(msg As Variant)
+		Private Shared Sub Print(msg As Variant)
 		  #if kDebug then
 		    Super.Print(msg)
 		  #else
@@ -975,7 +975,7 @@ Inherits AdventBase
 		      for col as integer = 0 to lastIndex
 		        var tile as SatelliteTile = grid( row, col )
 		        if tile is nil then
-		          Print String.FromArray( builder, "" )
+		          self.Print String.FromArray( builder, "" )
 		          exit for row
 		        end if
 		        
@@ -984,10 +984,10 @@ Inherits AdventBase
 		        builder.Add item
 		      next
 		      
-		      Print String.FromArray( builder, "" )
+		      self.Print String.FromArray( builder, "" )
 		    next
 		    
-		    Print ""
+		    self.Print ""
 		    
 		  #endif
 		  
@@ -1021,6 +1021,18 @@ Inherits AdventBase
 
 
 	#tag ViewBehavior
+		#tag ViewProperty
+			Name="Type"
+			Visible=true
+			Group="Behavior"
+			InitialValue=""
+			Type="Types"
+			EditorType="Enum"
+			#tag EnumValues
+				"0 - Cooperative"
+				"1 - Preemptive"
+			#tag EndEnumValues
+		#tag EndViewProperty
 		#tag ViewProperty
 			Name="IsComplete"
 			Visible=false
