@@ -94,6 +94,10 @@ Inherits AdventBase
 		  9 * 2024 _
 		  )
 		  
+		  if blinks = 0 then
+		    return
+		  end if
+		  
 		  var stoneKey as string = stone.ToString
 		  var key as string = stoneKey + "," + blinks.ToString
 		  
