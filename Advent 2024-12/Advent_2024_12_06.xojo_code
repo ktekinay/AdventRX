@@ -70,12 +70,10 @@ Inherits AdventBase
 		  var grid( -1, -1 ) as string = ToStringGrid( input )
 		  
 		  var visited as Dictionary = Solve( grid )
-		  var visitedJSON as string = GenerateJSON( visited.Keys )
+		  var visitedIndexes() as variant = visited.Keys
 		  
 		  var lastRowIndex as integer = grid.LastIndex( 1 )
 		  var lastColIndex as integer = grid.LastIndex( 2 )
-		  
-		  var rowCount as integer = lastRowIndex + 1
 		  
 		  var startingRow, startingCol as integer
 		  StartingPosition grid, startingRow, startingCol
@@ -83,25 +81,27 @@ Inherits AdventBase
 		  
 		  var availableProcessors as integer = max( System.CoreCount - 2, 1 )
 		  
-		  var rowsPerThread as integer = rowCount / availableProcessors + 1
+		  var valuesPerThread as integer = ceil( visitedIndexes.Count / availableProcessors )
 		  
 		  var strippedInput as string = input.ReplaceLineEndings( "" )
 		  
 		  var threads() as Day6Thread 
 		  
-		  for row as integer = 0 to lastRowIndex step rowsPerThread
+		  for startIndex as integer = 0 to visitedIndexes.LastIndex step valuesPerThread
 		    var t as new Day6Thread
 		    t.Type = Thread.Types.Preemptive
 		    
-		    t.StartingObstacleRow = row
-		    t.EndingObstacleRow = row + rowsPerThread - 1
 		    t.StartingRow = startingRow
 		    t.StartingCol = startingCol
 		    t.StartingDirection = startingDirection
 		    t.Grid = strippedInput
 		    t.LastRowIndex = lastRowIndex
 		    t.LastColIndex = lastColIndex
-		    t.VisitedJSON = visitedJSON
+		    
+		    var lastIndex as integer = min( startIndex + valuesPerThread - 1, visitedIndexes.LastIndex )
+		    for i as integer = startIndex to lastIndex
+		      t.VisitedIndexes.Add visitedIndexes( i )
+		    next
 		    
 		    t.Start
 		    threads.Add t

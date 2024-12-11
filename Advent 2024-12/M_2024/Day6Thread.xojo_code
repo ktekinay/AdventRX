@@ -31,91 +31,70 @@ Inherits Thread
 		    startingDirection = 3
 		  end select
 		  
-		  var visitedArr() as variant = ParseJSON( VisitedJSON )
-		  var visited as new Dictionary
-		  for each v as variant in visitedArr
-		    visited.Value( v ) = nil
-		  next
+		  var visitedIndexes() as integer = VisitedIndexes
 		  
 		  var result as integer
 		  
-		  var startingObstacleRow as integer = self.StartingObstacleRow
-		  var endingObstacleRow as integer = min( self.EndingObstacleRow, lastRowIndex )
-		  
-		  for obstacleRow as integer = startingObstacleRow to endingObstacleRow
-		    for obstacleCol as integer = 0 to lastColIndex
-		      var obstacleIndex as integer = obstacleRow * colCount + obstacleCol
-		      
-		      if not visited.HasKey( obstacleIndex ) then
-		        continue
+		  for each obstacleIndex as integer in visitedIndexes
+		    gridPtr.Byte( obstacleIndex ) = poundCode
+		    
+		    var row as integer = startingRow
+		    var col as integer = startingCol
+		    var direction as integer = startingDirection
+		    
+		    var counter as integer
+		    
+		    do
+		      counter = counter + 1
+		      if counter > counterLimit then
+		        result = result + 1
+		        exit
 		      end if
 		      
-		      var char as integer = gridPtr.Byte( obstacleIndex )
-		      
-		      if char <> dotCode then
-		        continue for obstacleCol
-		      end if
-		      
-		      gridPtr.Byte( obstacleIndex ) = poundCode
-		      
-		      var row as integer = startingRow
-		      var col as integer = startingCol
-		      var direction as integer = startingDirection
-		      
-		      var counter as integer
+		      //
+		      // Move
+		      //
+		      var newRow as integer
+		      var newCol as integer 
 		      
 		      do
-		        counter = counter + 1
-		        if counter > counterLimit then
-		          result = result + 1
+		        newRow = row
+		        newCol = col
+		        
+		        select case direction
+		        case 0
+		          newRow = newRow - 1
+		        case 1
+		          newCol = newCol + 1
+		        case 2
+		          newRow = newRow + 1
+		        case 3
+		          newCol = newCol - 1
+		        end select
+		        
+		        if newRow < 0 or newRow > lastRowIndex or _
+		          newCol < 0 or newCol > lastColIndex then
+		          row = -1
 		          exit
 		        end if
 		        
-		        //
-		        // Move
-		        //
-		        var newRow as integer
-		        var newCol as integer 
+		        var newByteIndex as integer = newRow * colCount + newCol
 		        
-		        do
-		          newRow = row
-		          newCol = col
-		          
-		          select case direction
-		          case 0
-		            newRow = newRow - 1
-		          case 1
-		            newCol = newCol + 1
-		          case 2
-		            newRow = newRow + 1
-		          case 3
-		            newCol = newCol - 1
-		          end select
-		          
-		          if newRow < 0 or newRow > lastRowIndex or _
-		            newCol < 0 or newCol > lastColIndex then
-		            row = -1
-		            exit
-		          end if
-		          
-		          var newByteIndex as integer = newRow * colCount + newCol
-		          
-		          if gridPtr.Byte( newByteIndex ) <> poundCode then
-		            row = newRow
-		            col = newCol
-		            exit
-		          end if
-		          
-		          direction = ( direction + 1 ) mod 4
-		        loop
-		        
-		        if row < 0 then 
+		        if gridPtr.Byte( newByteIndex ) <> poundCode then
+		          row = newRow
+		          col = newCol
 		          exit
 		        end if
+		        
+		        direction = ( direction + 1 ) mod 4
 		      loop
 		      
-		      gridPtr.Byte( obstacleIndex ) = dotCode
-		    next
+		      if row < 0 then 
+		        exit
+		      end if
+		    loop
+		    
+		    gridPtr.Byte( obstacleIndex ) = dotCode
 		  next
 		  
 		  self.Result = result
@@ -123,10 +102,6 @@ Inherits Thread
 		End Sub
 	#tag EndEvent
 
-
-	#tag Property, Flags = &h0
-		EndingObstacleRow As Integer
-	#tag EndProperty
 
 	#tag Property, Flags = &h0
 		EndingRow As Integer
@@ -157,15 +132,11 @@ Inherits Thread
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
-		StartingObstacleRow As Integer
-	#tag EndProperty
-
-	#tag Property, Flags = &h0
 		StartingRow As Integer
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
-		VisitedJSON As String
+		VisitedIndexes() As Integer
 	#tag EndProperty
 
 
@@ -295,22 +266,6 @@ Inherits Thread
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="StartingCol"
-			Visible=false
-			Group="Behavior"
-			InitialValue=""
-			Type="Integer"
-			EditorType=""
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="StartingObstacleRow"
-			Visible=false
-			Group="Behavior"
-			InitialValue=""
-			Type="Integer"
-			EditorType=""
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="EndingObstacleRow"
 			Visible=false
 			Group="Behavior"
 			InitialValue=""
