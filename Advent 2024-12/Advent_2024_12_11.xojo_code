@@ -85,8 +85,10 @@ Inherits AdventBase
 		    return
 		  end if
 		  
-		  var stoneKey as string = stone.ToString + ","
-		  var key as string = stoneKey + blinks.ToString
+		  const kBlinksMult as integer = 2^40
+		  
+		  var blinksKey as integer = blinks * kBlinksMult
+		  var key as integer = blinksKey + stone
 		  
 		  var existing as variant = cache.Lookup( key, nil )
 		  if existing.Type = Variant.TypeInt64 then
@@ -111,7 +113,6 @@ Inherits AdventBase
 		      stone = stone * 2024
 		      
 		    end if
-		    
 		  next
 		  
 		  var diff as integer = result - startingResult
