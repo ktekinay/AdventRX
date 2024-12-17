@@ -191,10 +191,6 @@ Inherits AdventBase
 		    next
 		  next
 		  
-		  if printer.Count <> 0 then
-		    Print String.FromArray( printer, ", " )
-		  end if
-		  
 		  return result : if( IsTest, 2858, 6382582136592 )
 		  
 		End Function
