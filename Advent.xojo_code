@@ -455,6 +455,15 @@ Protected Module Advent
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub TryRemove(Extends dict As Dictionary, key As Variant)
+		  if dict.HasKey( key ) then
+		    dict.Remove( key )
+		  end if
+		  
+		End Sub
+	#tag EndMethod
+
 
 	#tag ViewBehavior
 		#tag ViewProperty

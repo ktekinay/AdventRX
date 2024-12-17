@@ -56,23 +56,36 @@ Inherits AdventBase
 		Private Function CalculateResultA(input As String) As Variant
 		  var layout() as integer = ToValues( input )
 		  
+		  var lastIndex as integer = layout.LastIndex
+		  var freeIndex as integer = 0
+		  
 		  do
-		    var lastValue as integer = layout.Pop
-		    while lastValue = -1
-		      lastValue = layout.Pop
+		    while freeIndex < lastIndex and layout( freeIndex ) <> -1
+		      freeIndex = freeIndex + 1
 		    wend
 		    
-		    var nextIndex as integer = layout.IndexOf( -1 )
-		    if nextIndex = -1 then
-		      layout.Add lastValue
+		    while lastIndex > freeIndex and layout( lastIndex ) = -1
+		      lastIndex = lastIndex - 1
+		    wend
+		    
+		    if freeIndex >= lastIndex then
 		      exit
 		    end if
-		    layout( nextIndex ) = lastValue
+		    
+		    var move as integer = layout( lastIndex )
+		    layout( freeIndex ) = move
+		    layout( lastIndex ) = -1
+		    
+		    lastIndex = lastIndex - 1
+		    freeIndex = freeIndex + 1
 		  loop
 		  
 		  var result as integer
-		  for i as integer = 0 to layout.LastIndex
-		    result = result + ( i * layout( i ) )
+		  for i as integer = 0 to lastIndex
+		    var value as integer = layout( i )
+		    if value <> -1 then
+		      result = result + ( i * value )
+		    end if
 		  next
 		  
 		  return result : if( IsTest, 1928, 6353658451014 )
@@ -81,93 +94,106 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Variant
-		  var layout() as integer = ToValues( input )
+		  var free() as DiskFile
+		  var layout() as DiskFile
 		  
-		  var currentId as integer
+		  var id as integer
+		  var isFree as boolean
+		  var position as integer
 		  
-		  for i as integer = layout.LastIndex downto 0
-		    currentId = layout( i )
-		    if currentId <> -1 then
-		      exit
+		  for each countString as string in Normalize( input ).Split( "" )
+		    var df as new DiskFile
+		    
+		    df.ID = id
+		    df.IsFree = isFree
+		    df.Count = countString.ToInteger
+		    df.Position = position
+		    
+		    layout.Add df
+		    
+		    if isFree then
+		      free.Add df
+		    else
+		      id = id + 1
 		    end if
+		    
+		    isFree = not isFree
+		    position = position + 1000
 		  next
 		  
-		  var searchPos as integer = layout.LastIndex
-		  var freeSpaceSearchPos as integer = Locate( layout, 0, -1 )
-		  
-		  outer :
-		  do
-		    'while layout( layout.LastIndex ) = -1
-		    'call layout.Pop
-		    'wend
+		  for layoutIndex as integer = layout.LastIndex downto 0
+		    var movedDF as DiskFile = layout( layoutIndex )
 		    
-		    if searchPos > layout.LastIndex then
-		      searchPos = layout.LastIndex
+		    if movedDF.IsFree then
+		      continue
 		    end if
 		    
-		    for searchIndex as integer = searchPos downto 0
-		      if layout( searchIndex ) = currentId then
-		        searchPos = searchIndex
+		    for freeIndex as integer = 0 to free.LastIndex
+		      var freeDF as DiskFile = free( freeIndex )
+		      
+		      if freeDF.Position > movedDF.Position then
 		        exit
 		      end if
+		      
+		      if freeDF.Count < movedDF.Count then
+		        continue
+		      end if
+		      
+		      if freeDF.Count = movedDF.Count then
+		        freeDF.ID = movedDF.ID
+		        freeDF.IsFree = false
+		        free.RemoveAt freeIndex
+		        
+		        movedDF.IsFree = true
+		        
+		        exit
+		      end if
+		      
+		      var originalFreeCount as integer = freeDF.Count
+		      var diff as integer = originalFreeCount - movedDF.Count
+		      
+		      var newFree as new DiskFile
+		      newFree.Position = freeDF.Position + 1
+		      newFree.Count = diff
+		      newFree.IsFree = true
+		      
+		      freeDF.ID = movedDF.ID
+		      freeDF.Count = movedDF.Count
+		      freeDF.IsFree = false
+		      
+		      free.RemoveAt freeIndex
+		      free.AddAt freeIndex, newFree
+		      
+		      movedDF.IsFree = true
+		      layout.Add newFree
+		      
+		      exit
 		    next
-		    
-		    var blockCount as integer = 1
-		    
-		    for searchIndex as integer = searchPos - 1 downto 0
-		      if layout( searchIndex ) <> currentId then
-		        searchPos = searchIndex + 1
-		        exit
-		      else
-		        blockCount = blockCount + 1
-		      end if
-		    next
-		    
-		    //
-		    // Look for a block of free space that can accommodate
-		    //
-		    var freeSpacePos as integer = freeSpaceSearchPos
-		    do
-		      if freeSpacePos > searchPos then
-		        exit
-		      end if
-		      
-		      var freeSpaceCount as integer = CountValue( layout, freeSpacePos, -1 )
-		      
-		      if freeSpaceCount >= blockCount then
-		        for inner as integer = freeSpacePos to freeSpacePos + blockCount - 1
-		          layout( inner ) = currentId
-		        next
-		        
-		        for inner as integer = searchPos to searchPos + blockCount - 1
-		          layout( inner ) = -1
-		        next
-		        
-		        if freeSpaceSearchPos = freeSpacePos then
-		          freeSpaceSearchPos = Locate( layout, freeSpacePos + 1, -1 )
-		          if freeSpaceSearchPos = -1 then
-		            currentId = -1 
-		          end if
-		        end if
-		        
-		        exit
-		      end if
-		      
-		      freeSpacePos = Locate( layout, freeSpacePos + freeSpaceCount, -1 )
-		      if freeSpacePos = -1 then
-		        exit
-		      end if
-		    loop
-		    
-		    currentId = currentId - 1
-		  loop until currentId < 0
+		  next
+		  
+		  layout.Sort AddressOf DiskFileSorter
 		  
 		  var result as integer
-		  for i as integer = 0 to layout.LastIndex
-		    if layout( i ) <> -1 then
-		      result = result + ( i * layout( i ) )
+		  
+		  position = 0
+		  
+		  for layoutIndex as integer = 0 to layout.LastIndex
+		    var df as DiskFile = layout( layoutIndex )
+		    
+		    if df.IsFree then
+		      position = position + df.Count
+		      continue
 		    end if
+		    
+		    for i as integer = 1 to df.Count
+		      result = result + ( df.ID * position )
+		      position = position + 1
+		    next
 		  next
+		  
+		  if printer.Count <> 0 then
+		    Print String.FromArray( printer, ", " )
+		  end if
 		  
 		  return result : if( IsTest, 2858, 6382582136592 )
 		  
@@ -187,6 +213,12 @@ Inherits AdventBase
 		  
 		  return count
 		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Shared Function DiskFileSorter(df1 As DiskFile, df2 As DiskFile) As Integer
+		  return df1.Position - df2.Position
 		End Function
 	#tag EndMethod
 
