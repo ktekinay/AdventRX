@@ -3,7 +3,7 @@ Protected Class Advent_2024_12_14
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "Unknown"
+		  return "Robots for a Christmas tree"
 		End Function
 	#tag EndEvent
 
@@ -118,14 +118,6 @@ Inherits AdventBase
 		  width = 101
 		  height = 103
 		  
-		  var builder() as string
-		  builder.ResizeTo width * height + 1
-		  
-		  var checkStringSource as string = String.FromArray( builder, "." )
-		  
-		  var midWidth as integer = width \ 2
-		  var midHeight as integer = height \ 2
-		  
 		  var rx as new RegEx
 		  rx.SearchPattern = "p=(\d+),(\d+) v=(-?\d+),(-?\d+)"
 		  
@@ -156,18 +148,21 @@ Inherits AdventBase
 		    var grid( -1, -1 ) as string
 		    grid.ResizeTo( height - 1, width - 1 )
 		    
-		    var checkArr() as string = checkStringSource.Split( "" )
+		    var checkMB as new MemoryBlock( width * height )
+		    var checkPtr as ptr = checkMB
 		    
 		    for each robot as SecurityRobot in robots
 		      var posx as integer = PositionInSeconds( robot.StartX, robot.VelocityX, width, seconds )
 		      var posy as integer = PositionInSeconds( robot.StartY, robot.VelocityY, height, seconds )
 		      
 		      grid( posy, posx ) = "X"
-		      checkArr( posy * width + posx ) = "X"
+		      checkPtr.Byte( posy * width + posx ) = &h44
 		    next
 		    
-		    var checkString as string = String.FromArray( checkArr, "" )
-		    if checkString.IndexOfBytes( "XXXXXXXX" ) = -1 then
+		    var checkString as string = checkMB
+		    var foundIt as boolean = checkString.IndexOfBytes( "DDDDDDDD" ) <> -1
+		    
+		    if not foundIt then
 		      continue for seconds
 		    end if
 		    
@@ -187,13 +182,6 @@ Inherits AdventBase
 		  next
 		  
 		  return result : if( IsTest, 0, 6285 )
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Shared Function Key(x As Integer, y As Integer) As Integer
-		  return x * 1000 + y
 		  
 		End Function
 	#tag EndMethod
