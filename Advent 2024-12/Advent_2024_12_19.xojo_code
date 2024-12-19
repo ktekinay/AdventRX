@@ -63,7 +63,7 @@ Inherits AdventBase
 		  var count as integer
 		  
 		  for each d as string in desired
-		    count = count + Can( d, available, cache )
+		    count = count + Can( d, available, cache, true )
 		  next
 		  
 		  return count : if( IsTest, 6, 327 )
@@ -81,7 +81,7 @@ Inherits AdventBase
 		  var count as integer
 		  
 		  for each d as string in desired
-		    count = count + Can( d, available, cache, true )
+		    count = count + Can( d, available, cache, false )
 		  next
 		  
 		  return count : if( IsTest, 16, 772696486795255 )
@@ -89,7 +89,7 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Shared Function Can(ss As String, available() As String, cache As Dictionary, getAll As Boolean = False) As Integer
+		Private Shared Function Can(ss As String, available() As String, cache As Dictionary, getOne As Boolean) As Integer
 		  if ss = "" then
 		    return 1
 		  end if
@@ -101,15 +101,11 @@ Inherits AdventBase
 		  var result as integer
 		  
 		  for each a as string in available
-		    if ss.BeginsWith( a ) then
-		      var this as integer = Can( ss.MiddleBytes( a.Bytes ), available, cache, getAll )
+		    if ss.BeginsWith( a, ComparisonOptions.CaseSensitive ) then
+		      result = result + Can( ss.MiddleBytes( a.Bytes ), available, cache, getOne )
 		      
-		      if this <> 0 then
-		        result = result + this
-		        
-		        if result = 1 and not getAll then
-		          exit
-		        end if
+		      if getOne and result = 1 then
+		        exit
 		      end if
 		    end if
 		  next
