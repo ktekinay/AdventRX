@@ -442,6 +442,7 @@ End
 		  AddRow new Advent_2024_12_09
 		  AddRow new Advent_2024_12_10
 		  AddRow new Advent_2024_12_11
+		  AddRow new Advent_2024_12_12
 		  AddRow new Advent_2024_12_13
 		  AddRow new Advent_2024_12_14
 		  AddRow new Advent_2024_12_15
