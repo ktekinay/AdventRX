@@ -85,6 +85,24 @@ Inherits Thread
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Shared Function FindInStringGrid(grid(, ) As String, value As String) As Xojo.Point
+		  var lastRowIndex as integer = grid.LastIndex( 1 )
+		  var lastColIndex as integer = grid.LastIndex( 2 )
+		  
+		  for y as integer = 0 to lastRowIndex
+		    for x as integer = 0 to lastColIndex
+		      if grid( y, x ) = value then
+		        return new Xojo.Point( x, y )
+		      end if
+		    next
+		  next
+		  
+		  return nil
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h1
 		Protected Function GetPuzzleInput() As String
 		  if StoredPuzzleInput <> "" then
@@ -116,7 +134,7 @@ Inherits Thread
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
-		Protected Function Normalize(s As String) As String
+		Protected Shared Function Normalize(s As String) As String
 		  return s.TrimRight.ReplaceLineEndings( EndOfLine )
 		  
 		End Function
@@ -237,7 +255,7 @@ Inherits Thread
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
-		Protected Function ToIntegerArray(vals() As String) As Integer()
+		Protected Shared Function ToIntegerArray(vals() As String) As Integer()
 		  var arr() as integer
 		  arr.ResizeTo vals.LastIndex
 		  
@@ -251,7 +269,7 @@ Inherits Thread
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
-		Protected Function ToIntegerArray(s As String) As Integer()
+		Protected Shared Function ToIntegerArray(s As String) As Integer()
 		  s = s.ReplaceLineEndings( EndOfLine ).ReplaceAll( ",", EndOfLine ).ReplaceAll( " ", EndOfLine ).Trim
 		  var sarr() as string = s.Split( EndOfLine )
 		  
@@ -266,7 +284,7 @@ Inherits Thread
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
-		Protected Function ToIntegerGrid(input As String) As Integer(,)
+		Protected Shared Function ToIntegerGrid(input As String) As Integer(,)
 		  var rows() as string = input.ReplaceLineEndings( EndOfLine ).Split( EndOfLine )
 		  
 		  var grid( -1, -1 ) as integer
@@ -285,7 +303,7 @@ Inherits Thread
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
-		Protected Function ToStringArray(s As String) As String()
+		Protected Shared Function ToStringArray(s As String) As String()
 		  s = Normalize( s )
 		  
 		  var arr() as string
@@ -300,7 +318,7 @@ Inherits Thread
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
-		Protected Function ToStringGrid(input As String) As String(,)
+		Protected Shared Function ToStringGrid(input As String) As String(,)
 		  var rows() as string = input.ReplaceLineEndings( EndOfLine ).Split( EndOfLine )
 		  
 		  var grid( -1, -1 ) as string
