@@ -10,7 +10,7 @@ Begin DesktopWindow WndAdvent
    HasFullScreenButton=   False
    HasMaximizeButton=   True
    HasMinimizeButton=   True
-   Height          =   500
+   Height          =   706
    ImplicitInstance=   True
    MacProcID       =   0
    MaximumHeight   =   32000
@@ -47,7 +47,7 @@ Begin DesktopWindow WndAdvent
       HasHorizontalScrollbar=   False
       HasVerticalScrollbar=   True
       HeadingIndex    =   -1
-      Height          =   460
+      Height          =   666
       Index           =   -2147483648
       InitialValue    =   "Day	Status	TestA	A	TestB	B"
       Italic          =   False

@@ -3,21 +3,19 @@ Protected Class Advent_2024_12_20
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "Unknown"
+		  return "Maze with cheats"
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return false
-		  
+		  return true
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnName() As String
-		  return ""
-		  
+		  return "Race Condition"
 		End Function
 	#tag EndEvent
 
@@ -61,30 +59,8 @@ Inherits AdventBase
 		  var path() as Xojo.Point = Traverse( grid )
 		  
 		  var limit as integer = if( IsTest, 38, 100 ) 
-		  var lastIndexToConsider as integer = path.LastIndex - limit
 		  
-		  var count as integer
-		  
-		  for upIndex as integer = 0 to lastIndexToConsider
-		    var lowPoint as Xojo.Point = path( upIndex )
-		    
-		    for downIndex as integer = path.LastIndex downto upIndex + 1
-		      var savings as integer = downIndex - upIndex - 1
-		      if savings < limit then
-		        continue for upIndex
-		      end if
-		      
-		      var highPoint as Xojo.Point = path( downIndex )
-		      
-		      if lowPoint.X <> highPoint.X and lowPoint.Y <> highPoint.Y then
-		        continue
-		      end if
-		      
-		      if abs( lowPoint.X - highPoint.X ) = 2 or abs( lowPoint.Y - highPoint.Y ) = 2 then
-		        count = count + 1
-		      end if
-		    next
-		  next
+		  var count as integer = Solve( path, limit, 2 )
 		  
 		  return count : if( IsTest, 3, 1429 )
 		  
@@ -93,11 +69,15 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Variant
+		  var grid( -1, -1 ) as string = ToStringGrid( Normalize( input ) )
 		  
+		  var path() as Xojo.Point = Traverse( grid )
 		  
+		  var limit as integer = if( IsTest, 73, 100 ) 
 		  
-		  return 0 : if( IsTest, 0, 0 )
+		  var count as integer = Solve( path, limit, 20 )
 		  
+		  return count : if( IsTest, 7, 988931 )
 		End Function
 	#tag EndMethod
 
@@ -153,6 +133,36 @@ Inherits AdventBase
 		      end if
 		    next
 		  next
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Function Solve(path() As Xojo.Point, limit As Integer, distance As Integer) As Integer
+		  var lastIndexToConsider as integer = path.LastIndex - limit
+		  
+		  var count as integer
+		  
+		  for upIndex as integer = 0 to lastIndexToConsider
+		    var lowPoint as Xojo.Point = path( upIndex )
+		    
+		    for downIndex as integer = path.LastIndex downto upIndex
+		      var highPoint as Xojo.Point = path( downIndex )
+		      
+		      var thisDistance as integer = M_Path.ManhattanDistance( lowPoint.X, lowPoint.Y, highPoint.X, highPoint.Y )
+		      
+		      if thisDistance >= 2 and thisDistance <= distance then
+		        var savings as integer = downIndex - upIndex - thisDistance
+		        
+		        if savings < limit then
+		          continue
+		        end if
+		        
+		        count = count + 1
+		      end if
+		    next
+		  next
+		  
+		  return count
 		End Function
 	#tag EndMethod
 
