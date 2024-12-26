@@ -317,8 +317,8 @@ Inherits Thread
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h1
-		Protected Shared Function ToStringGrid(input As String) As String(,)
+	#tag Method, Flags = &h0
+		Shared Function ToStringGrid(input As String) As String(,)
 		  var rows() as string = input.ReplaceLineEndings( EndOfLine ).Split( EndOfLine )
 		  
 		  var grid( -1, -1 ) as string
