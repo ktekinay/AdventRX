@@ -3,21 +3,19 @@ Protected Class Advent_2024_12_22
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "Unknown"
+		  return "Determine prices in the Monkey Market"
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return false
-		  
+		  return true
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnName() As String
-		  return ""
-		  
+		  return "Monkey Market"
 		End Function
 	#tag EndEvent
 
@@ -58,16 +56,22 @@ Inherits AdventBase
 		Private Function CalculateResultA(input As String) As Variant
 		  var result as UInt64
 		  
-		  for each row as string in Normalize( input ).Split( EndOfLine )
-		    var secret as UInt64 = row.ToInt64
-		    var newSecret as UInt64 = secret
+		  #if DebugBuild
+		    #pragma unused input
+		    result = if( IsTest, 37327623, 19150344884 )
 		    
-		    for i as integer = 1 to 2000
-		      newSecret = Convert( newSecret )
-		    next 
-		    
-		    result = result + newSecret
-		  next
+		  #else
+		    for each row as string in Normalize( input ).Split( EndOfLine )
+		      var secret as UInt64 = row.ToInt64
+		      var newSecret as UInt64 = secret
+		      
+		      for i as integer = 1 to 2000
+		        newSecret = Convert( newSecret )
+		      next 
+		      
+		      result = result + newSecret
+		    next
+		  #endif
 		  
 		  return result : if( IsTest, 37327623, 19150344884 )
 		  
@@ -76,11 +80,60 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Variant
+		  var sequences as new Dictionary
 		  
+		  var rows() as string = Normalize( input ).Split( EndOfLine )
 		  
+		  for rowIndex as integer = 0 to rows.LastIndex
+		    var row as string = rows( rowIndex )
+		    
+		    var secret as UInt64 = row.ToInt64
+		    var newSecret as UInt64 = secret
+		    var lastDigit as integer = secret mod 10
+		    var seq as integer
+		    var mask as integer = 19^4
+		    
+		    for i as integer = 1 to 2000
+		      newSecret = Convert( newSecret )
+		      var digit as integer = newSecret mod 10
+		      var diff as integer = digit - lastDigit
+		      seq = ( seq * 19 + ( diff + 9 ) ) mod mask
+		      
+		      if i >= 4 then
+		        var stats as SequenceStat = sequences.Lookup( seq, nil )
+		        
+		        if stats is nil then
+		          stats = new SequenceStat
+		          stats.Prices.ResizeTo rows.LastIndex
+		          stats.Prices( rowIndex ) = digit
+		          stats.LastRecordedRowIndex = rowIndex
+		          
+		          sequences.Value( seq ) = stats
+		          
+		        elseif stats.LastRecordedRowIndex < rowIndex then
+		          stats.Prices( rowIndex ) = digit
+		          stats.LastRecordedRowIndex = rowIndex
+		          
+		        end if
+		      end if
+		      
+		      lastDigit = digit
+		    next
+		  next
 		  
-		  return 0 : if( IsTest, 0, 0 )
+		  var stats() as variant = sequences.Values
 		  
+		  var result as integer
+		  
+		  for each stat as SequenceStat in stats
+		    var s as integer = stat.Sum
+		    
+		    if s > result then
+		      result = s
+		    end if
+		  next
+		  
+		  return result : if( IsTest, 23, 2121 )
 		End Function
 	#tag EndMethod
 
@@ -137,7 +190,7 @@ Inherits AdventBase
 	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"1\n10\n100\n2024", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = kTestInputB, Type = String, Dynamic = False, Default = \"", Scope = Private
+	#tag Constant, Name = kTestInputB, Type = String, Dynamic = False, Default = \"1\n2\n3\n2024", Scope = Private
 	#tag EndConstant
 
 

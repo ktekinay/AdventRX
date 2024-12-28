@@ -3,7 +3,7 @@ Protected Class Advent_2024_12_18
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "Unknown"
+		  return "Find best path through falling RAM"
 		End Function
 	#tag EndEvent
 
