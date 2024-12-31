@@ -3,7 +3,7 @@ Protected Class Advent_2024_12_24
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "Unknown"
+		  return "Binary operations on wires through gates"
 		End Function
 	#tag EndEvent
 
@@ -16,8 +16,7 @@ Inherits AdventBase
 
 	#tag Event
 		Function ReturnName() As String
-		  return ""
-		  
+		  return "Crossed Wires"
 		End Function
 	#tag EndEvent
 
@@ -55,121 +54,94 @@ Inherits AdventBase
 
 
 	#tag Method, Flags = &h21
-		Private Shared Function Calculate(v1 As Integer, op As String, v2 As Integer) As Integer
-		  select case op
-		  case "AND"
-		    return v1 and v2
-		  case "OR"
-		    return v1 or v2
-		  case "xor"
-		    return v1 xor v2
-		  case else
-		    raise new RuntimeException
-		  end select
+		Private Shared Sub Backtrace(w As Wire)
+		  if w.InGate is nil then
+		    Print if( w.InGate isa object, "<- ", "!! " ) + w.Name
+		  elseif w.Gates.Count = 0 then
+		    Print "<- " + w.Name
+		  end if
+		  
+		  if w.InGate isa object then
+		    var g as Gate = w.InGate
+		    
+		    if g.InWires.Count = 0 then
+		      Print "---"
+		    else
+		      Backtrace g.InWire1
+		      Backtrace g.InWire2
+		    end if
+		  end if
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Function Build(gateDataString As String) As Dictionary
+		  var machine as new Dictionary
+		  
+		  var gateData() as string = gateDataString.Split( EndOfLine )
+		  
+		  for each gateString as string in gateData
+		    var parts() as string = gateString.Split( " " )
+		    
+		    if parts( 0 ) = "x01" or parts( 2 ) = "x01" then
+		      parts = parts
+		    end if
+		    
+		    var inW1 as Wire = machine.Lookup( parts( 0 ), nil )
+		    if inW1 is nil then
+		      inW1 = new Wire
+		      inW1.Name = parts( 0 )
+		      machine.Value( inW1.Name ) = inW1
+		    end if
+		    
+		    var inW2 as Wire = machine.Lookup( parts( 2 ), nil )
+		    if inW2 is nil then
+		      inW2 = new Wire
+		      inW2.Name = parts( 2 )
+		      machine.Value( inW2.Name ) = inW2
+		    end if
+		    
+		    var outW as Wire = machine.Lookup( parts( 4 ), nil )
+		    if outW is nil then
+		      outW = new Wire
+		      outW.Name = parts( 4 )
+		      machine.Value( outW.Name ) = outW
+		    end if
+		    
+		    var gate as new Gate
+		    gate.InWires.Add inW1.MyWeakRef
+		    gate.InWires.Add inW2.MyWeakRef
+		    gate.Op = parts( 1 )
+		    gate.OutWire = outW
+		    
+		    outw.InGate = gate
+		    
+		    inW1.Gates.Add gate
+		    inW2.Gates.Add gate
+		  next
+		  
+		  return machine
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Variant
-		  var queue() as string
-		  var wires as new Dictionary
-		  var ready as new Dictionary
-		  var pool as new Dictionary
-		  var zs as new Set
-		  
 		  var sections() as string = Normalize( input ).Split( EndOfLine + EndOfLine )
 		  var initialWires() as string = sections( 0 ).Split( EndOfLine )
-		  var gateData() as string =  sections( 1 ).Split( EndOfLine )
 		  
-		  for each wire as string in initialWires
-		    var parts() as string = wire.Split( ": " )
-		    wire = parts( 0 )
-		    var value as integer = parts( 1 ).ToInteger
+		  var machine as Dictionary = Build( sections( 1 ) )
+		  
+		  var zs() as Wire = GetWires( machine, "z" )
+		  
+		  for each wireName as string in initialWires
+		    var parts() as string = wireName.Split( ": " )
+		    var w as Wire = machine.Value( parts( 0 ) )
 		    
-		    queue.Add wire
-		    wires.Value( wire ) = value
+		    var value as integer = parts( 1 ).ToInt64
+		    w.Set value
 		  next
 		  
-		  for each gateString as string in gateData
-		    var parts() as string = gateString.Split( " " )
-		    var gate as new Gate
-		    gate.In1 = parts( 0 )
-		    gate.Op = parts( 1 )
-		    gate.In2 = parts( 2 )
-		    gate.Out = parts( 4 )
-		    
-		    Store( pool, gate.In1, gate, false )
-		    Store( pool, gate.In2, gate, false )
-		  next
-		  
-		  do
-		    for queueIndex as integer = 0 to queue.LastIndex
-		      var wire as string = queue( queueIndex )
-		      
-		      if wire.BeginsWith( "z" ) then
-		        zs.Add wire
-		        continue
-		      end if
-		      
-		      if ready.HasKey( wire ) then
-		        var gates() as Gate = ready.Value( wire )
-		        
-		        for gateIndex as integer = gates.LastIndex downto 0
-		          var gate as Gate = gates( gateIndex )
-		          
-		          if not wires.HasKey( gate.In1 ) or not wires.HasKey( gate.In2 ) then
-		            continue
-		          end if
-		          
-		          var in1 as integer = wires.Value( gate.In1 )
-		          var in2 as integer = wires.Value( gate.In2 )
-		          
-		          var out as integer = Calculate( in1, gate.Op, in2 )
-		          
-		          queue.Add gate.Out
-		          wires.Value( gate.Out ) = out
-		          
-		          gates.RemoveAt gateIndex
-		        next
-		        
-		        if gates.Count = 0 then
-		          ready.Remove( wire )
-		        end if
-		      end if
-		      
-		      if pool.HasKey( wire ) then
-		        var gates() as Gate = pool.Value( wire )
-		        pool.Remove( wire )
-		        
-		        for each gate as Gate in gates
-		          Store ready, wire, gate, true
-		        next
-		      end if
-		    next
-		    
-		    if ready.Count <> 0 then
-		      queue.RemoveAll
-		      
-		      for each k as variant in ready.Keys
-		        queue.Add k
-		      next
-		    else
-		      exit
-		    end if
-		  loop
-		  
-		  var bitMaker() as string
-		  bitMaker.ResizeTo zs.Count - 1
-		  
-		  while zs.Count <> 0
-		    var z as string = zs.Pop
-		    var bitValue as integer = wires.Value( z )
-		    var index as integer = z.Middle( 1 ).ToInteger
-		    bitMaker( bitMaker.LastIndex - index ) = bitValue.ToString
-		  wend
-		  
-		  var bitString as string = "&b" + String.FromArray( bitMaker, "" )
-		  var bitValue as integer = bitString.ToInteger
+		  var bitValue as integer = ToBinary( zs )
 		  
 		  return bitValue : if( IsTest, 2024, 53190357879014 )
 		  
@@ -178,35 +150,327 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Variant
+		  if IsTest then
+		    return ""
+		  end if
+		  
+		  var sections() as string = Normalize( input ).Split( EndOfLine + EndOfLine )
+		  
+		  var machine as Dictionary = Build( sections( 1 ) )
+		  
+		  var zs() as Wire = GetWires( machine, "z" )
+		  var xs() as Wire = GetWires( machine, "x" )
+		  var ys() as Wire = GetWires( machine, "y" )
+		  var allWires() as Wire = GetWires( machine, "" )
+		  
+		  Designate xs, ys
+		  for i as integer = 0 to zs.LastIndex
+		    Print i.ToString + ": " + zs( i ).Designation
+		  next
+		  
+		  return ""
+		  
+		  var resultSet as new Set
+		  
+		  var failIndexes() as integer
+		  
+		  var failGates as new Set
+		  var successGates as new Set
+		  
+		  var v as integer = 0
+		  do
+		    var v1 as integer = 2^v
+		    
+		    Reset allWires
+		    
+		    if Test( xs, ys, zs, v1, 0 ) then
+		      successGates = Trace(xs( v ), successGates )
+		      
+		    else
+		      failIndexes.Add v
+		      
+		      failGates = Trace( xs( v ), failGates )
+		      
+		      'failIndexes.Add v
+		      
+		      'Print v
+		      'var fixSet as Set = Fix( xs, ys, zs, v, allWires )
+		      '
+		      'if fixSet.Count = 0 then
+		      'fixSet = fixSet
+		      'end if
+		      '
+		      'resultSet = resultSet.Union( fixSet )
+		    end if
+		    
+		    v = v + 1
+		  loop until v > xs.LastIndex
+		  
+		  failGates = failGates - successGates
 		  
 		  
 		  
-		  return 0 : if( IsTest, 0, 0 )
+		  
+		  
+		  var failNames() as string
+		  for each g as Gate in failGates
+		    failNames.Add g.OutWire.Name
+		  next
+		  
+		  failNames.Sort
+		  
+		  var result as string = String.FromArray( failNames, "," )
+		  
+		  'var val as integer = 2^xs.Count - 1
+		  'for each v in failIndexes
+		  'val = val - ( 2^v )
+		  'next
+		  
+		  'Reset allWires
+		  'call Test( xs, ys, zs, val, 0 )
+		  
+		  return result : if( IsTest, 0, 0 ) 
+		  // Not bbp,mfr,mqf,nrn,pwk,rbr,tjp,z23
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Sub Designate(xs() As Wire, ys() As Wire)
+		  var pq as new PriorityQueue_MTC
+		  
+		  for i as integer = 0 to xs.LastIndex
+		    var w as Wire = xs( i )
+		    
+		    w.Designation = w.Name
+		    pq.Add i * 10, w
+		  next
+		  
+		  for each w as Wire in ys
+		    w.Designation = w.Name
+		  next
+		  
+		  while pq.Count <> 0
+		    var priority as integer = pq.PeekPriority
+		    
+		    var w as Wire = pq.Pop
+		    
+		    for each g as Gate in w.Gates
+		      if g.OutWire.Designation <> "" then
+		        continue
+		      end if
+		      
+		      if g.InWire1.Designation = "" or g.InWire2.Designation = "" then
+		        pq.Add priority + 1, w
+		        continue
+		      end if
+		      
+		      var parts() as string = array( g.InWire1.Designation, g.InWire2.Designation )
+		      parts.Sort AddressOf DesignationSorter
+		      
+		      g.OutWire.Designation = "(" + String.FromArray( parts, " " + g.Op + " " ) + "): " + g.OutWire.Name
+		      pq.Add priority + 5, g.OutWire
+		    next
+		  wend
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Function DesignationSorter(s1 As String, s2 As String) As Integer
+		  if s1.Bytes < s2.Bytes then
+		    return 1
+		  elseif s1.Bytes > s2.Bytes then
+		    return -1
+		  else
+		    return s1.Compare( s1 )
+		  end if
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Function ExtractWires(s As Set) As Set
+		  var wireSet as new Set
+		  
+		  for each g As Gate in s.ToArray
+		    wireSet.Add g.InWire1
+		    wireSet.Add g.InWire2
+		    wireSet.Add g.OutWire
+		  next
+		  
+		  return wireSet
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Shared Sub Store(dict As Dictionary, key As String, gate As Gate, useOther As Boolean)
-		  var gates() as Gate
+		Private Shared Function Fix(xs() As Wire, ys() As Wire, zs() As Wire, index As Integer, allWires() As Wire) As Set
+		  'var xw as Wire = xs( index )
+		  'var yw as Wire = ys( index )
+		  '
+		  'var xGateSet as Set = Trace( xw )
+		  'var yGateSet as Set = Trace( yw )
+		  '
+		  'var uniqueXGateSet as Set = xGateSet - yGateSet
+		  'var uniqueYGateSet as Set = yGateSet - xGateSet
+		  '
+		  'var xGates() as variant = uniqueXGateSet.ToArray
+		  'var yGates() as variant = uniqueYGateSet.ToArray
+		  '
+		  '
+		  'for each xGate as Gate in xGates
+		  'var xOut as Wire = xGate.OutWire
+		  'if xOut is nil then
+		  'continue
+		  'end if
+		  '
+		  'for each yGate as Gate in yGates
+		  'var yOut as Wire = yGate.OutWire
+		  'if yOut is nil then
+		  'continue
+		  'end if
+		  '
+		  'xGate.OutWire = yOut
+		  'yGate.OutWire = xOut
+		  '
+		  'Reset allWires
+		  'if Test( xs, ys, xs, 2^index, 0 ) then
+		  'var fixSet as new Set
+		  'fixSet.Add xOut.Name
+		  'fixSet.Add yOut.Name
+		  '
+		  'return fixSet
+		  'end if
+		  '
+		  'xGate.OutWire = xOut
+		  'yGate.OutWire = yOut
+		  'next
+		  'next
+		  '
+		  'return new Set
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Function GetWires(machine As Dictionary, prefix As String) As Wire()
+		  var zs() as Wire
 		  
-		  if useOther then
-		    if gate.In1 = key then
-		      key = gate.In2
-		    else
-		      key = gate.In1
+		  for each v as variant in machine.Keys
+		    var vs as string = v.StringValue
+		    
+		    if vs.BeginsWith( prefix ) then
+		      zs.Add machine.Value( v )
 		    end if
-		  end if
+		  next
 		  
-		  if dict.HasKey( key ) then
-		    gates = dict.Value( key )
-		  else
-		    dict.Value( key ) = gates
-		  end if
+		  zs.Sort AddressOf WireSorter
 		  
-		  gates.Add gate
-		  
+		  return zs
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Sub Reset(allWires() As Wire)
+		  for each w as Wire in allWires
+		    w.WasSet = false
+		    w.Value = 0
+		  next
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Function Test(xs() As Wire, ys() As Wire, zs() As Wire, v1 As UInt64, v2 As UInt64) As Boolean
+		  var expected as integer = v1 + v2
+		  
+		  var b1() as string = v1.ToBinary( xs.Count ).Split( "" )
+		  var b2() as string = v2.ToBinary( ys.Count ).Split( "" )
+		  
+		  
+		  for i as integer = 0 to b1.LastIndex
+		    xs( i ).Set b1( b1.LastIndex - i ).ToInteger
+		    ys( i ).Set b2( b2.LastIndex - i ).ToInteger
+		  next
+		  
+		  var actual as integer = ToBinary( zs )
+		  
+		  if actual <> expected then
+		    Print v1.ToBinary( xs.Count ) + " + " + v2.ToBinary( ys.Count ) _
+		    + " = " + expected.ToBinary( zs.Count ) + ", not " + actual.ToBinary( zs.Count )
+		  end if
+		  
+		  return actual = expected
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Function ToBinary(zs() As Wire) As Integer
+		  var bitMaker() as string
+		  bitMaker.ResizeTo zs.Count - 1
+		  
+		  for each w as Wire in zs
+		    var z as string = w.Name
+		    var index as integer = z.Middle( 1 ).ToInteger
+		    var bitValue as integer = w.Value
+		    bitMaker( bitMaker.LastIndex - index ) = bitValue.ToString
+		  next
+		  
+		  var bitString as string = "&b" + String.FromArray( bitMaker, "" )
+		  var bitValue as integer = bitString.ToInteger
+		  
+		  return bitValue
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Function Trace(w As Wire, s As Set = nil) As Set
+		  if s is nil then
+		    s = new Set
+		  end if
+		  
+		  if w is nil then
+		    return s
+		  end if
+		  
+		  for each g as Gate in w.Gates
+		    s.Add g
+		    s = Trace( g.OutWire, s )
+		  next
+		  
+		  return s
+		  
+		  
+		  'var printer() as string
+		  '
+		  'for each g as Gate in failGates.ToArray
+		  'var inNames() as string
+		  'inNames.Add g.InWire1.Name
+		  'inNames.Add g.InWire2.Name
+		  'inNames.Sort
+		  '
+		  'printer.Add String.FromArray( inNames, " " + g.Op + " " ) + " -> " + g.OutWire.Name
+		  'next
+		  '
+		  'printer.Sort
+		  'Print String.FromArray( printer, EndOfLine )
+		  '
+		  'Print ""
+		  '
+		  'for each g as Gate in successGates.ToArray
+		  'var inNames() as string
+		  'inNames.Add g.InWire1.Name
+		  'inNames.Add g.InWire2.Name
+		  'inNames.Sort
+		  '
+		  'printer.Add String.FromArray( inNames, " " + g.Op + " " ) + " -> " + g.OutWire.Name
+		  'next
+		  '
+		  'printer.Sort
+		  'Print String.FromArray( printer, EndOfLine )
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Function WireSorter(w1 As Wire, w2 As Wire) As Integer
+		  return w1.Name.Compare( w2.Name )
+		End Function
 	#tag EndMethod
 
 

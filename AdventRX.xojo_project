@@ -261,6 +261,7 @@ Class=KeyLock;Advent 2024-12/M_2024/KeyLock.xojo_code;&h000000004E7687FF;&h00000
 Class=MemorySpace;Advent 2024-12/M_2024/MemorySpace.xojo_code;&h0000000000ED47FF;&h000000001709EFFF;false
 Class=Gate;Advent 2024-12/M_2024/Gate.xojo_code;&h00000000563977FF;&h000000001709EFFF;false
 Class=SequenceStat;Advent 2024-12/M_2024/SequenceStat.xojo_code;&h0000000053E6BFFF;&h000000001709EFFF;false
+Class=Wire;Advent 2024-12/M_2024/Wire.xojo_code;&h000000000E21AFFF;&h000000001709EFFF;false
 DefaultWindow=WndAdvent
 AppMenuBar=MainMenuBar
 MajorVersion=1
