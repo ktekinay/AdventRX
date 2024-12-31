@@ -56,56 +56,16 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Variant
-		  ''IF NOT IsTest THEN RETURN 0
-		  '
-		  'var codes() as string = Normalize( input ).Split( EndOfLine )
-		  '
-		  'var result as integer
-		  '
-		  'var keypadLayoutDict as Dictionary = keypadLayout()
-		  'var directionalLayoutDict as Dictionary = directionalLayout()
-		  '
-		  'for each code as string in codes
-		  ''IF code <> "379A" THEN CONTINUE
-		  '
-		  'var newCode as string = code
-		  '
-		  'newCode = GetSequence( newCode, keypadLayoutDict )
-		  ''Print code + "(1): " + newCode
-		  '
-		  'for thisCount as integer = 2 to 3
-		  'newCode = GetSequence( newCode, directionalLayoutDict )
-		  ''Print code + "(" + thisCount.ToString + "): " + newCode
-		  'next 
-		  '
-		  '
-		  ''newCode = "^A<<^^A>>AvvvA"
-		  ''Print code + "(1): " + newCode
-		  ''
-		  ''newCode = GetSequence( newCode, directionalLayoutDict )
-		  ''Print code + "(2): " + newCode
-		  ''
-		  ''newCode = GetSequence( newCode, directionalLayoutDict )
-		  ''Print code + "(3): " + newCode
-		  '
-		  'var nums as integer = Numbers( code )
-		  'var complexity as integer = newCode.Length * nums
-		  '
-		  ''Print code + ": count=" + newcode.Length.ToString + ", nums=" + nums.ToString + ", complexity=" + complexity.ToString
-		  ''Print ""
-		  '
-		  'result = result + complexity
-		  'next
-		  
 		  var result as integer = Solve( input, 3 )
-		  return result : if( IsTest, 126384, 0 )
+		  
+		  return result : if( IsTest, 126384, 205160 )
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Variant
-		  var result as integer = Solve( input, 27 )
+		  var result as integer = Solve( input, 8 )
 		  
 		  return 0 : if( IsTest, 0, 0 )
 		  
@@ -278,33 +238,21 @@ Inherits AdventBase
 		  var directionalLayoutDict as Dictionary = directionalLayout()
 		  
 		  for each code as string in codes
-		    'IF code <> "379A" THEN CONTINUE
-		    
 		    var newCode as string = code
 		    
 		    newCode = GetSequence( newCode, keypadLayoutDict )
-		    'Print code + "(1): " + newCode
+		    Print code + "(1): " + newCode
 		    
 		    for thisCount as integer = 2 to count
 		      newCode = GetSequence( newCode, directionalLayoutDict )
-		      'Print code + "(" + thisCount.ToString + "): " + newCode
+		      Print code + "(" + thisCount.ToString + "): " + newCode
 		    next 
-		    
-		    
-		    'newCode = "^A<<^^A>>AvvvA"
-		    'Print code + "(1): " + newCode
-		    '
-		    'newCode = GetSequence( newCode, directionalLayoutDict )
-		    'Print code + "(2): " + newCode
-		    '
-		    'newCode = GetSequence( newCode, directionalLayoutDict )
-		    'Print code + "(3): " + newCode
 		    
 		    var nums as integer = Numbers( code )
 		    var complexity as integer = newCode.Length * nums
 		    
 		    'Print code + ": count=" + newcode.Length.ToString + ", nums=" + nums.ToString + ", complexity=" + complexity.ToString
-		    'Print ""
+		    Print ""
 		    
 		    result = result + complexity
 		  next
