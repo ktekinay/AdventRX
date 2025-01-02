@@ -146,6 +146,12 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
+		Private Shared Function LocalKey(sq As M_Path.GridSquare) As Integer
+		  return sq.Row * sq.Grid.LastIndex( 2 ) + sq.Column
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Shared Sub RecursiveSearch(grid(, ) As String, trail() As M_Path.MilestoneInterface, trailIndex As Integer, allSquares As Set)
 		  var lastIndex as integer = trail.LastIndex - 2
 		  
@@ -158,23 +164,25 @@ Inherits AdventBase
 		    case 0
 		      // We've exceeded best cost
 		      exit
-		    case 2
-		      // Only one path
+		    case 1
+		      // Start
 		      continue
+		    case 2
+		      // If we aren't at the start...
+		      if i <> 0 then
+		        // ... there is only one path
+		        continue
+		      end if
 		    case else
 		      var nextSq as MazeSquare = MazeSquare( trail( i + 1 ) )
 		      
 		      grid( nextSq.Row, nextSq.Column ) = "#"
-		      var pathResult as M_Path.Result = M_Path.FindPath( trail( trail.LastIndex ), sq, false )
+		      var pathResult as M_Path.Result = M_Path.FindPath( trail( trail.LastIndex ), sq, true )
 		      
-		      if pathResult.Trail.Count <> 0 then
-		        var lastSquare as MazeSquare = MazeSquare( pathResult.Trail( pathResult.Trail.LastIndex ) )
-		        
-		        if lastSquare.CostToStart = MazeSquare.BestCostToStart then
-		          TrailToSet pathResult.Trail, allSquares
-		          
-		          RecursiveSearch grid, pathResult.Trail, i, allSquares
-		        end if
+		      TrailToSet pathResult.Trail, allSquares
+		      
+		      if neighbors.Count = 4 then
+		        RecursiveSearch grid, pathResult.Trail, i, allSquares
 		      end if
 		      
 		      grid( nextSq.Row, nextSq.Column ) = "."
@@ -188,7 +196,7 @@ Inherits AdventBase
 		Private Shared Sub TrailToSet(trail() As M_Path.MilestoneInterface, toSet As Set)
 		  for i as integer = 0 to trail.LastIndex
 		    var sq as MazeSquare = MazeSquare( trail( i ) )
-		    var key as integer = sq.Row * sq.Grid.LastIndex( 2 ) + sq.Column
+		    var key as integer = LocalKey( sq )
 		    toSet.Add key
 		  next
 		End Sub

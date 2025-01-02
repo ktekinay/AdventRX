@@ -34,15 +34,13 @@ Implements M_Path.MilestoneInterface
 
 	#tag Method, Flags = &h0
 		Function Successors() As M_Path.MilestoneInterface()
-		  var neighbors() as M_Path.GridSquare
+		  var result() as M_Path.MilestoneInterface
 		  
 		  if BestCostToStart > 0.0 and CostToStart >= BestCostToStart then
-		    return neighbors
+		    return result
 		  end if
 		  
-		  neighbors = super.Neighbors()
-		  
-		  var result() as M_Path.MilestoneInterface
+		  var neighbors() as M_Path.GridSquare = super.Neighbors()
 		  
 		  for each n as M_Path.GridSquare in neighbors
 		    if Grid( n.Row, n.Column ) <> "#" then
@@ -71,22 +69,6 @@ Implements M_Path.MilestoneInterface
 
 
 	#tag ViewBehavior
-		#tag ViewProperty
-			Name="CostToParent"
-			Visible=false
-			Group="Behavior"
-			InitialValue=""
-			Type="Double"
-			EditorType=""
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="CostToEnd"
-			Visible=false
-			Group="Behavior"
-			InitialValue=""
-			Type="Double"
-			EditorType=""
-		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Name"
 			Visible=true
@@ -156,6 +138,14 @@ Implements M_Path.MilestoneInterface
 				"2 - South"
 				"3 - West"
 			#tag EndEnumValues
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="CostToStart"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Double"
+			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class
