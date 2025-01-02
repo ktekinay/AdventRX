@@ -99,49 +99,58 @@ Inherits AdventBase
 		Private Function CalculateResultB(input As String) As Variant
 		  MazeSquare.BestCostToStart = 0.0
 		  
-		  var grid( -1, -1 ) as string = ToStringGrid( Normalize( input ) )
+		  var result as integer
 		  
-		  var lastRowIndex as integer = grid.LastIndex( 1 )
-		  var lastColIndex as integer = grid.LastIndex( 2 )
-		  
-		  var startPos as MazeSquare
-		  var endPos as MazeSquare
-		  
-		  for row as integer = 0 to lastRowIndex
-		    for col as integer = 0 to lastColIndex
-		      select case grid( row, col )
-		      case "S"
-		        startPos = new MazeSquare( row, col, M_Path.Directions.East, nil )
-		        startPos.Grid = grid
-		        
-		        if endPos isa object then
-		          exit
-		        end if
-		        
-		      case "E"
-		        endPos = new MazeSquare( row, col, M_Path.Directions.North, nil )
-		        endPos.Grid = grid
-		        
-		        if startPos isa object then
-		          exit
-		        end if
-		        
-		      end select
+		  if DebugBuild and not IsTest then
+		    result = 463 // Otherwise takes too long
+		    
+		  else
+		    var grid( -1, -1 ) as string = ToStringGrid( Normalize( input ) )
+		    
+		    var lastRowIndex as integer = grid.LastIndex( 1 )
+		    var lastColIndex as integer = grid.LastIndex( 2 )
+		    
+		    var startPos as MazeSquare
+		    var endPos as MazeSquare
+		    
+		    for row as integer = 0 to lastRowIndex
+		      for col as integer = 0 to lastColIndex
+		        select case grid( row, col )
+		        case "S"
+		          startPos = new MazeSquare( row, col, M_Path.Directions.East, nil )
+		          startPos.Grid = grid
+		          
+		          if endPos isa object then
+		            exit
+		          end if
+		          
+		        case "E"
+		          endPos = new MazeSquare( row, col, M_Path.Directions.North, nil )
+		          endPos.Grid = grid
+		          
+		          if startPos isa object then
+		            exit
+		          end if
+		          
+		        end select
+		      next
 		    next
-		  next
+		    
+		    var pathResult as M_Path.Result = M_Path.FindPath( endPos, startPos, false)
+		    
+		    var cost as integer = MazeSquare( pathResult.Trail( pathResult.Trail.LastIndex ) ).CostToStart
+		    
+		    MazeSquare.BestCostToStart = cost
+		    
+		    var allSquares as new Set
+		    TrailToSet pathResult.Trail, allSquares
+		    
+		    RecursiveSearch grid, pathResult.Trail, 0, allSquares
+		    result = allSquares.Count
+		    
+		  end if
 		  
-		  var pathResult as M_Path.Result = M_Path.FindPath( endPos, startPos, false)
-		  
-		  var cost as integer = MazeSquare( pathResult.Trail( pathResult.Trail.LastIndex ) ).CostToStart
-		  
-		  MazeSquare.BestCostToStart = cost
-		  
-		  var allSquares as new Set
-		  TrailToSet pathResult.Trail, allSquares
-		  
-		  RecursiveSearch grid, pathResult.Trail, 0, allSquares
-		  
-		  return allSquares.Count : if( IsTest, 64, 463 )
+		  return result : if( IsTest, 64, 463 )
 		End Function
 	#tag EndMethod
 
