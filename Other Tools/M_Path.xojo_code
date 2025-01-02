@@ -146,6 +146,39 @@ Protected Module M_Path
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h1
+		Protected Function ToMilestoneArray(arr() As Object) As M_Path.MilestoneInterface()
+		  var result() as M_Path.MilestoneInterface
+		  
+		  for each o as Object in arr
+		    result.Add M_Path.MilestoneInterface( o )
+		  next
+		  
+		  return result
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
+		Protected Function TurnLeft(direction As M_Path.Directions) As Directions
+		  var d as integer = integer( direction )
+		  
+		  d = ( d + 3 ) mod 4
+		  
+		  return M_Path.Directions( d )
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
+		Protected Function TurnRight(direction As M_Path.Directions) As Directions
+		  var d as integer = integer( direction )
+		  
+		  d = ( d + 1 ) mod 4
+		  
+		  return M_Path.Directions( d )
+		End Function
+	#tag EndMethod
+
 
 	#tag Structure, Name = CostStructure, Flags = &h21
 		ToGoal As Double
@@ -153,6 +186,13 @@ Protected Module M_Path
 		Total As Double
 	#tag EndStructure
 
+
+	#tag Enum, Name = Directions, Type = Integer, Flags = &h1
+		North=0
+		  East=1
+		  South=2
+		West=3
+	#tag EndEnum
 
 	#tag Enum, Name = Statuses, Type = Integer, Flags = &h21
 		IsNew

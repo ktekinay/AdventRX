@@ -3,21 +3,19 @@ Protected Class Advent_2024_12_16
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "Unknown"
+		  return "Best paths through a maze"
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return false
-		  
+		  return true
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnName() As String
-		  return ""
-		  
+		  return "Reindeer Maze"
 		End Function
 	#tag EndEvent
 
@@ -56,47 +54,144 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Variant
-		  var grid as ObjectGrid = ObjectGrid.FromStringGrid( ToStringGrid( Normalize( input ) ), new MazeGridMember )
+		  MazeSquare.BestCostToStart = 0.0
 		  
-		  var startPos as MazeGridMember
-		  var endPos as MazeGridMember
+		  var grid( -1, -1 ) as string = ToStringGrid( Normalize( input ) )
 		  
-		  for each m as MazeGridMember in grid
-		    select case m.RawValue.StringValue
-		    case "S"
-		      startPos = m
-		      
-		      if endPos isa object then
-		        exit
-		      end if
-		      
-		    case "E"
-		      endPos = m
-		      
-		      if startPos isa object then
-		        exit
-		      end if
-		      
-		    end select
+		  var lastRowIndex as integer = grid.LastIndex( 1 )
+		  var lastColIndex as integer = grid.LastIndex( 2 )
+		  
+		  var startPos as MazeSquare
+		  var endPos as MazeSquare
+		  
+		  for row as integer = 0 to lastRowIndex
+		    for col as integer = 0 to lastColIndex
+		      select case grid( row, col )
+		      case "S"
+		        startPos = new MazeSquare( row, col, M_Path.Directions.East, nil )
+		        startPos.Grid = grid
+		        
+		        if endPos isa object then
+		          exit
+		        end if
+		        
+		      case "E"
+		        endPos = new MazeSquare( row, col, M_Path.Directions.North, nil )
+		        endPos.Grid = grid
+		        
+		        if startPos isa object then
+		          exit
+		        end if
+		        
+		      end select
+		    next
 		  next
 		  
-		  var finder as new M_Path.PathFinder_MTC( endPos )
+		  var pathResult as M_Path.Result = M_Path.FindPath( endPos, startPos, true)
 		  
-		  
-		  
-		  return 0 : if( IsTest, 0, 0 )
+		  var cost as integer = MazeSquare( pathResult.Trail( pathResult.Trail.LastIndex ) ).CostToStart
+		  return cost : if( IsTest, 11048, 78428 )
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Variant
+		  MazeSquare.BestCostToStart = 0.0
 		  
+		  var grid( -1, -1 ) as string = ToStringGrid( Normalize( input ) )
 		  
+		  var lastRowIndex as integer = grid.LastIndex( 1 )
+		  var lastColIndex as integer = grid.LastIndex( 2 )
 		  
-		  return 0 : if( IsTest, 0, 0 )
+		  var startPos as MazeSquare
+		  var endPos as MazeSquare
 		  
+		  for row as integer = 0 to lastRowIndex
+		    for col as integer = 0 to lastColIndex
+		      select case grid( row, col )
+		      case "S"
+		        startPos = new MazeSquare( row, col, M_Path.Directions.East, nil )
+		        startPos.Grid = grid
+		        
+		        if endPos isa object then
+		          exit
+		        end if
+		        
+		      case "E"
+		        endPos = new MazeSquare( row, col, M_Path.Directions.North, nil )
+		        endPos.Grid = grid
+		        
+		        if startPos isa object then
+		          exit
+		        end if
+		        
+		      end select
+		    next
+		  next
+		  
+		  var pathResult as M_Path.Result = M_Path.FindPath( endPos, startPos, false)
+		  
+		  var cost as integer = MazeSquare( pathResult.Trail( pathResult.Trail.LastIndex ) ).CostToStart
+		  
+		  MazeSquare.BestCostToStart = cost
+		  
+		  var allSquares as new Set
+		  TrailToSet pathResult.Trail, allSquares
+		  
+		  RecursiveSearch grid, pathResult.Trail, 0, allSquares
+		  
+		  return allSquares.Count : if( IsTest, 64, 463 )
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Sub RecursiveSearch(grid(, ) As String, trail() As M_Path.MilestoneInterface, trailIndex As Integer, allSquares As Set)
+		  var lastIndex as integer = trail.LastIndex - 2
+		  
+		  for i as integer = trailIndex to lastIndex
+		    var sq as MazeSquare = MazeSquare( trail( i ) )
+		    
+		    var neighbors() as M_Path.GridSquare = sq.Neighbors
+		    
+		    select case neighbors.Count
+		    case 0
+		      // We've exceeded best cost
+		      exit
+		    case 2
+		      // Only one path
+		      continue
+		    case else
+		      var nextSq as MazeSquare = MazeSquare( trail( i + 1 ) )
+		      
+		      grid( nextSq.Row, nextSq.Column ) = "#"
+		      var pathResult as M_Path.Result = M_Path.FindPath( trail( trail.LastIndex ), sq, false )
+		      
+		      if pathResult.Trail.Count <> 0 then
+		        var lastSquare as MazeSquare = MazeSquare( pathResult.Trail( pathResult.Trail.LastIndex ) )
+		        
+		        if lastSquare.CostToStart = MazeSquare.BestCostToStart then
+		          TrailToSet pathResult.Trail, allSquares
+		          
+		          RecursiveSearch grid, pathResult.Trail, i, allSquares
+		        end if
+		      end if
+		      
+		      grid( nextSq.Row, nextSq.Column ) = "."
+		      
+		    end select
+		  next
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Sub TrailToSet(trail() As M_Path.MilestoneInterface, toSet As Set)
+		  for i as integer = 0 to trail.LastIndex
+		    var sq as MazeSquare = MazeSquare( trail( i ) )
+		    var key as integer = sq.Row * sq.Grid.LastIndex( 2 ) + sq.Column
+		    toSet.Add key
+		  next
+		End Sub
 	#tag EndMethod
 
 

@@ -48,6 +48,13 @@ Protected Module Advent
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function Column(Extends pt As Xojo.Point) As Integer
+		  return pt.X
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function IndexOf(Extends mb As MemoryBlock, b As Byte) As Integer
 		  var p as ptr = mb
 		  var lastByte as integer = mb.Size - 1
@@ -206,6 +213,12 @@ Protected Module Advent
 		  
 		  return rowValues
 		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function Row(Extends pt As Xojo.Point) As Integer
+		  return pt.Y
 		End Function
 	#tag EndMethod
 
