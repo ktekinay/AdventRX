@@ -458,10 +458,10 @@ End
 		  AddRow new Advent_2024_12_25
 		  
 		  // Auto-run
-		  Timer.CallLater 10, AddressOf RunEventTimer, new Advent_2024_12_16
+		  Timer.CallLater 10, AddressOf RunEventTimer, new Advent_2023_12_17
 		  
 		  // Expand
-		  ExpandYear 2024
+		  ExpandYear 2023
 		  
 		  
 		End Sub

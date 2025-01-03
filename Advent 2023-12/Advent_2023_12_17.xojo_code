@@ -56,33 +56,73 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Variant
+		  BlockGridSquare.BestCost = 0.0
+		  BlockGridSquare.IsReverse = false
+		  
 		  var total as integer
 		  
-		  var grid as ObjectGrid = ObjectGrid.FromStringGrid( ToStringGrid( input ), new BlockGridMember )
-		  var goal as BlockGridMember = BlockGridMember( grid( grid.LastRowIndex, grid.LastColIndex ) )
-		  var start as BlockGridMember = BlockGridMember( grid( 0, 0 ) )
+		  var grid( -1, -1 ) as string = ToStringGrid( input )
 		  
-		  var result as M_Path.Result = M_Path.FindPath( goal, start, false )
-		  var trail() as M_Path.MilestoneInterface = result.Trail
+		  var lastRowIndex as integer = grid.LastIndex( 1 )
+		  var lastColIndex as integer = grid.LastIndex( 2 )
 		  
-		  for each m as M_Path.MilestoneInterface in trail
-		    if m is start then
-		      continue
+		  var goal as new BlockGridSquare( lastRowIndex, lastColIndex, M_Path.Directions.North, nil )
+		  goal.Grid = grid
+		  
+		  var start1 as new BlockGridSquare( 0, 0, M_Path.Directions.East, nil )
+		  start1.Grid = grid
+		  
+		  var start2 as new BlockGridSquare( 0, 0, M_Path.Directions.South, nil )
+		  start2.Grid = grid
+		  
+		  var bestTrail() as M_Path.MilestoneInterface
+		  
+		  for each start as BlockGridSquare in array( start1, start2 )
+		    var thisTotal as integer
+		    
+		    var result as M_Path.Result = M_Path.FindPath( goal, start, false )
+		    var trail() as M_Path.MilestoneInterface = result.Trail
+		    
+		    thisTotal = GetTotal( grid, trail, 1, trail.LastIndex )
+		    
+		    if total = 0 or thisTotal < total then
+		      bestTrail = trail
+		      total = thisTotal
 		    end if
-		    total = total + BlockGridMember( m ).Value.IntegerValue
 		  next
 		  
+		  'BlockGridSquare.IsReverse = true
+		  '
+		  'goal.Direction = M_Path.Directions.North
+		  'var result as M_Path.Result = M_Path.FindPath( start1, goal, false )
+		  'var thisTotal as integer = GetTotal( grid, result.Trail, 0, result.Trail.LastIndex - 1 )
+		  'if thisTotal < total then
+		  'total = thisTotal
+		  'bestTrail = result.Trail
+		  'end if
+		  '
+		  'goal.Direction = M_Path.Directions.West
+		  'result = M_Path.FindPath( start2, goal, false )
+		  'thisTotal = GetTotal( grid, result.Trail, 0, result.Trail.LastIndex - 1 )
+		  'if thisTotal < total then
+		  'total = thisTotal
+		  'bestTrail = result.Trail
+		  'end if
+		  
+		  BlockGridSquare.BestCost = total
+		  
+		  total = RecursiveSearch( grid, bestTrail, 0 )
+		  
 		  if IsTest then
-		    Print grid
-		    Print ""
-		    PrintWithTrail grid, trail
-		    Print ""
+		    PrintWithTrail grid, bestTrail
 		  end if
 		  
 		  return total : if( IsTest, 102, 0 )
 		  // TOO HIGH: 1483
 		  // TOO HIGH: 1429
 		  // TOO HIGH: 1008
+		  // INCORRECT: 923
+		  // INCORRECT: 975
 		End Function
 	#tag EndMethod
 
@@ -97,7 +137,21 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Sub PrintWithTrail(grid As ObjectGrid, trail() As M_Path.MilestoneInterface)
+		Private Shared Function GetTotal(grid(, ) As String, trail() As M_Path.MilestoneInterface, startIndex As Integer, endIndex As Integer) As Integer
+		  var total as integer
+		  
+		  for i as integer = startIndex to endIndex
+		    var sq as BlockGridSquare = BlockGridSquare( trail( i ) )
+		    
+		    total = total + grid( sq.Row, sq.Column ).ToInteger
+		  next
+		  
+		  return total
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub PrintWithTrail(grid(, ) As String, trail() As M_Path.MilestoneInterface)
 		  'for i as integer = 1 to trail.LastIndex
 		  'var this as BlockGridMember = BlockGridMember( trail( i ) )
 		  'var prev as BlockGridMember = BlockGridMember( trail( i - 1 ) )
@@ -119,15 +173,57 @@ Inherits AdventBase
 		  'end if
 		  'next
 		  
+		  var lastRowIndex as integer = grid.LastIndex( 1 )
+		  var lastColIndex as integer = grid.LastIndex( 2 )
+		  
+		  var printGrid( -1, -1 ) as string
+		  printGrid.ResizeTo lastRowIndex, lastColIndex
+		  
+		  for row as integer = 0 to lastRowIndex
+		    for col as integer = 0 to lastColIndex
+		      printGrid( row, col ) = grid( row, col )
+		    next
+		  next
+		  
 		  for each m as M_Path.MilestoneInterface in trail
-		    var gm as BlockGridMember = BlockGridMember( m )
-		    if gm.Direction <> "" then
-		      gm.Value = gm.Direction
+		    var gm as BlockGridSquare = BlockGridSquare( m )
+		    printGrid( gm.Row, gm.Column ) = gm.Direction.ToString
+		  next
+		  
+		  Print printGrid
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Function RecursiveSearch(grid(, ) As String, trail() As M_Path.MilestoneInterface, index As Integer) As Integer
+		  var lastIndex as integer = trail.LastIndex - 2
+		  var goal as M_Path.MilestoneInterface = trail( trail.LastIndex )
+		  var start as M_Path.MilestoneInterface = trail( 0 )
+		  
+		  var total as integer = BlockGridSquare.BestCost
+		  
+		  for trailIndex as integer = index to lastIndex
+		    'var sq as BlockGridSquare = BlockGridSquare( trail( trailIndex ) )
+		    var nextSq as BlockGridSquare = BlockGridSquare( trail( trailIndex + 1 ) )
+		    
+		    var existing as string = grid( nextSq.Row, nextSq.Column )
+		    grid( nextSq.Row, nextSq.Column ) = "#"
+		    
+		    var result as M_Path.Result = M_Path.FindPath( goal, start, false )
+		    grid( nextSq.Row, nextSq.Column ) = existing
+		    
+		    if result.Trail.Count <> 0 then
+		      var thisTrail() as M_Path.MilestoneInterface = result.Trail
+		      var lastSq as BlockGridSquare = BlockGridSquare( thisTrail( thisTrail.LastIndex ) )
+		      if lastSq.CostToStart < total then
+		        BlockGridSquare.BestCost = lastSq.CostToStart
+		        total = RecursiveSearch( grid, thisTrail, 0 )
+		      end if
 		    end if
 		  next
 		  
-		  Print grid
-		End Sub
+		  return total
+		End Function
 	#tag EndMethod
 
 
@@ -146,6 +242,18 @@ Inherits AdventBase
 
 
 	#tag ViewBehavior
+		#tag ViewProperty
+			Name="Type"
+			Visible=true
+			Group="Behavior"
+			InitialValue=""
+			Type="Types"
+			EditorType="Enum"
+			#tag EnumValues
+				"0 - Cooperative"
+				"1 - Preemptive"
+			#tag EndEnumValues
+		#tag EndViewProperty
 		#tag ViewProperty
 			Name="IsComplete"
 			Visible=false

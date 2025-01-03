@@ -159,6 +159,22 @@ Protected Module M_Path
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Function ToString(Extends d As M_Path.Directions) As String
+		  select case d
+		  case M_Path.Directions.North
+		    return "^"
+		  case M_Path.Directions.East
+		    return ">"
+		  case M_Path.Directions.South
+		    return "v"
+		  case M_Path.Directions.West
+		    return "<"
+		  end select
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h1
 		Protected Function TurnLeft(direction As M_Path.Directions) As Directions
 		  var d as integer = integer( direction )
