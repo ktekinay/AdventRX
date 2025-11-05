@@ -10,6 +10,7 @@ Begin DesktopWindow WndAdvent
    HasFullScreenButton=   False
    HasMaximizeButton=   True
    HasMinimizeButton=   True
+   HasTitleBar     =   True
    Height          =   706
    ImplicitInstance=   True
    MacProcID       =   0
@@ -322,6 +323,10 @@ End
 		  AddRow new Advent_2016_12_06
 		  AddRow new Advent_2016_12_07
 		  
+		  // 2019
+		  AddRow new Advent_2019_12_01
+		  AddRow new Advent_2019_12_02
+		  
 		  // 2020
 		  AddRow new Advent_2020_12_01
 		  AddRow new Advent_2020_12_02
@@ -461,7 +466,9 @@ End
 		  Timer.CallLater 10, AddressOf RunEventTimer, new Advent_2023_12_17
 		  
 		  // Expand
-		  ExpandYear 2023
+		  ExpandYear 2019
+		  
+		  
 		  
 		  
 		End Sub
@@ -714,6 +721,14 @@ End
 	#tag EndEvent
 #tag EndEvents
 #tag ViewBehavior
+	#tag ViewProperty
+		Name="HasTitleBar"
+		Visible=true
+		Group="Frame"
+		InitialValue="True"
+		Type="Boolean"
+		EditorType=""
+	#tag EndViewProperty
 	#tag ViewProperty
 		Name="Name"
 		Visible=true

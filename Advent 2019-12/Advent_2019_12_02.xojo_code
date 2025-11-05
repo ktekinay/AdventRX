@@ -1,22 +1,22 @@
 #tag Class
-Protected Class AdventTemplate
+Protected Class Advent_2019_12_02
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "Unknown"
+		  return "Evaluate opcodes"
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return false
+		  return true
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnName() As String
-		  return ""
+		  return "1202 Program Alarm"
 		  
 		End Function
 	#tag EndEvent
@@ -58,22 +58,79 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Variant
+		  var data() as integer = ToIntegerArray( input.Split( "," ) )
 		  
+		  data( 1 ) = 12
+		  data( 2 ) = 2
 		  
+		  Eval( data )
 		  
-		  return 0 : if( IsTest, 0, 0 )
+		  var result as integer = data( 0 )
+		  
+		  return result : if( IsTest, 0, 3850704 )
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Variant
+		  const kTarget as integer = 19690720
+		  
+		  var n as integer
+		  var v as integer
+		  var result as integer
+		  
+		  do
+		    var data() as integer = ToIntegerArray( input.Split( "," ) )
+		    
+		    data( 1 ) = n
+		    data( 2 ) = v
+		    
+		    Eval( data )
+		    
+		    if data( 0 ) = kTarget then
+		      result = n * 100 + v
+		      exit
+		    end if
+		    
+		    if n = 99 then
+		      n = 0
+		      v = v + 1
+		    else
+		      n = n + 1
+		    end if
+		  loop
 		  
 		  
-		  
-		  return 0 : if( IsTest, 0, 0 )
+		  return result : if( IsTest, 0, 6718 )
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Sub Eval(data() As Integer)
+		  var index as integer
+		  
+		  do
+		    var op as integer = data( index )
+		    
+		    if op = 99 then
+		      return
+		    end if
+		    
+		    var loc1 as integer = data( index + 1 )
+		    var loc2 as integer = data( index + 2 )
+		    var dest as integer = data( index + 3 )
+		    
+		    if op = 1 then
+		      data( dest ) = data( loc1 ) + data( loc2 )
+		    else
+		      data( dest ) = data( loc1 ) * data( loc2 )
+		    end if
+		    
+		    index = index + 4
+		  loop
+		End Sub
 	#tag EndMethod
 
 
