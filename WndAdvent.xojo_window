@@ -328,6 +328,7 @@ End
 		  AddRow new Advent_2019_12_02
 		  AddRow new Advent_2019_12_03
 		  AddRow new Advent_2019_12_04
+		  AddRow new Advent_2019_12_06
 		  
 		  // 2020
 		  AddRow new Advent_2020_12_01
@@ -465,7 +466,7 @@ End
 		  AddRow new Advent_2024_12_25
 		  
 		  // Auto-run
-		  Timer.CallLater 10, AddressOf RunEventTimer, new Advent_2019_12_04
+		  Timer.CallLater 10, AddressOf RunEventTimer, new Advent_2019_12_06
 		  
 		  // Expand
 		  ExpandYear 2019
