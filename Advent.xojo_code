@@ -223,6 +223,21 @@ Protected Module Advent
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function SplitEvery(Extends s As String, count As Integer) As String()
+		  var result() as string
+		  
+		  var len as integer = s.Length
+		  
+		  for i as integer = 1 to len step count
+		    result.Add s.Middle( i - 1, count )
+		  next
+		  
+		  return result
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function Squeeze(Extends src As String, charSet As String = " ") As String
 		  // Find any repeating characters, where the character is a member of
 		  // charSet, and replace the run with a single character.  Example:
