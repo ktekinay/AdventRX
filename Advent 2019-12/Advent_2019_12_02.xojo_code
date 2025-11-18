@@ -144,10 +144,6 @@ Inherits AdventBase
 	#tag EndConstant
 
 
-	#tag Using, Name = M_2024
-	#tag EndUsing
-
-
 	#tag ViewBehavior
 		#tag ViewProperty
 			Name="Type"
