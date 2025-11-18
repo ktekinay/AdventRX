@@ -22,7 +22,7 @@ Protected Module M_Path
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
-		Protected Function FindPath(goal As MilestoneInterface, start As MilestoneInterface, useNeighborCache As Boolean = True) As M_Path.Result
+		Protected Function FindPath(goal As MilestoneInterface, start As MilestoneInterface, useNeighborCache As Boolean = True, untilBestStart As Boolean = False) As M_Path.Result
 		  #if not DebugBuild
 		    #pragma BackgroundTasks false
 		    #pragma BoundsChecking false
@@ -55,36 +55,43 @@ Protected Module M_Path
 		  costDict.Value( startKey ) = currentCost
 		  
 		  queue.Add currentCost.Total, start
+		  var bestStartCost as double = -1.0
 		  
 		  while queue.Count <> 0
 		    var current as MilestoneInterface = queue.Pop
 		    var currentKey as variant = current.GetKey
+		    currentCost = costDict.Value( currentKey )
 		    
 		    if currentKey = goalKey then
-		      //
-		      // Backtrack!
-		      //
-		      var trail() as MilestoneInterface
-		      do
-		        trail.Add current
-		        current = trailDict.Lookup( currentKey, nil )
-		        currentKey = current.GetKey
-		      loop until currentKey = startKey
-		      
-		      trail.Add start
-		      
-		      result.Trail.ResizeTo trail.LastIndex
-		      
-		      var addIndex as integer = -1
-		      for i as integer = trail.LastIndex downto 0
-		        addIndex = addIndex + 1
-		        result.Trail( addIndex ) = trail( i )
-		      next
-		      
-		      return result
+		      if bestStartCost < 0.0 or bestStartCost > currentCost.ToStart then
+		        bestStartCost = currentCost.ToStart
+		        
+		        //
+		        // Backtrack!
+		        //
+		        var trail() as MilestoneInterface
+		        do
+		          trail.Add current
+		          current = trailDict.Lookup( currentKey, nil )
+		          currentKey = current.GetKey
+		        loop until currentKey = startKey
+		        
+		        trail.Add start
+		        
+		        result.Trail.ResizeTo trail.LastIndex
+		        
+		        var addIndex as integer = -1
+		        for i as integer = trail.LastIndex downto 0
+		          addIndex = addIndex + 1
+		          result.Trail( addIndex ) = trail( i )
+		        next
+		        
+		        if not untilBestStart then
+		          return result
+		        end if
+		      end if
 		    end if
 		    
-		    currentCost = costDict.Value( currentKey )
 		    var neighbors() as MilestoneInterface 
 		    if useNeighborCache and neighborDict.HasKey( currentKey ) then
 		      neighbors = neighborDict.Value( currentKey )
@@ -118,14 +125,16 @@ Protected Module M_Path
 		    next
 		  wend
 		  
-		  //
-		  // If we get here, there is no path
-		  //
-		  var seen() as variant = trailDict.Values
-		  result.Touched = new Dictionary
-		  for each m as MilestoneInterface in seen
-		    result.Touched.Value( m ) = nil
-		  next
+		  if result.Trail.Count = 0 then
+		    //
+		    // If we get here, there is no path
+		    //
+		    var seen() as variant = trailDict.Values
+		    result.Touched = new Dictionary
+		    for each m as MilestoneInterface in seen
+		      result.Touched.Value( m ) = nil
+		    next 
+		  end if
 		  
 		  return result
 		  

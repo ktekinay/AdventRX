@@ -56,12 +56,15 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Variant
-		  BlockGridSquare.BestCost = 0.0
-		  BlockGridSquare.IsReverse = false
-		  
 		  var total as integer
 		  
 		  var grid( -1, -1 ) as string = ToStringGrid( input )
+		  var goalGrid as ObjectGrid = ObjectGrid.FromStringGrid( grid )
+		  
+		  'MapAllGoalCost goalGrid
+		  
+		  BlockGridSquare.GoalGrid = goalGrid
+		  BlockGridSquare.GoalMultiplier = 0.0
 		  
 		  var lastRowIndex as integer = grid.LastIndex( 1 )
 		  var lastColIndex as integer = grid.LastIndex( 2 )
@@ -69,49 +72,35 @@ Inherits AdventBase
 		  var goal as new BlockGridSquare( lastRowIndex, lastColIndex, M_Path.Directions.North, nil )
 		  goal.Grid = grid
 		  
-		  var start1 as new BlockGridSquare( 0, 0, M_Path.Directions.East, nil )
-		  start1.Grid = grid
-		  
-		  var start2 as new BlockGridSquare( 0, 0, M_Path.Directions.South, nil )
-		  start2.Grid = grid
-		  
 		  var bestTrail() as M_Path.MilestoneInterface
 		  
-		  for each start as BlockGridSquare in array( start1, start2 )
-		    var thisTotal as integer
+		  do
+		    'BlockGridSquare.GoalMultiplier = BlockGridSquare.GoalMultiplier + 1.0
 		    
-		    var result as M_Path.Result = M_Path.FindPath( goal, start, false )
-		    var trail() as M_Path.MilestoneInterface = result.Trail
+		    var start1 as new BlockGridSquare( 0, 0, M_Path.Directions.East, nil )
+		    start1.Grid = grid
 		    
-		    thisTotal = GetTotal( grid, trail, 1, trail.LastIndex )
+		    var start2 as new BlockGridSquare( 0, 0, M_Path.Directions.South, nil )
+		    start2.Grid = grid
 		    
-		    if total = 0 or thisTotal < total then
-		      bestTrail = trail
-		      total = thisTotal
-		    end if
-		  next
-		  
-		  'BlockGridSquare.IsReverse = true
-		  '
-		  'goal.Direction = M_Path.Directions.North
-		  'var result as M_Path.Result = M_Path.FindPath( start1, goal, false )
-		  'var thisTotal as integer = GetTotal( grid, result.Trail, 0, result.Trail.LastIndex - 1 )
-		  'if thisTotal < total then
-		  'total = thisTotal
-		  'bestTrail = result.Trail
-		  'end if
-		  '
-		  'goal.Direction = M_Path.Directions.West
-		  'result = M_Path.FindPath( start2, goal, false )
-		  'thisTotal = GetTotal( grid, result.Trail, 0, result.Trail.LastIndex - 1 )
-		  'if thisTotal < total then
-		  'total = thisTotal
-		  'bestTrail = result.Trail
-		  'end if
-		  
-		  BlockGridSquare.BestCost = total
-		  
-		  total = RecursiveSearch( grid, bestTrail, 0 )
+		    
+		    for each start as BlockGridSquare in array( start1, start2 )
+		      var thisTotal as integer
+		      
+		      var result as M_Path.Result = M_Path.FindPath( goal, start, false, true )
+		      var trail() as M_Path.MilestoneInterface = result.Trail
+		      
+		      thisTotal = GetTotal( grid, trail, 1, trail.LastIndex )
+		      thisTotal = BlockGridSquare( trail( trail.LastIndex ) ).CostToStart
+		      
+		      if total = 0 or thisTotal < total then
+		        bestTrail = trail
+		        total = thisTotal
+		      end if
+		    next
+		    bestTrail = bestTrail
+		    exit
+		  loop until not MapGoalCosts( bestTrail ) and BlockGridSquare.GoalMultiplier > 10.0
 		  
 		  if IsTest then
 		    PrintWithTrail grid, bestTrail
@@ -122,7 +111,10 @@ Inherits AdventBase
 		  // TOO HIGH: 1429
 		  // TOO HIGH: 1008
 		  // INCORRECT: 923
+		  // INCORRECT: 925
 		  // INCORRECT: 975
+		  // INCORRECT: 979
+		  // INCORRECT: 980
 		End Function
 	#tag EndMethod
 
@@ -147,6 +139,77 @@ Inherits AdventBase
 		  next
 		  
 		  return total
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Sub MapAllGoalCost(grid As ObjectGrid)
+		  var goal as GridMember = grid( grid.LastRowIndex, grid.LastColIndex )
+		  
+		  for count as integer = 1 to 1
+		    var queue as new Set
+		    
+		    if true then
+		      var neighbors() as GridMember = goal.Neighbors( false )
+		      for each n as GridMember in neighbors
+		        queue.Add n
+		      next
+		    end if
+		    
+		    while queue.Count <> 0
+		      var gm as GridMember = queue.Pop
+		      
+		      var neighbors() as GridMember = gm.Neighbors( false )
+		      
+		      var wasChanged as boolean
+		      
+		      for each n as GridMember in neighbors
+		        if n.BestSteps = 0 and not ( n is goal ) then
+		          queue.Add n
+		          continue
+		        end if
+		        
+		        var theseBest as integer = n.Value + n.BestSteps
+		        
+		        if gm.BestSteps = 0 or gm.BestSteps > theseBest then
+		          gm.BestSteps = theseBest
+		          wasChanged = true
+		        end if
+		      next
+		      
+		      if wasChanged then
+		        for each n as GridMember in neighbors
+		          if not ( n is goal ) then
+		            queue.Add n
+		          end if
+		        next
+		      end if
+		    wend
+		  next
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Function MapGoalCosts(trail() As M_Path.MilestoneInterface) As Boolean
+		  var keepGoing as boolean
+		  
+		  var goalGrid as ObjectGrid = BlockGridSquare.GoalGrid
+		  var newCost as integer
+		  
+		  for i as integer = trail.LastIndex downto 0
+		    var sq as BlockGridSquare = BlockGridSquare( trail( i ) )
+		    var og as GridMember = goalGrid( sq.Row, sq.Column )
+		    
+		    if og.BestSteps <> newCost then
+		      og.BestSteps = newCost
+		      keepGoing = true
+		    end if
+		    
+		    newCost = newCost + og.Value.IntegerValue
+		  next
+		  
+		  return keepGoing
+		  
 		End Function
 	#tag EndMethod
 
@@ -192,38 +255,6 @@ Inherits AdventBase
 		  
 		  Print printGrid
 		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Shared Function RecursiveSearch(grid(, ) As String, trail() As M_Path.MilestoneInterface, index As Integer) As Integer
-		  var lastIndex as integer = trail.LastIndex - 2
-		  var goal as M_Path.MilestoneInterface = trail( trail.LastIndex )
-		  var start as M_Path.MilestoneInterface = trail( 0 )
-		  
-		  var total as integer = BlockGridSquare.BestCost
-		  
-		  for trailIndex as integer = index to lastIndex
-		    'var sq as BlockGridSquare = BlockGridSquare( trail( trailIndex ) )
-		    var nextSq as BlockGridSquare = BlockGridSquare( trail( trailIndex + 1 ) )
-		    
-		    var existing as string = grid( nextSq.Row, nextSq.Column )
-		    grid( nextSq.Row, nextSq.Column ) = "#"
-		    
-		    var result as M_Path.Result = M_Path.FindPath( goal, start, false )
-		    grid( nextSq.Row, nextSq.Column ) = existing
-		    
-		    if result.Trail.Count <> 0 then
-		      var thisTrail() as M_Path.MilestoneInterface = result.Trail
-		      var lastSq as BlockGridSquare = BlockGridSquare( thisTrail( thisTrail.LastIndex ) )
-		      if lastSq.CostToStart < total then
-		        BlockGridSquare.BestCost = lastSq.CostToStart
-		        total = RecursiveSearch( grid, thisTrail, 0 )
-		      end if
-		    end if
-		  next
-		  
-		  return total
-		End Function
 	#tag EndMethod
 
 

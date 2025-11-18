@@ -14,33 +14,31 @@ Implements M_Path.MilestoneInterface
 	#tag Method, Flags = &h0
 		Function DistanceToGoal(goal As M_Path.MilestoneInterface) As Double
 		  var g as BlockGridSquare = BlockGridSquare( goal )
+		  '
+		  'var goalGrid as ObjectGrid = BlockGridSquare.GoalGrid
+		  '
+		  'var gm as GridMember = goalGrid( g.Row, g.Column )
+		  'return gm.BestSteps
 		  
-		  var minR as integer = max( 0, g.Row - 2 )
-		  var minC as integer = max( 0, g.Column - 2 )
+		  var distance as integer = M_Path.ManhattanDistance( g.Column, g.Row, Column, Row )
+		  return distance * 3
 		  
-		  var r as integer = minR
-		  var c as integer = minC
+		  'var goalMultiplier as double = BlockGridSquare.GoalMultiplier
+		  '
+		  'if goalMultiplier < 10.0 then
+		  'if gm.BestSteps <> 0 then
+		  'return distance * 10.0 * goalMultiplier
+		  'else
+		  'return distance
+		  'end if
+		  'end if
+		  '
+		  'if gm.BestSteps <> 0 then
+		  'return gm.BestSteps
+		  'end if
+		  '
+		  'return distance
 		  
-		  var total as integer
-		  var count as integer
-		  
-		  do
-		    c = c + 1
-		    if c > g.Column then
-		      c = minC
-		      r = r + 1
-		      
-		      if r > g.Row then
-		        exit
-		      end if
-		    end if
-		    
-		    count = count + 1
-		    total = total + Grid( r, c ).ToInteger
-		  loop
-		  
-		  var avg as integer = total \ count
-		  return avg
 		End Function
 	#tag EndMethod
 
@@ -66,12 +64,8 @@ Implements M_Path.MilestoneInterface
 
 	#tag Method, Flags = &h0
 		Function GetKey() As Variant
-		  if IsReverse and Row = 0 and Column = 0 then
-		    return - 1
-		     
-		  elseif not IsReverse and Row = grid.LastIndex( 1 ) and Column = grid.LastIndex( 2 ) then
+		  if Row = grid.LastIndex( 1 ) and Column = grid.LastIndex( 2 ) then
 		    return -1
-		    
 		  end if
 		  
 		  return super.GetKey
@@ -101,18 +95,18 @@ Implements M_Path.MilestoneInterface
 	#tag Method, Flags = &h0
 		Sub SetParent(parent As M_Path.MilestoneInterface)
 		  if Parent is nil then
-		    super.SetParent(parent)
+		    super.SetParent( parent )
 		  end if
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Function Successors() As M_Path.MilestoneInterface()
-		  var result() as M_Path.MilestoneInterface
-		  
-		  if BestCost <> 0.0  and CostToStart >= BestCost then
-		    return result
+		  if Row = 10 and Column >= 11 then
+		    Row = Row
 		  end if
+		  
+		  var result() as M_Path.MilestoneInterface
 		  
 		  var neighbors() as M_Path.GridSquare = self.DirectionalNeighbors
 		  
@@ -130,12 +124,12 @@ Implements M_Path.MilestoneInterface
 		    
 		    var nn as new BlockGridSquare
 		    n.CloneTo nn
-		    if n.Direction <> Direction then
-		      var p as new BlockGridSquare
-		      CloneTo p
-		      p.Direction = n.Direction
-		      n.SetParent p
-		    end if
+		    
+		    var p as new BlockGridSquare
+		    CloneTo p
+		    
+		    p.Direction = nn.Direction
+		    nn.SetParent p
 		    
 		    result.Add nn
 		  next
@@ -147,15 +141,15 @@ Implements M_Path.MilestoneInterface
 
 
 	#tag Property, Flags = &h0
-		Shared BestCost As Double
-	#tag EndProperty
-
-	#tag Property, Flags = &h0
 		CostToStart As Double
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
-		Shared IsReverse As Boolean
+		Shared GoalGrid As ObjectGrid
+	#tag EndProperty
+
+	#tag Property, Flags = &h0
+		Shared GoalMultiplier As Double
 	#tag EndProperty
 
 
@@ -229,6 +223,14 @@ Implements M_Path.MilestoneInterface
 				"2 - South"
 				"3 - West"
 			#tag EndEnumValues
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="CostToStart"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Double"
+			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class
