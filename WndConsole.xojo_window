@@ -10,6 +10,7 @@ Begin DesktopWindow WndConsole
    HasFullScreenButton=   True
    HasMaximizeButton=   True
    HasMinimizeButton=   True
+   HasTitleBar     =   True
    Height          =   576
    ImplicitInstance=   True
    MacProcID       =   0
@@ -138,23 +139,71 @@ End
 
 	#tag Method, Flags = &h21
 		Private Function HandleKeyDown(key As String) As Boolean
-		  if not Keyboard.CommandKey then
+		  static defaultLineSpacing as double = FldConsole.LineSpacing
+		  
+		  if not Keyboard.AsyncCommandKey then
 		    return false
 		  end if
 		  
-		  if key = "+" or key = "=" then
-		    FldConsole.FontSize = FldConsole.FontSize + 2
-		    return true
-		  elseif key = "-" and FldConsole.FontSize > BaseFontSize then
-		    FldConsole.FontSize = FldConsole.FontSize - 2
+		  if key = "r" then
+		    FldConsole.LineSpacing = defaultLineSpacing
+		    FldConsole.FontSize = BaseFontSize
+		    
 		    return true
 		  end if
+		  
+		  var isPlus as boolean = key = "+" or key = "=" or key = "≠" or key = "±"
+		  var isMinus as boolean = key = "-" or key = "–"
+		  
+		  if not isPlus and not isMinus then
+		    return false
+		  end if
+		  
+		  const kLineSpacingIncrement as double = 0.2
+		  const kLineSpacingMinimum as double = 0.2
+		  
+		  const kFontSizeIncrement as integer = 2
+		  
+		  if Keyboard.AsyncOptionKey then
+		    
+		    if isPlus then
+		      FldConsole.LineSpacing = FldConsole.LineSpacing + klineSpacingIncrement
+		      return true
+		      
+		    elseif isMinus and FldConsole.LineSpacing > kLineSpacingMinimum then
+		      FldConsole.LineSpacing = FldConsole.LineSpacing - kLineSpacingIncrement
+		      return true
+		      
+		    end if
+		     
+		  else
+		    
+		    if isPlus then
+		      FldConsole.FontSize = FldConsole.FontSize + kFontSizeIncrement
+		      return true
+		      
+		    elseif isMinus and FldConsole.FontSize > BaseFontSize then
+		      FldConsole.FontSize = FldConsole.FontSize - kFontSizeIncrement
+		      return true
+		      
+		    end if
+		    
+		  end if
+		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Shared Sub Print(msg As String)
+		  if MessagesCS is nil then
+		    MessagesCS = new CriticalSection
+		    MessagesCS.Type = Thread.Types.Preemptive
+		  end if
+		  
+		  MessagesCS.Enter
 		  Messages.Add msg
+		  MessagesCS.Leave
+		  
 		  Timer.CallLater 1,  AddressOf ShowAsNeeded
 		End Sub
 	#tag EndMethod
@@ -181,6 +230,10 @@ End
 		Private Shared Messages() As String
 	#tag EndProperty
 
+	#tag Property, Flags = &h21
+		Private Shared MessagesCS As CriticalSection
+	#tag EndProperty
+
 
 #tag EndWindowCode
 
@@ -194,6 +247,8 @@ End
 #tag Events TmrPrinter
 	#tag Event
 		Sub Action()
+		  MessagesCS.Enter
+		  
 		  if Messages.Count <> 0 then
 		    var toPrint as string = String.FromArray( Messages, EndOfLine )
 		    Messages.RemoveAll
@@ -205,6 +260,7 @@ End
 		    end if
 		  end if
 		  
+		  MessagesCS.Leave
 		End Sub
 	#tag EndEvent
 #tag EndEvents
@@ -217,6 +273,14 @@ End
 	#tag EndEvent
 #tag EndEvents
 #tag ViewBehavior
+	#tag ViewProperty
+		Name="HasTitleBar"
+		Visible=true
+		Group="Frame"
+		InitialValue="True"
+		Type="Boolean"
+		EditorType=""
+	#tag EndViewProperty
 	#tag ViewProperty
 		Name="Name"
 		Visible=true
