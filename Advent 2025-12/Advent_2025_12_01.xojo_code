@@ -1,22 +1,22 @@
 #tag Class
-Protected Class AdventTemplate
+Protected Class Advent_2025_12_01
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "Unknown"
+		  return "Count the number of times a combination dial passes zero"
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return false
+		  return true
 		  
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnName() As String
-		  return ""
+		  return "Secret Entrance"
 		  
 		End Function
 	#tag EndEvent
@@ -58,20 +58,85 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Variant
+		  var instructions() as string = input.Trim.Split( EndOfLine )
 		  
+		  var count as integer
+		  var position as integer = 50
 		  
+		  for each instruction as string in instructions
+		    var direction as string = instruction.Left( 1 )
+		    var rotations as integer = instruction.Middle( 1 ).ToInteger
+		    
+		    rotations = rotations mod 100
+		    
+		    if direction = "R" then
+		      position = position + rotations
+		      position = position mod 100
+		      
+		    else
+		      position = position - rotations
+		      
+		      if position < 0 then
+		        position = 100 + position
+		      end if
+		      
+		    end if
+		    
+		    if position = 0 then
+		      count = count + 1
+		    end if
+		  next
 		  
-		  return 0 : if( IsTest, 0, 0 )
+		  return count : if( IsTest, 3, 1172 )
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Variant
+		  var instructions() as string = input.Trim.Split( EndOfLine )
 		  
+		  var count as integer
+		  var position as integer = 50
 		  
+		  for each instruction as string in instructions
+		    var direction as string = instruction.Left( 1 )
+		    var rotations as integer = instruction.Middle( 1 ).ToInteger
+		    
+		    if position = 0 then
+		      if direction = "R" then
+		        position = 1
+		      else
+		        position = 99
+		      end if
+		      
+		      rotations = rotations - 1
+		    end if
+		    
+		    count = count + ( rotations \ 100 )
+		    rotations = rotations mod 100
+		    
+		    if direction = "R" then
+		      position = position + rotations
+		      
+		      if position >= 100 then
+		        count = count + 1
+		        position = position - 100
+		      end if
+		      
+		    else 
+		      position = position - rotations
+		      
+		      if position <= 0 then
+		        count = count + 1
+		        position = 100 + position
+		        position = position mod 100
+		      end if
+		      
+		    end if
+		  next
 		  
-		  return 0 : if( IsTest, 0, 0 )
+		  return count : if( IsTest, 6, 6932 )
 		  
 		End Function
 	#tag EndMethod
@@ -80,7 +145,7 @@ Inherits AdventBase
 	#tag Constant, Name = kPuzzleInput, Type = String, Dynamic = False, Default = \"", Scope = Private, Description = 5768656E2070617374696E67207468652064617461206973206E65636573736172792E
 	#tag EndConstant
 
-	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"", Scope = Private
+	#tag Constant, Name = kTestInput, Type = String, Dynamic = False, Default = \"L68\nL30\nR48\nL5\nR60\nL55\nL1\nL99\nR14\nL82", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = kTestInputB, Type = String, Dynamic = False, Default = \"", Scope = Private
