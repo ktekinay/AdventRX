@@ -93,7 +93,7 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Variant
-		  var sum as integer = Calculate( input, "^([^-,]+)\g1$" )
+		  var sum as integer = Calculate( input, "^(\d+)\g1$" )
 		  return sum : if( IsTest, 1227775554, 12586854255 )
 		  
 		End Function
@@ -101,7 +101,7 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Variant
-		  var sum as integer = Calculate( input, "^([^-,]+)\g1+$" )
+		  var sum as integer = Calculate( input, "^(\d+)\g1+$" )
 		  return sum : if( IsTest, 4174379265, 17298174201 )
 		  
 		End Function
