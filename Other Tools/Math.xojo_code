@@ -68,6 +68,14 @@ Protected Module Math
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Function Log10(value As Double) As Double
+		  static logOf10 as double = log( 10 )
+		  
+		  return log( value ) / logOf10
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h1
 		Protected Function SolveForXY(a As Integer, b As Integer, e As Integer, c As Integer, d As Integer, f As Integer) As Pair
 		  //

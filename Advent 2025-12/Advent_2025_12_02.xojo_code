@@ -57,7 +57,23 @@ Inherits AdventBase
 
 
 	#tag Method, Flags = &h21
-		Private Shared Function Calculate(input As String, pattern As String) As Integer
+		Private Function CalculateResultA(input As String) As Variant
+		  var sum as integer = CalculateSections( input, true )
+		  return sum : if( IsTest, 1227775554, 12586854255 )
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CalculateResultB(input As String) As Variant
+		  var sum as integer = CalculateSections( input )
+		  return sum : if( IsTest, 4174379265, 17298174201 )
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Function CalculateSections(input As String, onlyHalf As Boolean = False) As Integer
 		  #if not DebugBuild
 		    #pragma BackgroundTasks false
 		  #endif
@@ -69,9 +85,6 @@ Inherits AdventBase
 		  
 		  var sum as integer
 		  
-		  var rx as new RegEx
-		  rx.SearchPattern = pattern
-		  
 		  for each r as string in ranges
 		    var parts() as string = r.Split( "-" )
 		    
@@ -79,30 +92,41 @@ Inherits AdventBase
 		    var endIndex as integer = parts( 1 ).ToInteger
 		    
 		    for v as integer = startIndex to endIndex
-		      var s as string = v.ToString
-		      if rx.Search( s ) isa object then
-		        sum = sum + v
+		      var digits as integer = Floor( Log10( v ) + 1.0 )
+		      
+		      if onlyHalf and ( digits mod 2 ) = 1 then
+		        continue
 		      end if
+		      
+		      var halfDigits as integer = digits \ 2
+		      
+		      var lastIndex as integer = if( onlyHalf, halfDigits, 1 )
+		      
+		      for testDigits as integer = halfDigits downto lastIndex
+		        if not onlyHalf and testDigits > 1 and ( digits mod testDigits ) <> 0 then
+		          continue
+		        end if
+		        
+		        var mask as integer = 10 ^ testDigits
+		        var testValue as integer = v
+		        
+		        var compare as integer = testValue mod mask
+		        testValue = testValue \ mask
+		        
+		        do
+		          if ( testValue mod mask ) <> compare then
+		            continue for testDigits
+		          end if
+		          testValue = testValue \ mask
+		        loop until testValue = 0
+		        
+		        sum = sum + v
+		        continue for v
+		      next
 		    next
 		  next
 		  
 		  return sum 
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Function CalculateResultA(input As String) As Variant
-		  var sum as integer = Calculate( input, "^(\d+)\g1$" )
-		  return sum : if( IsTest, 1227775554, 12586854255 )
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Function CalculateResultB(input As String) As Variant
-		  var sum as integer = Calculate( input, "^(\d+)\g1+$" )
-		  return sum : if( IsTest, 4174379265, 17298174201 )
 		  
 		End Function
 	#tag EndMethod
