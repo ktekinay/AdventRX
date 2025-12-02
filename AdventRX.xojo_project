@@ -272,6 +272,7 @@ Class=Wire;Advent 2024-12/M_2024/Wire.xojo_code;&h000000000E21AFFF;&h00000000170
 Class=GridSquare;Other Tools/M_Path/GridSquare.xojo_code;&h000000002C14D7FF;&h000000005B2B7FFF;false
 Folder=Advent 2025-12;Advent 2025-12;&h00000000140697FF;&h0000000000000000;false
 Class=Advent_2025_12_01;Advent 2025-12/Advent_2025_12_01.xojo_code;&h0000000049A55FFF;&h00000000140697FF;false
+Class=Advent_2025_12_02;Advent 2025-12/Advent_2025_12_02.xojo_code;&h000000000F2A27FF;&h00000000140697FF;false
 Module=M_2025;Advent 2025-12/M_2025.xojo_code;&h0000000077BF4FFF;&h00000000140697FF;false
 DefaultWindow=WndAdvent
 AppMenuBar=MainMenuBar
