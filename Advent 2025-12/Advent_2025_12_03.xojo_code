@@ -59,13 +59,14 @@ Inherits AdventBase
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Variant
 		  var rows() as string = input.Trim.Split( EndOfLine )
+		  var maxIndex as integer = rows( 0 ).Bytes - 1
 		  
 		  var sum as integer
 		  
 		  for each row as string in rows
 		    var rowArr( 9 ) as variant = NewRowArray( row )
 		    
-		    var thisSum as integer = NextValue( 2, rowArr, 0, -1 )
+		    var thisSum as integer = NextValue( 2, rowArr, maxIndex )
 		    sum = sum + thisSum
 		  next
 		  
@@ -77,13 +78,14 @@ Inherits AdventBase
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Variant
 		  var rows() as string = input.Trim.Split( EndOfLine )
+		  var maxIndex as integer = rows( 0 ).Bytes - 1
 		  
 		  var sum as integer
 		  
 		  for each row as string in rows
 		    var rowArr( 9 ) as variant = NewRowArray( row )
 		    
-		    var thisSum as integer = NextValue( 12, rowArr, 0, -1 )
+		    var thisSum as integer = NextValue( 12, rowArr, maxIndex )
 		    sum = sum + thisSum
 		  next
 		  
@@ -116,7 +118,13 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Shared Function NextValue(count As Integer, rowArr() As Variant, previousValue As Integer, previousIndex As Integer, runningSum As integer = 0) As Integer
+		Private Shared Function NextValue(count As Integer, rowArr() As Variant, maxIndex As Integer, previousIndex As Integer = -1, runningSum As integer = 0) As Integer
+		  var lastViableIndex as integer = maxIndex - count
+		  
+		  if previousIndex > lastViableIndex then
+		    return -1
+		  end if
+		  
 		  for thisValue as integer = 9 downto 1
 		    if rowArr( thisValue ) is nil then
 		      continue
@@ -133,7 +141,7 @@ Inherits AdventBase
 		        return runningSum * 10 + thisValue
 		      end if
 		      
-		      var sum as integer = NextValue( count - 1, rowArr, thisValue, index, runningSum * 10 + thisValue )
+		      var sum as integer = NextValue( count - 1, rowArr, maxIndex, index, runningSum * 10 + thisValue )
 		      
 		      if sum = -1 then
 		        continue for thisValue
