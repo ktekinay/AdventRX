@@ -58,49 +58,9 @@ Inherits AdventBase
 	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Variant
 		  var grid( -1, -1 ) as string = ToStringGrid( input )
+		  var points() as Xojo.Point = MapPoints( grid )
 		  
-		  var count as integer
-		  
-		  for x as integer = 0 to grid.LastIndex( 1 )
-		    for y as integer = 0 to grid.LastIndex( 2 )
-		      var adjCount as integer
-		      
-		      var tester as string = grid( x, y )
-		      
-		      if tester <> "@" then
-		        continue
-		      end if
-		      
-		      for deltax as integer = -1 to 1
-		        var testx as integer = x + deltax
-		        
-		        if testx < 0 or testx > grid.LastIndex( 1 ) then
-		          continue
-		        end if
-		        
-		        for deltay as integer = -1 to 1
-		          if deltay = 0 and deltax = 0 then 
-		            continue
-		          end if
-		          
-		          var testy as integer = y + deltay
-		          
-		          if testy < 0 or testy > grid.LastIndex( 2 ) then
-		            continue
-		          end if
-		          
-		          var compare as string = grid( testx, testy )
-		          if compare = "@" then
-		            adjCount = adjCount + 1
-		          end if
-		        next
-		      next
-		      
-		      if adjCount < 4 then
-		        count = count + 1
-		      end if
-		    next
-		  next
+		  var count as integer = RemoveRolls( points, grid, false )
 		  
 		  var answer as variant = 1397
 		  return count : if( IsTest, 13, answer )
@@ -112,60 +72,95 @@ Inherits AdventBase
 		Private Function CalculateResultB(input As String) As Variant
 		  var grid( -1, -1 ) as string = ToStringGrid( input )
 		  
+		  var points() as Xojo.Point = MapPoints( grid )
+		  
 		  var count as integer
 		  
-		  var keepGoing as boolean = true
-		  
-		  while keepGoing
-		    keepGoing = false
+		  do
+		    var lastCount as integer = count
 		    
-		    for x as integer = 0 to grid.LastIndex( 1 )
-		      for y as integer = 0 to grid.LastIndex( 2 )
-		        var adjCount as integer
-		        
-		        var tester as string = grid( x, y )
-		        
-		        if tester <> "@" then
-		          continue
-		        end if
-		        
-		        for deltax as integer = -1 to 1
-		          var testx as integer = x + deltax
-		          
-		          if testx < 0 or testx > grid.LastIndex( 1 ) then
-		            continue
-		          end if
-		          
-		          for deltay as integer = -1 to 1
-		            if deltay = 0 and deltax = 0 then 
-		              continue
-		            end if
-		            
-		            var testy as integer = y + deltay
-		            
-		            if testy < 0 or testy > grid.LastIndex( 2 ) then
-		              continue
-		            end if
-		            
-		            var compare as string = grid( testx, testy )
-		            if compare = "@" then
-		              adjCount = adjCount + 1
-		            end if
-		          next
-		        next
-		        
-		        if adjCount < 4 then
-		          count = count + 1
-		          grid( x, y ) = "."
-		          keepGoing = true
-		        end if
-		      next
-		    next
-		  wend
+		    count = count + RemoveRolls( points, grid, true )
+		    
+		    if count = lastCount then
+		      exit
+		    end if  
+		  loop
 		  
 		  var answer as variant = 8758
 		  return count : if( IsTest, 43, answer )
 		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Function MapPoints(grid(, ) As String) As Xojo.Point()
+		  var points() as Xojo.Point
+		  
+		  for x as integer = 0 to grid.LastIndex( 1 )
+		    for y as integer = 0 to grid.LastIndex( 2 )
+		      if grid( x, y ) = "@" then
+		        points.Add new Xojo.Point( x, y )
+		      end if
+		    next
+		  next
+		  
+		  return points
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Function RemoveRolls(points() As Xojo.Point, grid(, ) As String, doRemove As Boolean) As Integer
+		  var count as integer
+		  
+		  for ptIndex as integer = points.LastIndex downto 0
+		    var pt as Xojo.Point = points( ptIndex )
+		    
+		    var x as integer = pt.X
+		    var y as integer = pt.Y
+		    
+		    var tester as string = grid( x, y )
+		    
+		    var adjCount as integer
+		    
+		    for deltax as integer = -1 to 1
+		      var testx as integer = x + deltax
+		      
+		      if testx < 0 or testx > grid.LastIndex( 1 ) then
+		        continue
+		      end if
+		      
+		      for deltay as integer = -1 to 1
+		        if deltay = 0 and deltax = 0 then 
+		          continue
+		        end if
+		        
+		        var testy as integer = y + deltay
+		        
+		        if testy < 0 or testy > grid.LastIndex( 2 ) then
+		          continue
+		        end if
+		        
+		        var compare as string = grid( testx, testy )
+		        
+		        if compare = "@" then
+		          adjCount = adjCount + 1
+		          
+		          if adjCount = 4 then
+		            continue for ptIndex
+		          end if
+		        end if
+		      next
+		    next
+		    
+		    count = count + 1
+		    
+		    if doRemove then
+		      grid( x, y ) = "."
+		      points.RemoveAt ptIndex
+		    end if
+		  next
+		  
+		  return count
 		End Function
 	#tag EndMethod
 
