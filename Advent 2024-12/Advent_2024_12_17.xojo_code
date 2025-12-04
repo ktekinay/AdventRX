@@ -148,7 +148,6 @@ Inherits AdventBase
 		  else
 		    var A as integer = registers.A
 		    var builder() as string
-		    var B as integer
 		    
 		    while A > 0
 		      builder.Add Solve( A ).ToString

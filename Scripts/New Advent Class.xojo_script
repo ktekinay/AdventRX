@@ -272,6 +272,8 @@ Print "Could not get source"
 return
 end if
 
+var originalLocation as string = Location
+
 var puzzleName as string = RipGrep( tempFilePath, "--- Day \d+: ([^<]+) ---", "$1" )
 
 if puzzleName <> "" then
@@ -294,6 +296,8 @@ var code as string = Text
 code = code.Replace( "var answer as variant = 0", "var answer as variant = " + answer )
 Text = code
 next
+
+Location = originalLocation
 
 call DoShellCommand( "rm " + tempFilePath )
 End Sub
