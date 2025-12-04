@@ -61,7 +61,8 @@ Inherits AdventBase
 		  
 		  
 		  
-		  return 0 : if( IsTest, 0, 0 )
+		  var answer as variant = 0
+		  return 0 : if( IsTest, 0, answer )
 		  
 		End Function
 	#tag EndMethod
@@ -71,7 +72,8 @@ Inherits AdventBase
 		  
 		  
 		  
-		  return 0 : if( IsTest, 0, 0 )
+		  var answer as variant = 0
+		  return 0 : if( IsTest, 0, answer )
 		  
 		End Function
 	#tag EndMethod

@@ -60,13 +60,18 @@ var year as string = parts( 0 )
 var month as string = parts( 1 )
 var day as string = parts( 2 )
 
+label = String.FromArray( parts, "_" )
+
+var className as string = "Advent_" + label
+
 //
 // Try to fetch the data
 //
 var asDate as new Date( year.ToInteger, month.ToInteger, day.ToInteger )
 var now as new Date
+var isTooSoon as boolean = now < asDate
 
-if now < asDate then
+if isTooSoon then
 print "Too soon for data"
 else
 var dataFetched as boolean = MaybeGetData( year, day, month )
@@ -82,16 +87,24 @@ return
 end if
 end if
 
-label = String.FromArray( parts, "_" )
-
-var className as string = "Advent_" + label
-
 if not SelectProjectItem( kTemplateCopyName ) then
 print "Could not select " + kTemplateCopyName + "."
+
+//
+// But maybe the item is already there so let's try
+//
+if not isTooSoon then
+MaybeUpdateClassValues( className, year, day, month )
+end if
+
 return
 end if
 
 PropertyValue( kTemplateCopyName + ".Name" ) = className
+
+if not isTooSoon then
+MaybeUpdateClassValues( className, year, day, month )
+end if
 
 //
 // Update the Window method
@@ -149,7 +162,6 @@ end if
 next
 
 return false
-
 End Function
 
 Function GetAOCCookie() As String
@@ -169,12 +181,74 @@ Function GetBaseURL(year As String, day As String, month As String = "12") As St
 return "https://adventofcode.com/" + year + "/day/" + day.ToInteger.ToString
 End Function
 
-Function MaybeGetData(year As String, day As String, month As String = "12") As Boolean
+Function CurlCommand(url As String) As String
 var cookie as string = GetAOCCookie
 if cookie = "" then
-return false
+return ""
 end if
 
+return "curl " + _
+"--silent " + _
+"--cookie-jar ""~/curlcookies"" --cookie 'session=" + cookie + "' " + _
+"'" + url + "'"
+End Function
+
+Function TemporaryDirectory() As String
+return DoShellCommand("echo $TMPDIR").Trim
+End Function
+
+Function CurlToFile(url As String, destPath As String) As Boolean
+var curl as string = CurlCommand( url )
+
+var shellResult as integer
+var result as string = DoShellCommand( curl + " > " + destPath, 3000, shellResult )
+
+if shellResult <> 0 then
+print result
+end if
+
+return shellResult = 0
+End Function
+
+Function Curl(url As String) As String
+var curl as string = CurlCommand(url)
+
+var shellResult as integer
+var result as string = DoShellCommand(curl, 3000, shellResult)
+
+if shellResult = 0 then
+return result
+else
+return ""
+end if
+End Function
+
+Function RipGrep(filePath As String, pattern As String, replacement As String = "") As String
+const kRG as string = "/opt/local/bin/rg -o -e "
+
+var cmd as string = kRG + "'" + pattern + "' "
+
+if replacement <> "" then
+cmd = cmd + "-r '" + replacement + "' "
+end if
+
+cmd = cmd + "'" + filePath + "'"
+
+var shellResult as integer
+var result as string = DoShellCommand( cmd, 2000, shellResult ).Trim
+
+if shellResult = 0 then
+return result
+else
+if result <> "" then
+Print result
+end if
+
+return ""
+end if
+End Function
+
+Function MaybeGetData(year As String, day As String, month As String = "12") As Boolean
 //
 // Make sure Puzzle Data exists
 //
@@ -184,18 +258,45 @@ call DoShellCommand( "mkdir " + destPath )
 destPath = destPath + "Advent_" + year + "_" + month + "_" + day + ".txt"
 
 var url as string = GetBaseURL(year, day, month) + "/input"
-
-var curl as string = _
-"curl " + _
-"--silent " + _
-"--cookie-jar ""~/curlcookies"" --cookie 'session=" + cookie + "' " + _
-"'" + url + "'"
-
-var shellResult as integer
-call DoShellCommand( curl + " > " + destPath, 3000, shellResult )
-
-return shellResult = 0
+return CurlToFile(url, destPath)
 End Function
+
+Sub MaybeUpdateClassValues(className As String, year As String, day As String, month As String)
+var tempFileName as string = "aoc_source_" + year + "_" + day + ".html"
+var tempFilePath as string = TemporaryDirectory + tempFileName
+
+var url as string = GetBaseURL( year, day, month )
+
+if not CurlToFile(url, tempFilePath) then
+Print "Could not get source"
+return
+end if
+
+var puzzleName as string = RipGrep( tempFilePath, "--- Day \d+: ([^<]+) ---", "$1" )
+
+if puzzleName <> "" then
+Location = className + ".ReturnName"
+Text = "return """ + puzzleName + """"
+end if
+
+var answersRaw as string = RipGrep( tempFilePath, "<p>Your puzzle answer was <code>([^<]+)</code>", "$1" )
+
+var answerParts() as string = answersRaw.Split( EndOfLine )
+var methodSuffixes() as string = array( "A", "B" )
+
+for i as integer = 0 to answerParts.LastIndex
+var answer as string = answerParts( i )
+var suffix as string = methodSuffixes( i )
+
+Location = className + ".CalculateResult" + suffix
+var code as string = Text
+
+code = code.Replace( "var answer as variant = 0", "var answer as variant = " + answer )
+Text = code
+next
+
+call DoShellCommand( "rm " + tempFilePath )
+End Sub
 
 Function ProjectFolderShellPath() As String
 var path as string = ProjectShellPath

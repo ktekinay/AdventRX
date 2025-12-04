@@ -17,7 +17,6 @@ Inherits AdventBase
 	#tag Event
 		Function ReturnName() As String
 		  return "Printing Department"
-		  
 		End Function
 	#tag EndEvent
 
@@ -103,7 +102,8 @@ Inherits AdventBase
 		    next
 		  next
 		  
-		  return count : if( IsTest, 13, 1397 )
+		  var answer as variant = 1397
+		  return count : if( IsTest, 13, answer )
 		  
 		End Function
 	#tag EndMethod
@@ -163,7 +163,8 @@ Inherits AdventBase
 		    next
 		  wend
 		  
-		  return count : if( IsTest, 43, 8758 )
+		  var answer as variant = 8758
+		  return count : if( IsTest, 43, answer )
 		  
 		End Function
 	#tag EndMethod
