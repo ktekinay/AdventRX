@@ -60,17 +60,29 @@ Inherits AdventBase
 		  var parts() as string = input.Trim.Split( EndOfLine + EndOfLine )
 		  
 		  var ranges() as Advent.Range = ToRanges( parts( 0 ).Split( EndOfLine ) )
+		  Combine( ranges )
+		  
 		  var ids() as integer = ToIntegerArray( parts( 1 ).Split( EndOfLine ) )
 		  
 		  var count as integer
 		  
 		  for each id as integer in ids
-		    for each r as Advent.Range in ranges
-		      if r.Contains( id ) then
+		    var firstIndex as integer = 0
+		    var lastIndex as integer = ranges.LastIndex
+		    
+		    while firstIndex <= lastIndex
+		      var index as integer = ( ( lastIndex - firstIndex ) \ 2 ) + firstIndex
+		      var r as Advent.Range = ranges( index )
+		      
+		      if id < r.Minimum then
+		        lastIndex = index - 1
+		      elseif id > r.Maximum then
+		        firstIndex = index + 1
+		      else
 		        count = count + 1
 		        continue for id
 		      end if
-		    next
+		    wend
 		  next
 		  
 		  var testAnswer as variant = 3
@@ -86,7 +98,24 @@ Inherits AdventBase
 		  var parts() as string = input.Trim.Split( EndOfLine + EndOfLine )
 		  
 		  var ranges() as Advent.Range = ToRanges( parts( 0 ).Split( EndOfLine ) )
+		  Combine( ranges )
 		  
+		  var count as integer
+		  
+		  for each r as Advent.Range in ranges
+		    count = count + r.Length
+		  next
+		  
+		  var testAnswer as variant = 14
+		  var answer as variant = 348115621205535
+		  
+		  return count : if( IsTest, testAnswer, answer )
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Sub Combine(ranges() As Advent.Range)
 		  ranges.Sort AddressOf Advent.Range.Sorter
 		  
 		  var rangeIndex as integer = ranges.LastIndex
@@ -108,18 +137,7 @@ Inherits AdventBase
 		    rangeIndex = rangeIndex - 1
 		  wend
 		  
-		  var count as integer
-		  
-		  for each r as Advent.Range in ranges
-		    count = count + r.Length
-		  next
-		  
-		  var testAnswer as variant = 14
-		  var answer as variant = 348115621205535
-		  
-		  return count : if( IsTest, testAnswer, answer )
-		  
-		End Function
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
