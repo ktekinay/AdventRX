@@ -49,7 +49,7 @@ Protected Class Range
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function Operator_Convert() As String
+		Attributes( Hidden )  Function Operator_Convert() As String
 		  return ToString
 		  
 		End Function
