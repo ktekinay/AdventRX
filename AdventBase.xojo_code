@@ -318,14 +318,16 @@ Inherits Thread
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Shared Function ToStringGrid(input As String) As String(,)
-		  var rows() as string = input.ReplaceLineEndings( EndOfLine ).Split( EndOfLine )
+		Shared Function ToStringGrid(input As String, rowSplitter As String = "") As String(,)
+		  var rows() as string = input.ReplaceLineEndings( EndOfLine ).Trim.Split( EndOfLine )
 		  
 		  var grid( -1, -1 ) as string
-		  grid.ResizeTo rows.LastIndex, rows( 0 ).Bytes - 1
+		  var firstRow() as string = rows( 0 ).Split( rowSplitter )
+		  
+		  grid.ResizeTo rows.LastIndex, firstRow.LastIndex
 		  
 		  for row as integer = 0 to rows.LastIndex
-		    var cols() as string = rows( row ).Split( "" )
+		    var cols() as string = rows( row ).Split( rowSplitter )
 		    for col as integer = 0 to cols.LastIndex
 		      grid( row, col ) = cols( col )
 		    next
