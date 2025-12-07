@@ -3,7 +3,7 @@ Protected Class Advent_2025_12_06
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "Unknown"
+		  return "Vertical math"
 		End Function
 	#tag EndEvent
 
