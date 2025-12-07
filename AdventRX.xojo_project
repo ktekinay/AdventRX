@@ -277,6 +277,7 @@ Class=Advent_2025_12_03;Advent 2025-12/Advent_2025_12_03.xojo_code;&h000000001E7
 Class=Advent_2025_12_04;Advent 2025-12/Advent_2025_12_04.xojo_code;&h0000000035A12FFF;&h00000000140697FF;false
 Class=Advent_2025_12_05;Advent 2025-12/Advent_2025_12_05.xojo_code;&h00000000072EA7FF;&h00000000140697FF;false
 Class=Advent_2025_12_06;Advent 2025-12/Advent_2025_12_06.xojo_code;&h000000001DAF87FF;&h00000000140697FF;false
+Class=Advent_2025_12_07;Advent 2025-12/Advent_2025_12_07.xojo_code;&h00000000389ABFFF;&h00000000140697FF;false
 Module=M_2025;Advent 2025-12/M_2025.xojo_code;&h0000000077BF4FFF;&h00000000140697FF;false
 DefaultWindow=WndAdvent
 AppMenuBar=MainMenuBar

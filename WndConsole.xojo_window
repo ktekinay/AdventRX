@@ -34,7 +34,7 @@ Begin DesktopWindow WndConsole
       BackgroundColor =   &cFFFFFF
       Bold            =   False
       Enabled         =   True
-      FontName        =   "0xProto Nerd Font Mono"
+      FontName        =   "Source Code Pro"
       FontSize        =   13.0
       FontUnit        =   0
       Format          =   ""
