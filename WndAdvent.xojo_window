@@ -477,9 +477,10 @@ End
 		  AddRow new Advent_2025_12_08
 		  AddRow new Advent_2025_12_09
 		  AddRow new Advent_2025_12_10
+		  AddRow new Advent_2025_12_11
 		  
 		  // Auto-run
-		  Timer.CallLater 10, AddressOf RunEventTimer, new Advent_2025_12_07
+		  Timer.CallLater 10, AddressOf RunEventTimer, new Advent_2025_12_11
 		  
 		  // Expand
 		  ExpandYear 2025
