@@ -59,8 +59,7 @@ Inherits AdventBase
 		Private Function CalculateResultA(input As String) As Variant
 		  var devices as Dictionary = ToDevices( input )
 		  
-		  'var count as integer = Trace( "you", devices )
-		  var count as integer = TraceTrail( "you", "out", devices )
+		  var count as integer = TraceTrail( "you", "out", devices, new Dictionary )
 		  
 		  var testAnswer as variant = 5
 		  var answer as variant = 566
@@ -72,16 +71,18 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Variant
+		  var devices as Dictionary = ToDevices( input )
+		  
 		  var count as integer
 		  
-		  if CanReach( "dac", "fft", ToDevices( input ) ) then
-		    count = TraceTrail( "dac", "out", ToDevices( input ) )
-		    count = count * TraceTrail( "fft", "dac", ToDevices( input ) )
-		    count = count * TraceTrail( "svr", "fft", ToDevices( input ) )
+		  if HasPath( "fft", "dac", devices, new Dictionary ) then
+		    count = TraceTrail( "dac", "out", devices, new Dictionary )
+		    count = count * TraceTrail( "fft", "dac", devices, new Dictionary )
+		    count = count * TraceTrail( "svr", "fft", devices, new Dictionary )
 		  else
-		    count = TraceTrail( "fft", "out", ToDevices( input ) )
-		    count = count * TraceTrail( "dac", "fft", ToDevices( input ) )
-		    count = count * TraceTrail( "svr", "dac", ToDevices( input ) )
+		    count = TraceTrail( "fft", "out", devices, new Dictionary )
+		    count = count * TraceTrail( "dac", "fft", devices, new Dictionary )
+		    count = count * TraceTrail( "svr", "dac", devices, new Dictionary )
 		  end if
 		  
 		  var testAnswer as variant = 2
@@ -93,28 +94,37 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Shared Function CanReach(goal As String, device As String, devices As Dictionary) As Boolean
+		Private Shared Function HasPath(device As String, goal As String, devices As Dictionary, cache As Dictionary) As Boolean
+		  #if not DebugBuild
+		    #pragma BackgroundTasks false
+		  #endif
+		  #pragma BoundsChecking false
+		  #pragma NilObjectChecking false
+		  #pragma StackOverflowChecking false
+		  
 		  if device = goal then
 		    return true
 		  elseif device = "out" then
 		    return false
 		  end if
 		  
-		  var entry as variant = devices.Value( device )
+		  var cached as variant = cache.Lookup( device, nil )
 		  
-		  if entry.Type = Variant.TypeBoolean then
-		    return entry.BooleanValue
+		  if cached.Type = Variant.TypeBoolean then
+		    return cached.BooleanValue
 		  end if
 		  
-		  var nextPaths() as string = entry.StringValue.Split( " " )
+		  var entry as variant = devices.Value( device )
+		  
+		  var nextPaths() as string = entry
 		  
 		  for each p as string in nextPaths
-		    if CanReach( goal, p, devices ) then
+		    if HasPath( p, goal, devices, cache ) then
 		      return true
 		    end if
 		  next
 		  
-		  devices.Value( device ) = false
+		  cache.Value( device ) = false
 		  
 		  return false
 		  
@@ -129,7 +139,7 @@ Inherits AdventBase
 		  
 		  for each row as string in rows
 		    var parts() as string = row.Split( ": " )
-		    devices.Value( parts( 0 ) ) = parts( 1 )
+		    devices.Value( parts( 0 ) ) = parts( 1 ).Split( " " )
 		  next
 		  
 		  return devices
@@ -138,28 +148,37 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Shared Function TraceTrail(device As String, goal As String, devices As Dictionary) As Integer
+		Private Shared Function TraceTrail(device As String, goal As String, devices As Dictionary, cache As Dictionary) As Integer
+		  #if not DebugBuild
+		    #pragma BackgroundTasks false
+		  #endif
+		  #pragma BoundsChecking false
+		  #pragma NilObjectChecking false
+		  #pragma StackOverflowChecking false
+		  
 		  if device = goal then
 		    return 1
 		  elseif device = "out" then
 		    return 0 
 		  end if
 		  
-		  var entry as variant = devices.Value( device )
+		  var cached as variant = cache.Lookup( device, nil )
 		  
-		  if entry.Type = Variant.TypeInt64 then
-		    return entry.IntegerValue
+		  if cached.Type = Variant.TypeInt64 then
+		    return cached.IntegerValue
 		  end if
 		  
-		  var nextPaths() as string  = entry.StringValue.Split( " " )
+		  var entry as variant = devices.Value( device )
+		  
+		  var nextPaths() as string  = entry
 		  
 		  var count as integer
 		  
 		  for each p as string in nextPaths
-		    count = count + TraceTrail( p, goal, devices )
+		    count = count + TraceTrail( p, goal, devices, cache )
 		  next
 		  
-		  devices.Value( device ) = count
+		  cache.Value( device ) = count
 		  
 		  return count
 		End Function
