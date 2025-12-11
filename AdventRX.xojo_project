@@ -280,6 +280,7 @@ Class=Advent_2025_12_06;Advent 2025-12/Advent_2025_12_06.xojo_code;&h000000001DA
 Class=Advent_2025_12_07;Advent 2025-12/Advent_2025_12_07.xojo_code;&h00000000389ABFFF;&h00000000140697FF;false
 Class=Advent_2025_12_08;Advent 2025-12/Advent_2025_12_08.xojo_code;&h0000000007E07FFF;&h00000000140697FF;false
 Class=Advent_2025_12_09;Advent 2025-12/Advent_2025_12_09.xojo_code;&h000000007205B7FF;&h00000000140697FF;false
+Class=Advent_2025_12_10;Advent 2025-12/Advent_2025_12_10.xojo_code;&h000000006DC2D7FF;&h00000000140697FF;false
 Module=M_2025;Advent 2025-12/M_2025.xojo_code;&h0000000077BF4FFF;&h00000000140697FF;false
 Class=Junction;Advent 2025-12/M_2025/Junction.xojo_code;&h0000000042EEFFFF;&h0000000077BF4FFF;false
 DefaultWindow=WndAdvent
