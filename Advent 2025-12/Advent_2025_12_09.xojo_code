@@ -9,7 +9,7 @@ Inherits AdventBase
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return false
+		  return true
 		  
 		End Function
 	#tag EndEvent
@@ -107,40 +107,23 @@ Inherits AdventBase
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Variant
+		  #if not DebugBuild
+		    #pragma BackgroundTasks false
+		  #endif
+		  #pragma BoundsChecking false
+		  #pragma NilObjectChecking false
+		  #pragma StackOverflowChecking false
+		  
 		  var points() as Xojo.Point = ToPointArray( input )
 		  
-		  var firstIndex as integer
-		  var firstPoint as Xojo.Point = points( 0 )
+		  var path as new GraphicsPath
 		  
-		  for i as integer = 1 to points.LastIndex
-		    var pt as Xojo.Point = points( i )
-		    
-		    if pt.X <= firstPoint.X and pt.Y <= firstPoint.Y then
-		      firstIndex = i
-		      firstPoint = pt
-		    end if
-		  next
+		  var lastPoint as Xojo.Point = points( points.LastIndex )
 		  
-		  if firstIndex <> 0 then
-		    var newPoints() as Xojo.Point
-		    
-		    for i as integer = 0 to points.LastIndex
-		      var newIndex as integer = ( firstIndex + i ) mod points.Count
-		      newPoints.Add points( newIndex )
-		    next
-		    
-		    points = newPoints
-		  end if
+		  path.MoveToPoint lastPoint.X, lastPoint.Y
 		  
-		  return 0
-		  
-		  var areas() as Xojo.Rect
-		  
-		  for i1 as integer = 0 to points.LastIndex
-		    var i2 as integer = ( i1 + 1 ) mod points.Count
-		    var i3 as integer = ( i1 + 2 ) mod points.Count
-		    
-		    areas.Add CompleteRect( points( i1 ), points( i2 ), points( i3 ))
+		  for each pt as Xojo.Point in points
+		    path.AddLineToPoint pt.X, pt.Y
 		  next
 		  
 		  var maxArea as integer
@@ -152,6 +135,7 @@ Inherits AdventBase
 		  
 		  for i1 as integer = 0 to points.LastIndex - 1
 		    var pt1 as Xojo.Point = points( i1 )
+		    
 		    for i2 as integer = i1 + 1 to points.LastIndex
 		      var pt2 as Xojo.Point = points( i2 )
 		      var area as integer = ( abs( pt1.X - pt2.X ) + 1 ) * ( abs( pt1.Y - pt2.Y ) + 1 )
@@ -161,71 +145,40 @@ Inherits AdventBase
 		      end if
 		      
 		      AllPoints( pt1, pt2, topLeft, topRight, bottomLeft, bottomRight )
-		      var rect as new Xojo.Rect( topLeft.X, topLeft.Y, topRight.X - topLeft.X, bottomRight.Y - topRight.Y )
 		      
-		      if area = 40 then
-		        area = area
-		      end if
+		      for each otherPoint as Xojo.Point in points
+		        if otherPoint is pt1 or otherPoint is pt2 then
+		          continue
+		        end if
+		        
+		        if otherPoint.X > topLeft.X and otherPoint.X < topRight.X and _
+		          otherPoint.Y > topLeft.Y and otherPoint.Y < bottomLeft.Y then
+		          continue for i2
+		        end if
+		      next
+		      
+		      var xDiff as integer = topRight.X - topLeft.X
+		      var yDiff as integer = bottomRight.Y - topRight.Y
+		      
+		      var xStep as integer = max( xDiff \ 75, 1 )
+		      var yStep as integer = max( yDiff \ 75, 1 )
+		      
+		      for x as integer =  topLeft.X to topRight.X step xStep
+		        for y as integer = topRight.Y to bottomRight.Y step yStep
+		          if not path.Contains( x, y ) then
+		            continue for i2
+		          end if
+		        next
+		      next
+		      
+		      maxArea = area
 		    next
 		  next
 		  
 		  var testAnswer as variant = 24
-		  var answer as variant = 0
+		  var answer as variant = 1562459680
 		  
 		  return maxArea : if( IsTest, testAnswer, answer )
-		  
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Shared Function CompleteRect(pt1 As Xojo.Point, pt2 As Xojo.Point, pt3 As Xojo.Point) As Xojo.Rect
-		  var topLeft as Xojo.Point
-		  var topRight as Xojo.Point
-		  var bottomLeft as Xojo.Point
-		  var bottomRight as Xojo.Point
-		  
-		  if pt1.X < pt2.X and pt1.Y = pt2.Y and pt3.X = pt2.X and pt3.Y > pt2.Y then
-		    topLeft = pt1
-		    topRight = pt2
-		    bottomRight = pt3
-		    bottomLeft = new Xojo.Point( topLeft.X, bottomRight.Y )
-		    
-		  elseif pt1.Y < pt2.Y and pt1.X = pt2.X and pt3.X < pt2.X and pt3.Y = pt2.Y then
-		    topRight = pt1
-		    bottomRight = pt2
-		    bottomLeft = pt3
-		    topLeft = new Xojo.Point( bottomLeft.X, topRight.Y )
-		    
-		  elseif pt1.X > pt2.X and pt1.Y = pt2.Y and pt3.Y < pt2.Y and pt3.X = pt2.X then
-		    bottomRight = pt1
-		    bottomLeft = pt2
-		    topLeft = pt3
-		    topRight = new Xojo.Point( bottomRight.X, topLeft.Y )
-		    
-		  elseif pt1.X = pt2.X and pt1.Y > pt2.Y and pt3.X > pt2.X and pt3.Y = pt2.Y then
-		    bottomLeft = pt1
-		    topLeft = pt2
-		    topRight = pt3
-		    bottomRight = new Xojo.Point( topRight.X, bottomLeft.Y )
-		    
-		  elseif pt1.X < pt2.X and pt1.Y = pt2.Y and pt3.Y < pt2.Y and pt3.X = pt2.X then
-		    bottomLeft = pt1
-		    bottomRight = pt2
-		    topRight = pt3
-		    topLeft = new Xojo.Point( bottomLeft.X, topRight.Y )
-		    
-		  elseif pt1.Y > pt2.Y and pt1.X = pt2.X and pt3.Y = pt2.Y and pt3.X < pt2.X then
-		    bottomRight = pt1
-		    topRight = pt2
-		    topLeft = pt3
-		    bottomLeft = new Xojo.Point( topLeft.X, bottomRight.Y )
-		    
-		  else
-		    break
-		    
-		  end if
-		  
-		  return new Xojo.Rect( topLeft.X, topLeft.Y, bottomRight.X - bottomLeft.X, bottomLeft.Y - topLeft.Y )
 		  
 		End Function
 	#tag EndMethod
