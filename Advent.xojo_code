@@ -204,6 +204,33 @@ Protected Module Advent
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub Reverse(Extends arr() As String)
+		  var midPoint as integer = ( arr.LastIndex - 1 ) \ 2
+		  
+		  for i as integer = 0 to midPoint
+		    var lowIndex as integer = i
+		    var low as string = arr( lowIndex )
+		    
+		    var highIndex as integer = arr.LastIndex - i
+		    var high as string = arr( highIndex )
+		    
+		    arr( lowIndex ) = high
+		    arr( highIndex ) = low
+		  next
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function Reverse(Extends s As String) As String
+		  var chars() as string = s.Split( "" )
+		  chars.Reverse
+		  return String.FromArray( chars, "" )
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function Row(Extends arr(, ) As String, row As Integer) As String()
 		  var rowValues() as string
 		  var lastColIndex as integer = arr.LastIndex( 2 )
