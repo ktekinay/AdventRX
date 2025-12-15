@@ -126,6 +126,24 @@ Inherits AdventBase
 		    path.AddLineToPoint pt.X, pt.Y
 		  next
 		  
+		  
+		  var allPoints() as pair
+		  
+		  for i1 as integer = 0 to points.LastIndex - 1
+		    var pt1 as Xojo.Point = points( i1 )
+		    
+		    for i2 as integer = i1 + 1 to points.LastIndex
+		      var pt2 as Xojo.Point = points( i2 )
+		      
+		      var area as integer = ( abs( pt1.X - pt2.X ) + 1 ) * ( abs( pt1.Y - pt2.Y ) + 1 )
+		      
+		      allPoints.Add area : array( pt1, pt2 )
+		    next
+		  next
+		  
+		  allPoints.Sort AddressOf Sorter
+		  
+		  
 		  var maxArea as integer
 		  
 		  var topLeft as Xojo.Point
@@ -133,52 +151,53 @@ Inherits AdventBase
 		  var bottomLeft as Xojo.Point
 		  var bottomRight as Xojo.Point
 		  
-		  for i1 as integer = 0 to points.LastIndex - 1
-		    var pt1 as Xojo.Point = points( i1 )
+		  for each p as Pair in allPoints
+		    var area as integer = p.Left.IntegerValue
+		    var thesePoints() as Xojo.Point = p.Right
 		    
-		    for i2 as integer = i1 + 1 to points.LastIndex
-		      var pt2 as Xojo.Point = points( i2 )
-		      var area as integer = ( abs( pt1.X - pt2.X ) + 1 ) * ( abs( pt1.Y - pt2.Y ) + 1 )
-		      
-		      if area <= maxArea then
-		        continue
+		    var pt1 as Xojo.Point = thesePoints( 0 )
+		    var pt2 as Xojo.Point = thesePoints( 1 )
+		    
+		    AllPoints( pt1, pt2, topLeft, topRight, bottomLeft, bottomRight )
+		    
+		    for each otherPoint as Xojo.Point in points
+		      if otherPoint.X > topLeft.X and otherPoint.X < topRight.X and _
+		        otherPoint.Y > topLeft.Y and otherPoint.Y < bottomLeft.Y then
+		        continue for p
 		      end if
-		      
-		      AllPoints( pt1, pt2, topLeft, topRight, bottomLeft, bottomRight )
-		      
-		      for each otherPoint as Xojo.Point in points
-		        if otherPoint is pt1 or otherPoint is pt2 then
-		          continue
-		        end if
-		        
-		        if otherPoint.X > topLeft.X and otherPoint.X < topRight.X and _
-		          otherPoint.Y > topLeft.Y and otherPoint.Y < bottomLeft.Y then
-		          continue for i2
-		        end if
-		      next
-		      
-		      var xDiff as integer = topRight.X - topLeft.X
-		      var yDiff as integer = bottomRight.Y - topRight.Y
-		      
-		      var xStep as integer = max( xDiff \ 75, 1 )
-		      var yStep as integer = max( yDiff \ 75, 1 )
-		      
-		      for x as integer =  topLeft.X to topRight.X step xStep
-		        for y as integer = topRight.Y to bottomRight.Y step yStep
-		          if not path.Contains( x, y ) then
-		            continue for i2
-		          end if
-		        next
-		      next
-		      
-		      maxArea = area
 		    next
+		    
+		    const kDivisor as integer = 60
+		    
+		    var xDiff as integer = topRight.X - topLeft.X
+		    var yDiff as integer = bottomRight.Y - topRight.Y
+		    
+		    var xStep as integer = max( xDiff \ kDivisor, 1 )
+		    var yStep as integer = max( yDiff \ kDivisor, 1 )
+		    
+		    for x as integer =  topLeft.X to topRight.X step xStep
+		      for y as integer = topRight.Y to bottomRight.Y step yStep
+		        if not path.Contains( x, y ) then
+		          continue for p
+		        end if
+		      next
+		    next
+		    
+		    maxArea = area
+		    exit
 		  next
 		  
 		  var testAnswer as variant = 24
 		  var answer as variant = 1562459680
 		  
 		  return maxArea : if( IsTest, testAnswer, answer )
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Function Sorter(p1 As Pair, p2 As Pair) As Integer
+		  return p2.Left.IntegerValue - p1.Left.IntegerValue
 		  
 		End Function
 	#tag EndMethod
