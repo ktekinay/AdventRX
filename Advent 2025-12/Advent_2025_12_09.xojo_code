@@ -56,33 +56,6 @@ Inherits AdventBase
 
 
 	#tag Method, Flags = &h21
-		Private Shared Sub AllPoints(pt1 As Xojo.Point, pt2 As Xojo.Point, ByRef topLeft As Xojo.Point, ByRef topRight As Xojo.Point, ByRef bottomLeft As Xojo.Point, ByRef bottomRight As Xojo.Point)
-		  var temp as Xojo.Point
-		  
-		  if pt1.Y > pt2.Y then
-		    temp = pt1
-		    pt1 = pt2
-		    pt2 = temp
-		  end if
-		  
-		  if pt1.X <= pt2.X then
-		    topLeft = pt1
-		    bottomRight = pt2
-		    
-		    topRight = new Xojo.Point( bottomRight.X, topLeft.Y )
-		    bottomLeft = new Xojo.Point( topLeft.X, bottomRight.Y )
-		    
-		  else
-		    topRight = pt1
-		    bottomLeft = pt2
-		    
-		    topLeft = new Xojo.Point( bottomLeft.X, topRight.Y )
-		    bottomRight = new Xojo.Point( topRight.X, bottomLeft.Y )
-		  end if
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
 		Private Function CalculateResultA(input As String) As Variant
 		  var points() as Xojo.Point = ToPointArray( input )
 		  
@@ -93,7 +66,9 @@ Inherits AdventBase
 		    for i2 as integer = i1 + 1 to points.LastIndex
 		      var pt2 as Xojo.Point = points( i2 )
 		      var area as integer = ( abs( pt1.X - pt2.X ) + 1 ) * ( abs( pt1.Y - pt2.Y ) + 1 )
-		      maxArea = max( maxArea, area )
+		      if area > maxArea then
+		        maxArea = area
+		      end if
 		    next
 		  next
 		  
@@ -127,7 +102,7 @@ Inherits AdventBase
 		  next
 		  
 		  
-		  var allPoints() as pair
+		  var allPoints() as Pair
 		  
 		  for i1 as integer = 0 to points.LastIndex - 1
 		    var pt1 as Xojo.Point = points( i1 )
@@ -137,7 +112,7 @@ Inherits AdventBase
 		      
 		      var area as integer = ( abs( pt1.X - pt2.X ) + 1 ) * ( abs( pt1.Y - pt2.Y ) + 1 )
 		      
-		      allPoints.Add area : array( pt1, pt2 )
+		      allPoints.Add area : new Pair( pt1, pt2 )
 		    next
 		  next
 		  
@@ -153,12 +128,12 @@ Inherits AdventBase
 		  
 		  for each p as Pair in allPoints
 		    var area as integer = p.Left.IntegerValue
-		    var thesePoints() as Xojo.Point = p.Right
+		    var thesePoints as Pair = p.Right
 		    
-		    var pt1 as Xojo.Point = thesePoints( 0 )
-		    var pt2 as Xojo.Point = thesePoints( 1 )
+		    var pt1 as Xojo.Point = thesePoints.Left
+		    var pt2 as Xojo.Point = thesePoints.Right
 		    
-		    AllPoints( pt1, pt2, topLeft, topRight, bottomLeft, bottomRight )
+		    PointsToCorners( pt1, pt2, topLeft, topRight, bottomLeft, bottomRight )
 		    
 		    for each otherPoint as Xojo.Point in points
 		      if otherPoint.X > topLeft.X and otherPoint.X < topRight.X and _
@@ -193,6 +168,33 @@ Inherits AdventBase
 		  return maxArea : if( IsTest, testAnswer, answer )
 		  
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Sub PointsToCorners(pt1 As Xojo.Point, pt2 As Xojo.Point, ByRef topLeft As Xojo.Point, ByRef topRight As Xojo.Point, ByRef bottomLeft As Xojo.Point, ByRef bottomRight As Xojo.Point)
+		  var temp as Xojo.Point
+		  
+		  if pt1.Y > pt2.Y then
+		    temp = pt1
+		    pt1 = pt2
+		    pt2 = temp
+		  end if
+		  
+		  if pt1.X <= pt2.X then
+		    topLeft = pt1
+		    bottomRight = pt2
+		    
+		    topRight = new Xojo.Point( bottomRight.X, topLeft.Y )
+		    bottomLeft = new Xojo.Point( topLeft.X, bottomRight.Y )
+		    
+		  else
+		    topRight = pt1
+		    bottomLeft = pt2
+		    
+		    topLeft = new Xojo.Point( bottomLeft.X, topRight.Y )
+		    bottomRight = new Xojo.Point( topRight.X, bottomLeft.Y )
+		  end if
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
