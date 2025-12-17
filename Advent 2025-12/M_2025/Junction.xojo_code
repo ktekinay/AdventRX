@@ -1,15 +1,40 @@
 #tag Class
 Protected Class Junction
 	#tag Method, Flags = &h0
-		Function Closest() As Pair
-		  for each p as Pair in Others
-		    var j as Junction = p.Right
-		    if not j.IsClosed then
-		      return p
-		    end if
-		  next
+		Sub AddToCircuit(other As Junction)
+		  if Circuit is nil and other.Circuit is nil then
+		    NextCircuitId = NextCircuitId + 1
+		    
+		    CircuitId = NextCircuitId
+		    Circuit = new Set
+		    Circuit.Add self
+		    Circuit.Add other
+		    
+		    other.CircuitId = NextCircuitId
+		    other.Circuit = Circuit
+		    
+		  elseif Circuit is nil then
+		    CircuitId = other.CircuitId
+		    Circuit = other.Circuit
+		    Circuit.Add self
+		    
+		  elseif other.Circuit is nil then
+		    Circuit.Add other
+		    
+		    other.CircuitId = CircuitId
+		    other.Circuit = Circuit
+		    
+		  elseif CircuitId <> other.CircuitId then
+		    Circuit = Circuit.Union( other.Circuit )
+		    
+		    for each j as Junction in Circuit
+		      j.CircuitId = CircuitId
+		      j.Circuit = Circuit
+		    next
+		    
+		  end if
 		  
-		End Function
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
@@ -19,26 +44,12 @@ Protected Class Junction
 		  var zVal as double = ( j1.Z - j2.Z ) ^ 2.0
 		  
 		  return Sqrt( xVal + yVal + zVal )
-		   
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Shared Function PairSorter(p1 As Pair, p2 As Pair) As Integer
-		  const kMult as double = 100000.0
-		  
-		  var d1 as integer = p1.Left.DoubleValue * kMult
-		  var d2 as integer = p2.Left.DoubleValue * kMult
-		  
-		  return d1 - d2
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub Reset()
-		  Connections.RemoveAll
-		  Others.RemoveAll
 		  Circuit = nil
 		  
 		End Sub
@@ -50,21 +61,11 @@ Protected Class Junction
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
-		Connections() As Junction
+		CircuitId As Integer = -1
 	#tag EndProperty
 
-	#tag ComputedProperty, Flags = &h0
-		#tag Getter
-			Get
-			  return Connections.Count = 2
-			  
-			End Get
-		#tag EndGetter
-		IsClosed As Boolean
-	#tag EndComputedProperty
-
-	#tag Property, Flags = &h0
-		Others() As Pair
+	#tag Property, Flags = &h21
+		Private Shared NextCircuitId As Integer = -1
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
@@ -118,6 +119,38 @@ Protected Class Junction
 			Visible=true
 			Group="Position"
 			InitialValue="0"
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="X"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Y"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Z"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="CircuitId"
+			Visible=false
+			Group="Behavior"
+			InitialValue="-1"
 			Type="Integer"
 			EditorType=""
 		#tag EndViewProperty

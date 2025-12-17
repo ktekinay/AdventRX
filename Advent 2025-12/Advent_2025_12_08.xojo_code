@@ -3,13 +3,13 @@ Protected Class Advent_2025_12_08
 Inherits AdventBase
 	#tag Event
 		Function ReturnDescription() As String
-		  return "Unknown"
+		  return "Create circuits from junction boxes"
 		End Function
 	#tag EndEvent
 
 	#tag Event
 		Function ReturnIsComplete() As Boolean
-		  return false
+		  return true
 		  
 		End Function
 	#tag EndEvent
@@ -61,126 +61,94 @@ Inherits AdventBase
 		  
 		  var junctions() as Junction = Parse( input )
 		  
-		  for i as integer = 0 to junctions.LastIndex - 1
-		    var j as Junction = junctions( i )
-		    if j.IsClosed then
+		  DestroyLater( self, junctions )
+		  
+		  var combos() as Pair = GetCombos( junctions )
+		  
+		  var testCount as integer
+		  
+		  for each combo as Pair in combos
+		    var j1 as Junction = combo.Left
+		    var j2 as Junction = combo.Right
+		    
+		    j1.AddToCircuit j2
+		    
+		    testCount = testCount + 1
+		    
+		    if testCount = targetCount then
+		      exit
+		    end if
+		  next
+		  
+		  var circuits as new Set
+		  var counts() as integer
+		  
+		  for each j as Junction in junctions
+		    if j.Circuit is nil or circuits.HasMember( j.CircuitId ) then
 		      continue
 		    end if
 		    
-		    var others() as Pair = j.Others
-		    
-		    for nextIndex as integer = i + 1 to junctions.LastIndex
-		      var j1 as Junction = junctions( nextIndex )
-		      var j1Others() as Pair = j1.Others
-		      
-		      var distance as double = Junction.Distance( j, j1 )
-		      
-		      others.Add distance : j1
-		      j1Others.Add distance : j
-		    next
+		    circuits.Add j.CircuitId
+		    counts.Add j.Circuit.Count
 		  next
 		  
-		  for i as integer = 1 to targetCount
-		    var closest() as Pair
-		    
-		    for each j as Junction in junctions
-		      j.Others.Sort AddressOf Junction.PairSorter
-		      closest.Add j.Closest
-		    next
-		    
-		    closest.Sort AddressOf Junction.PairSorter
-		    
-		    var j1 as Junction = closest( 0 ).Right
-		    var j2 as Junction = closest( 1 ).Right
-		    
-		    if j1.IsClosed or j2.IsClosed then
-		      break
-		    end if
-		    
-		    
-		    var circuit as Set
-		    
-		    if j1.Circuit is nil and j2.Circuit is nil then
-		      circuit = new Set
-		      j1.Circuit = circuit
-		      j2.Circuit = circuit
-		      
-		      circuit.Add j1, j2
-		      
-		      j1.Connections.Add j2
-		      j2.Connections.Add j1
-		      
-		    elseif j1.Circuit is j2.Circuit then
-		      // Already on the same circuit
-		      
-		    elseif j1.Circuit is nil then
-		      circuit = j2.Circuit
-		      j1.Circuit = circuit
-		      
-		      circuit.Add j1
-		      j1.Connections.Add j2
-		      
-		      if not j2.IsClosed then
-		        j2.Connections.Add j1
-		      end if
-		      
-		    elseif j2.Circuit is nil then
-		      circuit = j1.Circuit
-		      j2.Circuit = circuit
-		      
-		      circuit.Add j2
-		      j2.Connections.Add j1
-		      
-		      if not j1.IsClosed then
-		        j1.Connections.Add j2
-		      end if
-		      
-		    else
-		      //
-		      // We have to connect these circuits
-		      //
-		      circuit = j1.Circuit.Union( j2.Circuit )
-		      
-		      j1.Circuit = circuit
-		      j2.Circuit = circuit
-		      
-		      if not j1.IsClosed then
-		        j1.Connections.Add j2
-		      end if
-		      
-		      if not j2.IsClosed then
-		        j2.Connections.Add j1
-		      end if
-		    end if
-		    
-		    closest = closest
-		  next
+		  counts.Sort
 		  
-		  DestroyLater( junctions )
+		  var prod as integer = 1
+		  
+		  for i as integer = counts.LastIndex downto counts.LastIndex - 2
+		    prod = prod * counts( i )
+		  next
 		  
 		  var testAnswer as variant = 40
-		  var answer as variant = 0
+		  var answer as variant = 26400
 		  
-		  return 0 : if( IsTest, testAnswer, answer )
+		  return prod : if( IsTest, testAnswer, answer )
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function CalculateResultB(input As String) As Variant
+		  var junctions() as Junction = Parse( input )
 		  
+		  DestroyLater( self, junctions )
 		  
+		  var combos() as Pair = GetCombos( junctions )
 		  
-		  var testAnswer as variant = 0
-		  var answer as variant = 0
+		  var prod as integer
 		  
-		  return 0 : if( IsTest, testAnswer, answer )
+		  for each combo as Pair in combos
+		    var j1 as Junction = combo.Left
+		    var j2 as Junction = combo.Right
+		    
+		    j1.AddToCircuit j2
+		    
+		    if j1.Circuit.Count = junctions.Count then
+		      prod = j1.X * j2.X
+		      exit
+		    end if
+		  next
+		  
+		  var testAnswer as variant = 25272
+		  var answer as variant = 8199963486
+		  
+		  return prod : if( IsTest, testAnswer, answer )
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Shared Sub Destroy(arr As Variant)
+		Private Shared Sub Destroy(data As Variant)
+		  var p as Pair = data
+		  var thd as Thread = p.Left
+		  var arr() as Junction = p.Right
+		  
+		  if thd.ThreadState <> Thread.ThreadStates.NotRunning then
+		    DestroyLater thd, arr
+		    return
+		  end if
+		  
 		  var junctions() as Junction = arr
 		  
 		  for each j as Junction in junctions
@@ -193,10 +161,33 @@ Inherits AdventBase
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
-		Private Shared Sub DestroyLater(junctions() As Junction)
-		  Timer.CallLater 50, AddressOf Destroy, junctions
+		Private Shared Sub DestroyLater(thd As Thread, junctions() As Junction)
+		  Timer.CallLater 50, AddressOf Destroy, thd : junctions
 		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Shared Function GetCombos(junctions() As Junction) As Pair()
+		  var combos() as Pair
+		  var distances() as double
+		  
+		  for i1 as integer = 0 to junctions.LastIndex - 1
+		    var j1 as Junction = junctions( i1 )
+		    
+		    for i2 as integer = i1 + 1 to junctions.LastIndex
+		      var j2 as Junction = junctions( i2 )
+		      
+		      combos.Add j1 : j2
+		      distances.Add Junction.Distance( j1, j2 )
+		    next
+		  next
+		  
+		  distances.SortWith combos
+		  
+		  return combos
+		  
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
