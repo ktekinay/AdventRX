@@ -61,34 +61,26 @@ Inherits AdventBase
 		  
 		  var junctions() as Junction = Parse( input )
 		  
-		  DestroyLater( self, junctions )
-		  
 		  var combos() as Pair = GetCombos( junctions )
 		  
-		  var testCount as integer
-		  
-		  for each combo as Pair in combos
+		  for comboIndex as integer = 0 to targetCount - 1
+		    var combo as Pair = combos( comboIndex )
+		    
 		    var j1 as Junction = combo.Left
 		    var j2 as Junction = combo.Right
 		    
 		    j1.AddToCircuit j2
-		    
-		    testCount = testCount + 1
-		    
-		    if testCount = targetCount then
-		      exit
-		    end if
 		  next
 		  
 		  var circuits as new Set
 		  var counts() as integer
 		  
 		  for each j as Junction in junctions
-		    if j.Circuit is nil or circuits.HasMember( j.CircuitId ) then
+		    if j.Circuit is nil or circuits.HasMember( j.Circuit ) then
 		      continue
 		    end if
 		    
-		    circuits.Add j.CircuitId
+		    circuits.Add j.Circuit
 		    counts.Add j.Circuit.Count
 		  next
 		  
@@ -112,8 +104,6 @@ Inherits AdventBase
 		Private Function CalculateResultB(input As String) As Variant
 		  var junctions() as Junction = Parse( input )
 		  
-		  DestroyLater( self, junctions )
-		  
 		  var combos() as Pair = GetCombos( junctions )
 		  
 		  var prod as integer
@@ -136,35 +126,6 @@ Inherits AdventBase
 		  return prod : if( IsTest, testAnswer, answer )
 		  
 		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Shared Sub Destroy(data As Variant)
-		  var p as Pair = data
-		  var thd as Thread = p.Left
-		  var arr() as Junction = p.Right
-		  
-		  if thd.ThreadState <> Thread.ThreadStates.NotRunning then
-		    DestroyLater thd, arr
-		    return
-		  end if
-		  
-		  var junctions() as Junction = arr
-		  
-		  for each j as Junction in junctions
-		    j.Reset
-		  next
-		  
-		  junctions.RemoveAll
-		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Shared Sub DestroyLater(thd As Thread, junctions() As Junction)
-		  Timer.CallLater 50, AddressOf Destroy, thd : junctions
-		  
-		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21

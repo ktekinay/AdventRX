@@ -3,32 +3,29 @@ Protected Class Junction
 	#tag Method, Flags = &h0
 		Sub AddToCircuit(other As Junction)
 		  if Circuit is nil and other.Circuit is nil then
-		    NextCircuitId = NextCircuitId + 1
-		    
-		    CircuitId = NextCircuitId
 		    Circuit = new Set
-		    Circuit.Add self
-		    Circuit.Add other
 		    
-		    other.CircuitId = NextCircuitId
+		    Circuit.Add WR
+		    Circuit.Add other.WR
+		    
 		    other.Circuit = Circuit
+		    
+		  elseif Circuit is other.Circuit then
+		    return
 		    
 		  elseif Circuit is nil then
-		    CircuitId = other.CircuitId
 		    Circuit = other.Circuit
-		    Circuit.Add self
+		    Circuit.Add WR
 		    
 		  elseif other.Circuit is nil then
-		    Circuit.Add other
-		    
-		    other.CircuitId = CircuitId
+		    Circuit.Add other.WR
 		    other.Circuit = Circuit
 		    
-		  elseif CircuitId <> other.CircuitId then
+		  else
 		    Circuit = Circuit.Union( other.Circuit )
 		    
-		    for each j as Junction in Circuit
-		      j.CircuitId = CircuitId
+		    for each jwr as WeakRef in Circuit
+		      var j as Junction = Junction( jwr.Value )
 		      j.Circuit = Circuit
 		    next
 		    
@@ -48,25 +45,28 @@ Protected Class Junction
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0
-		Sub Reset()
-		  Circuit = nil
-		  
-		End Sub
-	#tag EndMethod
-
 
 	#tag Property, Flags = &h0
 		Circuit As Set
 	#tag EndProperty
 
-	#tag Property, Flags = &h0
-		CircuitId As Integer = -1
+	#tag Property, Flags = &h21
+		Private mWR As WeakRef
 	#tag EndProperty
 
-	#tag Property, Flags = &h21
-		Private Shared NextCircuitId As Integer = -1
-	#tag EndProperty
+	#tag ComputedProperty, Flags = &h0
+		#tag Getter
+			Get
+			  if mWR is nil then
+			    mWR = new WeakRef( self )
+			  end if
+			  
+			  return mWR
+			  
+			End Get
+		#tag EndGetter
+		WR As WeakRef
+	#tag EndComputedProperty
 
 	#tag Property, Flags = &h0
 		X As Integer
@@ -143,14 +143,6 @@ Protected Class Junction
 			Visible=false
 			Group="Behavior"
 			InitialValue=""
-			Type="Integer"
-			EditorType=""
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="CircuitId"
-			Visible=false
-			Group="Behavior"
-			InitialValue="-1"
 			Type="Integer"
 			EditorType=""
 		#tag EndViewProperty
